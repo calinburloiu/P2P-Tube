@@ -1,0 +1,11 @@
+#!/bin/bash
+
+RSYNC=/usr/bin/rsync
+SSH=/usr/bin/ssh
+RUSER=p2p-next
+RHOST=koala.cs.pub.ro
+OPTS="-avz --exclude /.git --exclude /.gitignore"
+
+RPATH=public_html/devel/
+LPATH=../
+$RSYNC $OPTS -e $SSH $LPATH $RUSER@$RHOST:$RPATH

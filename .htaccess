@@ -6,3 +6,7 @@
 	Order allow,deny
 	Deny from all
 </Files>
+<Files no-web>
+	Order allow,deny
+	Deny from all
+</Files>
