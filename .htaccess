@@ -1,0 +1,8 @@
+<Files .gitignore>
+	Order allow,deny
+	Deny from all
+</Files>
+<Files .git>
+	Order allow,deny
+	Deny from all
+</Files>
