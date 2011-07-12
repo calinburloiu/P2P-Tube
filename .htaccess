@@ -1,3 +1,11 @@
+<Files data>
+	Order allow,deny
+	Deny from all
+</Files>
+<Files docs>
+	Order allow,deny
+	Deny from all
+</Files>
 <Files .gitignore>
 	Order allow,deny
 	Deny from all
@@ -10,3 +18,7 @@
 	Order allow,deny
 	Deny from all
 </Files>
+
+RewriteEngine on
+RewriteCond $1 !^(index\.php|data|robots\.txt)
+RewriteRule ^(.*)$ index.php/$1 [L]

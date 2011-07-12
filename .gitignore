@@ -26,3 +26,6 @@ config.mk
 .512b
 .directory
 *.patch
+application/logs/*.php
+data/thumbs/*
+data/torrents/*
