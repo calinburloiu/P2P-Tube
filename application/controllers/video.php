@@ -8,23 +8,44 @@
  * @author		Călin-Andrei Burloiu
  */
 class Video extends CI_Controller {
+
+	public function __construct()
+	{
+		parent::__construct();
+	}
 	
 	public function index()
 	{
 		
 	}
 	
-	public function watch($id, $name = NULL)
+	/**
+	 * The page used for watching a video
+	 *
+	 * @param	string $id	DB id of the video
+	 * @param	string $name	`name` of the video from DB
+	 * @param	string $plugin	video plugin ('vlc', 'html5'). If it's set 
+	 * to NULL or 'auto', the plugin is automatically selected.
+	 */
+	public function watch($id, $name = NULL, $plugin = NULL)
 	{
 		$this->load->helper('url');
 		
-		$this->load->view('html_begin');
-		$this->load->view('header');
-		
+		// Retrieve video information.
 		$this->load->model('videos_model');
-		$data['video'] = $this->videos_model->getVideo($id)->row();
-		if ($name !== NULL && $data['video']->name != $name)
-			$data['video']->err = 'INVALID_NAME';
+		$data['video'] = $this->videos_model->get_video($id, $name);
+		$data['plugin'] = ($plugin === NULL ? 'auto' : $plugin);
+		
+		// Display page.
+		$params = array(	'title' => $data['video']['title'] . ' -- '
+								. $this->config->item('site_name'),
+							'stylesheets' => array('jquery-ui.css', 'NextSharePC-interface.css'),
+							'javascripts' => array('jquery.min.js', 'jquery-ui.min.js', 'NextSharePC-interface.js'),
+							//'metas' => array('description'=>'','keywords'=>'')
+							);
+		$this->load->library('html_head_params', $params);
+		$this->load->view('html_begin', $this->html_head_params);
+		$this->load->view('header');
 		
 		$this->load->view('video/watch_view', $data);
 		

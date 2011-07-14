@@ -41,10 +41,10 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'root';
-$db['default']['password'] = 'root';
-$db['default']['database'] = 'livinglab';
+$db['default']['hostname'] = 'koala.cs.pub.ro';
+$db['default']['username'] = 'koala_p2pnext';
+$db['default']['password'] = 'ahmitairoo';
+$db['default']['database'] = 'koala_livinglab';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;

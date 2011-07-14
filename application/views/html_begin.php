@@ -6,18 +6,19 @@
 
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 
-<!--TODO: title-->
-<title>TODO</title>
+<title><?php echo $title ?></title>
 
-<!--TODO: custom css-->
-<link rel="stylesheet" type="text/css" href="main.css" />
+<?php foreach ($stylesheets as $stylesheet): ?>
+<link rel="stylesheet" type="text/css" href="<?php echo $stylesheet ?>" />
+<?php endforeach ?>
 
-<!--TODO: script-->
-<!--<script type="text/javascript" src="TODO.js"></script>-->
+<?php foreach ($javascripts as $javascript): ?>
+<script type="text/javascript" src="<?php echo $javascript ?>"></script>
+<?php endforeach ?>
 
-<!--TODO: meta-->
-<meta name="description" content="TODO" /> 
-<meta name="keywords" content="TODO" />
+<?php foreach ($metas as $meta_name => $meta_content): ?>
+<meta name="<?php echo $meta_name ?>" content="<?php echo $meta_content ?>" /> 
+<?php endforeach ?>
 
 </head>
 

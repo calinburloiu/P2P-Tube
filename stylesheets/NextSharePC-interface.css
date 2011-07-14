@@ -1,0 +1,23 @@
+#nsTable {
+	width: 800;
+}
+
+#nsPlaybackCell {
+	width: 22%;
+}
+
+#nsTimeCell {
+	width: 55%;
+}
+
+#nsTime {
+	padding: 3px; 
+	border-style:solid; 
+	border-width: 1px; 
+	border-color:#AAAAAA
+}
+
+#nsVol {
+	height: 5;
+}
+

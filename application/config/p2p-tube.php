@@ -4,6 +4,48 @@
 
 /*
 |--------------------------------------------------------------------------
+| Site Name
+|--------------------------------------------------------------------------
+|
+| Sets the name of the site. It can be used for example in pages title.
+|
+*/
+$config['site_name'] = 'P2P-Next UPB LivingLab';
+
+/*
+|--------------------------------------------------------------------------
+| Default Stylesheet
+|--------------------------------------------------------------------------
+|
+| Sets the default CSS that is going to be automatically added on any HTML
+| page generated with 'application/views/html_begin.php' view and
+| HTML_head_params library.
+|
+| Do not include any path to the file! 'stylesheets/' is going to be used.
+|
+| Leave blank for no default stylesheet.
+|
+*/
+$config['default_stylesheet'] = 'default.css';
+
+/*
+|--------------------------------------------------------------------------
+| Default Javascript
+|--------------------------------------------------------------------------
+|
+| Sets the default Javascript that is going to be automatically added in any
+| HTML page generated with 'application/views/html_begin.php' view and
+| HTML_head_params library.
+|
+| Do not include any path to the file! 'javascripts/' is going to be used.
+|
+| Leave blank for no default javascript.
+|
+*/
+$config['default_javascript'] = '';
+
+/*
+|--------------------------------------------------------------------------
 | Default Video File Extension
 |--------------------------------------------------------------------------
 |
@@ -30,5 +72,5 @@ $config['default_video_ext'] = 'ogg';	// TODO: Change to 'ogv'!
 |	torrent
 |
 */
-$config['default_video_ext'] = 'tstream';
+$config['default_torrent_ext'] = 'tstream';
 

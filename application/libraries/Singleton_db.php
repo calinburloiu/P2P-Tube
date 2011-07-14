@@ -7,7 +7,7 @@
  * This avoids opening multiple connections to the same database and ensures
  * that you obtain a Database object only when you need it.
  *
- * @category	Controller
+ * @category	Library
  * @author		Călin-Andrei Burloiu
  */
 class Singleton_db {
@@ -22,7 +22,7 @@ class Singleton_db {
 	{
 		if(!isset(self::$db))
 		{
-			$CI = & get_instance();
+			$CI =& get_instance();
 			
 			self::$db = $CI->load->database('default', TRUE);
 		}
