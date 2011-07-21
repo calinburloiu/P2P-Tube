@@ -1,4 +1,4 @@
-﻿// NextSharePC plugin controls
+// NextSharePC plugin controls
 // Author: Calin-Andrei Burloiu, calin.burloiu@gmail.com
 // 2011
 
@@ -14,6 +14,17 @@ function getURLParam( name )
 		return "";
 	else
 		return results[1];
+}
+
+function pad(number, length) 
+{
+	var str = '' + number;
+	while (str.length < length) 
+	{
+		str = '0' + str;
+	}
+
+	return str;
 }
 
 function getPluginWidth()
@@ -68,19 +79,11 @@ function update()
 	timerHandle = setTimeout("update()", updateInterval);
 }
 
-function displayNextSharePC(torrent, html5)
+function displayNextSharePC(torrent)
 {
-	if(html5 == true)
-	{
-		document.write('<video src="'+torrent+'" controls="controls" width="800" height="600">');
-		document.write('    Error: Your browser does not support HTML5!');
-		document.write('</video>');
-		document.write('<br /><br /><p><a href="' + window.location.href.replace('&html5=1', '') + '">');
-		document.write('Play video using VLC with NextSharePC</a></p>');
-
-		return true;
-	}
-
+	//document.write('popârțac');
+	//return;
+	
 	if (navigator.appName == "Netscape")
 	{
 		document.write('<embed type="application/x-ns-stream"');
@@ -123,11 +126,6 @@ function displayNextSharePC(torrent, html5)
 		+ '<td><input type=button value="Fullscreen" onclick="fullscreen();" /></td></tr>'
 		+ '<tr><td colspan="4"><div id="nsSlider"></div></td></tr>'
 		+ '</table>');
-		
-	$("nsTable").css("width", getPluginWidth());
-
-	document.write('<br /><p><a href="' + window.location.href + '&html5=1">');
-	document.write('Play video using HTML5 with SwarmPlayer</a></p>');
 
 	return true;
 }
@@ -155,17 +153,6 @@ function onSliderStop(event, ui)
 	timerHandle = setTimeout("update()", updateInterval);
 }
 
-function pad(number, length) 
-{
-	var str = '' + number;
-	while (str.length < length) 
-	{
-		str = '0' + str;
-	}
-
-	return str;
-}
-
 function onSliderSlide(event, ui)
 {
 	updateTime(true);
@@ -180,10 +167,12 @@ function onVolChange(event, ui)
 	document.vlc.audio.volume = val;
 }
 
-$(document).ready(function() 
+function loadControls()
 {
 	if(document.vlc == null)
 		return;
+	
+	$("nsTable").css("width", getPluginWidth());
 	
 	// Progress Slider
 	$("#nsSlider").slider({ animate: true });
@@ -208,7 +197,7 @@ $(document).ready(function()
 	$("#nsVol").slider();
 	
 	timerHandle = setTimeout("update()", updateInterval);
-});  
+}
 
 function play()
 {

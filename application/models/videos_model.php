@@ -46,7 +46,7 @@ class Videos_model extends CI_Model {
 				$video['id'], $video['name']));
 			
 			// Thumbnails
-			$video['thumbs'] = $this->getThumbs($video['name'], 
+			$video['thumbs'] = $this->get_thumbs($video['name'], 
 				$video['thumbs_count']);
 		}
 		
@@ -97,26 +97,27 @@ class Videos_model extends CI_Model {
 		// Convert JSON encoded string to arrays.
 		$video['formats'] = json_decode($video['formats'], TRUE);
 		$video['tags'] = json_decode($video['tags'], TRUE);
+		asort($video['tags']);
+		$video['tags'] = array_reverse($video['tags'], true);
 		
 		// Torrents
 		$video['torrents'] = array();
 		foreach ($video['formats'] as $format)
 		{
-			$pos = strpos($format, ' ');
-			if($pos !== FALSE)
-				$format = substr($format, 0, $pos);
+			$ext = isset($format['ext']) ? 
+				$format['ext'] : $this->config->item('default_video_ext');
  			$video['torrents'][] = site_url('data/torrents/'. $video['name'] . '_'
- 				. $format . '.'. $this->config->item('default_video_ext')
+ 				. $format['def'] . '.'. $ext
  				. '.'. $this->config->item('default_torrent_ext'));
 		}
 		
 		// Thumbnails
-		$video['thumbs'] = $this->getThumbs($video['name'], $video['thumbs_count']);
+		$video['thumbs'] = $this->get_thumbs($video['name'], $video['thumbs_count']);
 		
 		return $video;
 	}
 	
-	public function getThumbs($name, $count)
+	public function get_thumbs($name, $count)
 	{
 		$thumbs = array();
 		

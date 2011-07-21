@@ -24,7 +24,7 @@ class Video extends CI_Controller {
 	 *
 	 * @param	string $id	DB id of the video
 	 * @param	string $name	`name` of the video from DB
-	 * @param	string $plugin	video plugin ('vlc', 'html5'). If it's set 
+	 * @param	string $plugin	video plugin ('ns-vlc', 'ns-html5'). If it's set 
 	 * to NULL or 'auto', the plugin is automatically selected.
 	 */
 	public function watch($id, $name = NULL, $plugin = NULL)
@@ -39,8 +39,8 @@ class Video extends CI_Controller {
 		// Display page.
 		$params = array(	'title' => $data['video']['title'] . ' -- '
 								. $this->config->item('site_name'),
-							'stylesheets' => array('jquery-ui.css', 'NextSharePC-interface.css'),
-							'javascripts' => array('jquery.min.js', 'jquery-ui.min.js', 'NextSharePC-interface.js'),
+							'stylesheets' => array('jquery-ui.css', 'NextShare_VLC_plugin.css'),
+							'javascripts' => array('jquery.min.js', 'jquery-ui.min.js', 'NextShare_VLC_plugin.js', 'video.js'),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
@@ -51,6 +51,22 @@ class Video extends CI_Controller {
 		
 		$this->load->view('footer');
 		$this->load->view('html_end');
+	}
+	
+	/**
+	 * AJAX page which retrieves a video plugin.
+	 *
+	 * The associated with this controller should be parameter type
+	 * concatenated with '_plugin_view' and must be located in
+	 * 'application/views/video'.
+	 *
+	 * @param	string $type	'ns-vlc', 'ns-html5'
+	 */
+	public function plugin($type)
+	{
+		$data['url'] = $this->input->post('url', TRUE);
+		
+		$this->load->view('video/'. $type . '_plugin_view', $data);
 	}
 }
 

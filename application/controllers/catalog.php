@@ -33,11 +33,12 @@ class Catalog extends CI_Controller {
 	{
 		$this->load->helper('url');
 		
-		$format = 'Calin Andrei ';
-		$pos = strpos($format, ' ');
-		if($pos !== FALSE)
-			$format = substr($format, 0, $pos);	
-		echo $format;
+		echo '<a href="/">link</a>';
+	}
+	
+	public function search($query_str)
+	{
+		echo $query_str;
 	}
 }
 
