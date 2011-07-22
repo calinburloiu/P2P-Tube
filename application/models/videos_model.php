@@ -36,7 +36,8 @@ class Videos_model extends CI_Model {
 		$query = $this->db->query(
 			'SELECT id, name, title, duration, user_id, views, thumbs_count,
 				default_thumb
-			FROM `videos`');
+			FROM `videos`
+			ORDER BY name'); // TODO summary order
 		$videos = $query->result_array();
 		
 		foreach ($videos as & $video)
