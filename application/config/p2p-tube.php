@@ -75,3 +75,14 @@ $config['default_video_ext'] = 'ogv';
 */
 $config['default_torrent_ext'] = 'tstream';
 
+/*
+|--------------------------------------------------------------------------
+| Categories
+|--------------------------------------------------------------------------
+|
+| An associative list with the video categories of the site. IDs are used
+| in DB (for example in `videos` table), and value are human-friendly names
+| for categories. IDs must be numeric and must preferably start from 1.
+|
+*/
+$config['categories'] = array(1 => 'Movies', 2 => 'TechTalks', 3 => 'Events', 4 => 'Karaoke');

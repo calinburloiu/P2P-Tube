@@ -20,5 +20,5 @@
 </Files>
 
 RewriteEngine on
-RewriteCond $1 !^(index\.php|images|stylesheets|javascript|data|robots\.txt)
+RewriteCond $1 !^(index\.php|img|stylesheets|javascript|data|robots\.txt)
 RewriteRule ^(.*)$ index.php/$1 [L]

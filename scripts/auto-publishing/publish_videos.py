@@ -3,7 +3,7 @@
 # Copyright Calin-Andrei Burloiu, calin.burloiu@gmail.com
 #
 # Automatically publishes videos in P2P-Tube DB based on the video files and
-# a videos info file. Parameters: videos_info_file videos_directory category
+# a videos info file. Parameters: videos_info_file videos_directory category_id
 #
 import sys
 import MySQLdb
@@ -23,7 +23,7 @@ class VideosTable:
     directory = os.curdir
     default_video_ext = 'ogv'
 
-    def __init__(self, dbCur, directory, name, title, description, tags, category):
+    def __init__(self, dbCur, directory, name, title, description, tags, category_id):
         self.dbCur = dbCur
         self.directory = directory
 
@@ -32,12 +32,13 @@ class VideosTable:
         self.description = description
         self.duration, self.formats = self.findVideosMeta()
         self.formats_json = json.dumps(self.formats, separators=(',', ':'))
-        self.category = category
+        self.category_id = category_id
         
         tagList = tags.split(',')
         self.tags = {}
         for tag in tagList:
-            self.tags[tag.strip()] = 0
+            if tag != '':
+                self.tags[tag.strip()] = 0
         self.tags_json = json.dumps(self.tags, separators=(',', ':'))
         
     def getVideoDefinition(self, fileName):
@@ -94,13 +95,13 @@ class VideosTable:
     def insert(self):
         if self.duration == None or self.formats_json == None or self.tags_json == None:
             print "Bzzzz"
-        query = "INSERT INTO `" + self.tableName + "` (name, title, description, duration, formats, category, user_id, tags, date, thumbs_count, default_thumb) VALUES ('" + self.name + "', '" + self.title + "', '" + self.description + "', '" + self.duration + "', '" + self.formats_json + "', '" + self.category + "', " + str(self.user_id) + ", '" + self.tags_json + "', NOW(), " + str(self.thumbs_count) + ", " + str(self.default_thumb) + ")"
+        query = "INSERT INTO `" + self.tableName + "` (name, title, description, duration, formats, category_id, user_id, tags, date, thumbs_count, default_thumb) VALUES ('" + self.name + "', '" + self.title + "', '" + self.description + "', '" + self.duration + "', '" + self.formats_json + "', " + str(self.category_id) + ", " + str(self.user_id) + ", '" + self.tags_json + "', NOW(), " + str(self.thumbs_count) + ", " + str(self.default_thumb) + ")"
         self.dbCur.execute(query)    
     
     @staticmethod
-    def getAllNames(dbCur, category):
+    def getAllNames(dbCur, category_id):
         allNames = set()
-        query = "SELECT name FROM `" + VideosTable.tableName + "` WHERE category = '" + category + "'"
+        query = "SELECT name FROM `" + VideosTable.tableName + "` WHERE category_id = " + str(category_id)
         dbCur.execute(query)
 
         while(True):
@@ -123,13 +124,13 @@ class VideoDefException(Exception):
 def main():
     # Check arguments.
     if len(sys.argv) < 3:
-        sys.stdout.write('usage: ' + sys.argv[0] + ' videos_info_file videos_dir category\n')
+        sys.stdout.write('usage: ' + sys.argv[0] + ' videos_info_file videos_dir category_id\n')
         exit(1)
 
     # Command line arguments
     fileName = sys.argv[1]
     directory = sys.argv[2]
-    category = sys.argv[3]
+    category_id = int(sys.argv[3])
     if len(sys.argv) == 4:
         thumbsDir = sys.argv[3]
     else:
@@ -140,7 +141,7 @@ def main():
             passwd = 'ahmitairoo', db = 'koala_livinglab')
     dbCur = dbConn.cursor()
 
-    allNames = VideosTable.getAllNames(dbCur, category)
+    allNames = VideosTable.getAllNames(dbCur, category_id)
 
     # Open info file
     file = open(fileName, 'r')
@@ -157,7 +158,7 @@ def main():
         if not name in allNames:
             sys.stdout.write(str(i) + '. ' + name + '\r')
             try:
-                video = VideosTable(dbCur, directory, name, title, description, tags, category)
+                video = VideosTable(dbCur, directory, name, title, description, tags, category_id)
                 video.insert()
                 i = i+1
 
@@ -169,6 +170,7 @@ def main():
     # Clean-up
     dbCur.close()
     dbConn.close()
+    sys.stdout.write('\n')
 
     return 0
 

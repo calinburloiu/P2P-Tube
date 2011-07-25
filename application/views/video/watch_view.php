@@ -37,11 +37,13 @@
 		<div id="video_description"><?php echo $video['description'] ?></div>
 		<!-- TODO <div id="video_category">Category: <?php echo $video['category_name'] ?></div>-->
 		<div id="video_tags">Tags:
-		<?php foreach($video['tags'] as $tag => $score): ?>
+		<?php print_r($video['tags']) ?>
+		<?php if (isset($video['tags'])): 
+		foreach ($video['tags'] as $tag => $score): ?>
 			<a href="<?php site_url('catalog/search/'. $tag) ?>">
 			<?php echo "$tag($score)" ?>
 			</a>
-		<?php endforeach ?>
+		<?php endforeach; endif ?>
 		<div id="video_license"><?php echo $video['license'] ?></div>
 		
 

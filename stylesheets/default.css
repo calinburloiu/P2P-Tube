@@ -1,0 +1,27 @@
+body
+{ 
+	font-size: 13px;
+}
+
+#header
+{
+	clear: both;
+}
+
+#body
+{
+	position: relative;
+}
+
+#content
+{
+	float: left;
+	width: 640px;
+	padding: 12px;
+	outline: 1px solid gray; /*TODO*/
+}
+
+#footer
+{
+	clear: both;
+}

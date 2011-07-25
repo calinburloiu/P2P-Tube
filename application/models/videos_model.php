@@ -15,9 +15,9 @@ class Videos_model extends CI_Model {
 		{
 			$this->load->library('singleton_db');
 			$this->db = $this->singleton_db->connect();
-			
-			$this->load->helper('url');
 		}
+		
+		$this->load->helper('url');
 	}
 	
 	/**
@@ -27,28 +27,37 @@ class Videos_model extends CI_Model {
 	 * TODO: filter, limit, ordering parameters
 	 * @return		array	a list of videos, each one being an assoc array with:
 	 *   * id, name, title, duration, thumbs_count, default_thumb, views => from DB
+	 *   * shorted_title => ellipsized title
 	 *   * video_url => P2P-Tube video URl
 	 *   * TODO: user_id, user_name
 	 *   * thumbs => thumbnail images' URLs
 	 */
-	public function get_videos_summary()
+	public function get_videos_summary($category_id)
 	{
+		$this->load->helper('text');
+		
 		$query = $this->db->query(
 			'SELECT id, name, title, duration, user_id, views, thumbs_count,
 				default_thumb
 			FROM `videos`
-			ORDER BY name'); // TODO summary order
+			WHERE category_id = ?
+			ORDER BY name', // TODO summary order 
+			$category_id); 
 		$videos = $query->result_array();
 		
 		foreach ($videos as & $video)
 		{
 			// P2P-Tube Video URL
-			$video['video_url'] = site_url(sprintf("video/watch/%d/%s",
+			$video['video_url'] = site_url(sprintf("watch/%d/%s",
 				$video['id'], $video['name']));
 			
 			// Thumbnails
 			$video['thumbs'] = $this->get_thumbs($video['name'], 
 				$video['thumbs_count']);
+				
+			// Ellipsized title
+			//$video['shorted_title'] = ellipsize($video['title'], 45, 0.75);
+			$video['shorted_title'] = character_limiter($video['title'], 45);
 		}
 		
 		return $videos;
