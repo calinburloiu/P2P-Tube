@@ -1,15 +1,37 @@
 <div id="body">
-	<?php foreach($videos as $video):
-		$img_src = $video['thumbs'][ $video['default_thumb'] ];
-		?>
-		<div class="video-icon">
-			<img src="<?php echo $img_src ?>" />
+<div id="content">
+
+<?php foreach ($categories as $category_id => $category_name): ?>
+<div class="video-list">
+<h1>
+	<a href="<?php echo site_url("catalog/category/$category_id") ?>">
+		<?php echo $category_name ?>
+	</a>
+</h1>
+
+<?php foreach($videos[$category_id] as $video):
+	$thumb_src = $video['thumbs'][ $video['default_thumb'] ];
+	?>
+	<div class="video-icon">
+		
+		<div class="video-thumb">
 			<a href="<?php echo $video['video_url'] ?>">
-				<div class="video-icon_title"><?php echo $video['title'] ?></div>
+				<img src="<?php echo $thumb_src ?>" />
+				<div class="video-duration"><?php echo $video['duration'] ?></div>
 			</a>
-			<div class="video-icon_duration"><?php echo $video['duration'] ?></div>
-			<div class="video-icon_views"><?php echo $video['views'] . ' views' ?></div>
-			<!--<div class="video-icon_user"><?php echo 'TODO: print user name' ?></div>-->
-			<br />
-	<?php endforeach ?>
+		</div>
+		<div class="video-title">
+			<a href="<?php echo $video['video_url'] ?>">			
+			<?php echo $video['shorted_title'] ?></a>
+		</div>		
+		<div class="video-views"><?php echo $video['views'] . ' views' ?></div>
+		<!--<div class="video-username"><?php echo 'TODO: print user name' ?></div>-->
+	</div>
+<?php endforeach ?>
+
+<div style="clear: both"></div>
+</div>
+<?php endforeach ?>
+
+</div>
 </div>

@@ -12,8 +12,8 @@
  * The variables are passed as data in 'application/views/html_begin.php' which
  * is going to generate the tags based on their information.
  *
- * All .css files must be located in 'stylesheets' and all .js file in
- * 'javascripts'.
+ * All .css files must be located in 'css' and all .js file in
+ * 'js'.
  *
  * @category	Library
  * @author		Călin-Andrei Burloiu
@@ -21,24 +21,24 @@
 class Html_head_params {
 	public $title;
 	// List of .css files
-	public $stylesheets;
+	public $css;
 	// List of .js files
-	public $javascripts;
+	public $js;
 	// Dictionary for meta tags: name => content
 	public $metas;
 	
 	/**
 	 * Initializes member variables with the parameters provided and adds the
-	 * default stylesheet to member $stylesheets and the default script to
-	 * member $javascripts. The URL prefixes are also added to filenames.
+	 * default stylesheet to member $css and the default script to
+	 * member $js. The URL prefixes are also added to filenames.
 	 *
 	 * Do not add in the parameters list the default stylesheet and script!
 	 *
 	 * @access		public
 	 * @param		array $params	asscociative list with the following parameters:
 	 *   * 'title' => HTML title tag content (page title)
-	 *   * 'stylesheets' => list of .css files without any path
-	 *   * 'javascripts' => list of .js files without any path
+	 *   * 'css' => list of .css files without any path
+	 *   * 'js' => list of .js files without any path
 	 *   * 'metas' => associative list of "name => content" meta
 	 */
 	public function __construct($params)
@@ -52,15 +52,15 @@ class Html_head_params {
 		else
 			$this->title = '';
 			
-		if (isset($params['stylesheets']))
-			$this->stylesheets = $params['stylesheets'];
+		if (isset($params['css']))
+			$this->css = $params['css'];
 		else
-			$this->stylesheets = array();
+			$this->css = array();
 			
-		if (isset($params['javascripts']))
-			$this->javascripts = $params['javascripts'];
+		if (isset($params['js']))
+			$this->js = $params['js'];
 		else
-			$this->javascripts = array();
+			$this->js = array();
 		
 		if (isset($params['metas']))
 			$this->metas = $params['metas'];
@@ -68,16 +68,16 @@ class Html_head_params {
 			$this->metas = array();
 			
 		// Default parameters from configuration file
-		if ($CI->config->item('default_stylesheet') != '')
-			$this->stylesheets[] = $CI->config->item('default_stylesheet');
-		if ($CI->config->item('default_javascript') != '')
-			$this->javascripts[] = $CI->config->item('default_javascript');
+		if ($CI->config->item('default_css') != '')
+			$this->css[] = $CI->config->item('default_css');
+		if ($CI->config->item('default_js') != '')
+			$this->js[] = $CI->config->item('default_js');
 		
 		// URL correct prefixes
-		foreach ($this->stylesheets as $i => $val)
-			$this->stylesheets[$i] = site_url("stylesheets/$val");
-		foreach ($this->javascripts as $i => $val)
-			$this->javascripts[$i] = site_url("javascript/$val");
+		foreach ($this->css as $i => $val)
+			$this->css[$i] = site_url("css/$val");
+		foreach ($this->js as $i => $val)
+			$this->js[$i] = site_url("js/$val");
 	}	
 }
 

@@ -25,6 +25,9 @@ class Videos_model extends CI_Model {
 	 * displayed in the catalog.
 	 *
 	 * TODO: filter, limit, ordering parameters
+	 * @param		int $category_id	DB category ID
+	 * @param		int $offset
+	 * @param		int $count
 	 * @return		array	a list of videos, each one being an assoc array with:
 	 *   * id, name, title, duration, thumbs_count, default_thumb, views => from DB
 	 *   * shorted_title => ellipsized title
@@ -32,7 +35,7 @@ class Videos_model extends CI_Model {
 	 *   * TODO: user_id, user_name
 	 *   * thumbs => thumbnail images' URLs
 	 */
-	public function get_videos_summary($category_id)
+	public function get_videos_summary($category_id, $offset, $count)
 	{
 		$this->load->helper('text');
 		
@@ -41,9 +44,14 @@ class Videos_model extends CI_Model {
 				default_thumb
 			FROM `videos`
 			WHERE category_id = ?
-			ORDER BY name', // TODO summary order 
-			$category_id); 
-		$videos = $query->result_array();
+			ORDER BY name
+			LIMIT ?, ?', // TODO summary order 
+			array(intval($category_id), $offset, $count)); 
+		
+		if ($query->num_rows() > 0)
+			$videos = $query->result_array();
+		else
+			return NULL;
 		
 		foreach ($videos as & $video)
 		{
@@ -61,6 +69,21 @@ class Videos_model extends CI_Model {
 		}
 		
 		return $videos;
+	}
+	
+	public function get_videos_count($category_id)
+	{
+		$query = $this->db->query(
+			'SELECT COUNT(*) count
+			FROM `videos`
+			WHERE category_id = ?',
+			$category_id);
+		
+		if ($query->num_rows() > 0)
+			return $row = $query->row()->count;
+		
+		// Error
+		return NULL;
 	}
 	
 	/**

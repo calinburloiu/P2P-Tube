@@ -12,30 +12,42 @@
 	height: 190px;
 	margin-right: 8px;
 }
+
 .video-icon .video-thumb
 {
 	position: relative;
-	width: 128px;
-	height: 98px;
-	background: url('/LivingLab/img/thumb_container.png') no-repeat left top;
+	width: 132px;
+	height: 99px;
+	background: url('/devel/img/thumb_container.png') no-repeat left top;
 }
-.video-icon .video-thumb > img
+.video-icon .video-thumb img
 {
 	position: absolute;
 	margin: auto;
-	left: 4px;
+	left: 6px;
 	top: 4px;
 }
-.video-icon .video-thumb > .video-duration
+.video-icon .video-thumb .video-duration
 {
 	position: absolute;
-	right: 5px;
+	right: 6px;
 	bottom: 5px;
 	font-size: 10px;
 	font-weight: bold;
 	color: white;
 	background: black;
 }
+.video-icon .video-thumb a
+{
+	border-style: none;
+	text-decoration: none;
+}
 
-Scorpions - Wind of Change / Gloria Gaynor - I Will Survive
-Independenta Romaniei: Rasboiul Romano-Ruso-Turc 1877
+.video-icon .video-title
+{
+	font-size: 12px;
+}
+.video-icon .video-views
+{
+	font-size: 12px;
+}

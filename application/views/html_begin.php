@@ -8,11 +8,11 @@
 
 <title><?php echo $title ?></title>
 
-<?php foreach ($stylesheets as $stylesheet): ?>
+<?php foreach ($css as $stylesheet): ?>
 <link rel="stylesheet" type="text/css" href="<?php echo $stylesheet ?>" />
 <?php endforeach ?>
 
-<?php foreach ($javascripts as $javascript): ?>
+<?php foreach ($js as $javascript): ?>
 <script type="text/javascript" src="<?php echo $javascript ?>"></script>
 <?php endforeach ?>
 

@@ -21,12 +21,12 @@ $config['site_name'] = 'P2P-Next UPB LivingLab';
 | page generated with 'application/views/html_begin.php' view and
 | HTML_head_params library.
 |
-| Do not include any path to the file! 'stylesheets/' is going to be used.
+| Do not include any path to the file! 'css/' is going to be used.
 |
 | Leave blank for no default stylesheet.
 |
 */
-$config['default_stylesheet'] = 'default.css';
+$config['default_css'] = 'default.css';
 
 /*
 |--------------------------------------------------------------------------
@@ -37,12 +37,12 @@ $config['default_stylesheet'] = 'default.css';
 | HTML page generated with 'application/views/html_begin.php' view and
 | HTML_head_params library.
 |
-| Do not include any path to the file! 'javascripts/' is going to be used.
+| Do not include any path to the file! 'js/' is going to be used.
 |
 | Leave blank for no default javascript.
 |
 */
-$config['default_javascript'] = '';
+$config['default_js'] = '';
 
 /*
 |--------------------------------------------------------------------------
@@ -86,3 +86,23 @@ $config['default_torrent_ext'] = 'tstream';
 |
 */
 $config['categories'] = array(1 => 'Movies', 2 => 'TechTalks', 3 => 'Events', 4 => 'Karaoke');
+
+/*
+|--------------------------------------------------------------------------
+| Videos per page
+|--------------------------------------------------------------------------
+|
+| The number of video icons shown per page (as in catalog/category).
+|
+*/
+$config['videos_per_page'] = 16;
+
+/*
+|--------------------------------------------------------------------------
+| Videos per row
+|--------------------------------------------------------------------------
+|
+| The number of video icons shown on a single line (as in home page).
+|
+*/
+$config['videos_per_row'] = 4;

@@ -1,0 +1,47 @@
+body
+{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	background: white url('/devel/img/bg.png') repeat-x left top;
+}
+
+a:link
+{
+	color: rgb(0,90,192);
+	text-decoration: none;
+}
+a:visited
+{
+	color: rgb(0,56,112);
+}
+a:hover, a:active
+{
+	text-decoration: underline;
+}
+
+#header
+{
+	clear: both;
+}
+
+#body
+{
+	position: relative;
+}
+
+#content
+{
+	float: left;
+	width: 616px;
+	padding: 12px;
+}
+
+#footer
+{
+	clear: both;
+}
+
+.pagination
+{
+	clear: both;
+}

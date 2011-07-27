@@ -1,4 +1,7 @@
-<script type="text/javascript">siteUrl = '<?php echo site_url() ?>';</script>
+<!--Javascript initializations-->
+<script type="text/javascript">
+	siteUrl = '<?php echo site_url() ?>';
+</script>
 
 <div id="body">
 	<!-- Invalid name in URL-->
@@ -19,14 +22,14 @@
 		<h1><?php echo $video['title'] ?></h1>
 		
 		<ul>
-			<li><a href="javascript: void(0)" onclick="getNsVlcPlugin('<? echo $video['torrents'][0] ?>')">VLC</a></li>
+			<li><a href="javascript: void(0)" onclick="retrieveNsVlcPlugin('<? echo $video['torrents'][0] ?>')">VLC</a></li>
 		
-			<li><a href="javascript: void(0)" onclick="getNsHtml5Plugin('<?php echo 'tribe://'. $video['torrents'][0] ?>')">HTML5</a></li>
+			<li><a href="javascript: void(0)" onclick="retrieveNsHtml5Plugin('<?php echo 'tribe://'. $video['torrents'][0] ?>')">HTML5</a></li>
 		</ul>
 		
 		<div id="video_plugin"></div>
 		<!--TODO preload user preferred plugin-->
-		<script type="text/javascript"> getNsHtml5Plugin('<?php echo 'tribe://'. $video['torrents'][0] ?>') </script>
+		<script type="text/javascript"> retrieveNsHtml5Plugin('<?php echo 'tribe://'. $video['torrents'][0] ?>') </script>
 		
 		<!--TODO user name-->
 		<!--TODO change format controls-->

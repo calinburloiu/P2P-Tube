@@ -1,7 +1,11 @@
+/**
+ * Video page client scripting (AJAX, events etc.)
+ */
+
 // Usually replaced in PHP
 siteUrl = '/';
 
-function getNsVlcPlugin(videoUrl)
+function retrieveNsVlcPlugin(videoUrl)
 {
 	$.post(
 		siteUrl + 'video/plugin/ns-vlc',
@@ -12,7 +16,7 @@ function getNsVlcPlugin(videoUrl)
 	);
 }
 
-function getNsHtml5Plugin(videoUrl)
+function retrieveNsHtml5Plugin(videoUrl)
 {
 	$.post(
 		siteUrl + 'video/plugin/ns-html5',
@@ -22,3 +26,8 @@ function getNsHtml5Plugin(videoUrl)
 		}
 	);
 }
+
+/*$(document).ready(function()
+{
+	$	
+}*/
