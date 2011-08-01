@@ -65,7 +65,7 @@ class Videos_model extends CI_Model {
 				
 			// Ellipsized title
 			//$video['shorted_title'] = ellipsize($video['title'], 45, 0.75);
-			$video['shorted_title'] = character_limiter($video['title'], 45);
+			$video['shorted_title'] = character_limiter($video['title'], 50);
 		}
 		
 		return $videos;
@@ -99,11 +99,11 @@ class Videos_model extends CI_Model {
 	 * @return		array	an associative list with information about a video
 	 * with the following keys:
 	 *   * all columns form DB with some exceptions that are overwritten or new
-	 *   * torrents => list of torrent file names formated as
+	 *   * url => list of URLs for the video torrents formated as
 	 * {name}_{format}.{default_video_ext}.{default_torrent_ext}
 	 *   * user_name => TODO: user name from `users` table
 	 *   * formats => list of formats like 1080p
-	 *   * category_name => TODO: human-friendly category name
+	 *   * category_title => a human-friendly category name
 	 *   * tags => associative list of "tag => score"
 	 *   * date => date and time when the video was created
 	 *   * thumbs => thumbnail images' URLs
@@ -134,15 +134,21 @@ class Videos_model extends CI_Model {
 		$video['tags'] = array_reverse($video['tags'], true);
 		
 		// Torrents
-		$video['torrents'] = array();
+		$video['url'] = array();
 		foreach ($video['formats'] as $format)
 		{
 			$ext = isset($format['ext']) ? 
 				$format['ext'] : $this->config->item('default_video_ext');
- 			$video['torrents'][] = site_url('data/torrents/'. $video['name'] . '_'
+ 			$video['url'][] = site_url('data/torrents/'. $video['name'] . '_'
  				. $format['def'] . '.'. $ext
  				. '.'. $this->config->item('default_torrent_ext'));
 		}
+		
+		// Category title
+		$categories = $this->config->item('categories');
+		$category_name = $categories[ intval($video['category_id']) ];
+		$video['category_title'] = $category_name ?
+			$this->lang->line("ui_categ_$category_name") : $category_name;
 		
 		// Thumbnails
 		$video['thumbs'] = $this->get_thumbs($video['name'], $video['thumbs_count']);

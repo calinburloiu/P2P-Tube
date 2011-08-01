@@ -1,6 +1,12 @@
-.video-list
+.videos-summary
 {
 	position: relative;
+}
+
+.category-title
+{
+	border-bottom: 1px solid rgb(108,162,222);
+	/*border-bottom: 1px solid rgb(171,209,255);*/
 }
 
 .video-icon
@@ -9,7 +15,7 @@
 	display: block;
 	float: left;
 	width: 146px;
-	height: 190px;
+	height: 170px;
 	margin-right: 8px;
 }
 
@@ -45,9 +51,15 @@
 
 .video-icon .video-title
 {
+	margin-top: 2px;
 	font-size: 12px;
+	line-height: 100%;
 }
 .video-icon .video-views
+{
+	font-size: 12px;
+}
+.video-icon .video-username
 {
 	font-size: 12px;
 }

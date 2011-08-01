@@ -1,5 +1,5 @@
 /**
- * Video page client scripting (AJAX, events etc.)
+ * Video page client scripting
  */
 
 // Usually replaced in PHP

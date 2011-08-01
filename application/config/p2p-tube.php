@@ -81,11 +81,13 @@ $config['default_torrent_ext'] = 'tstream';
 |--------------------------------------------------------------------------
 |
 | An associative list with the video categories of the site. IDs are used
-| in DB (for example in `videos` table), and value are human-friendly names
-| for categories. IDs must be numeric and must preferably start from 1.
+| in DB (for example in `videos` table), and values are string identifiers
+| for categories. Category names localization can be made by concatenating
+| 'ui_categ_' with the value in order to obtain a language key.
+| IDs must be numeric and must preferably start from 1.
 |
 */
-$config['categories'] = array(1 => 'Movies', 2 => 'TechTalks', 3 => 'Events', 4 => 'Karaoke');
+$config['categories'] = array(1 => 'movies', 2 => 'tech_talks', 3 => 'events', 4 => 'karaoke');
 
 /*
 |--------------------------------------------------------------------------

@@ -1,10 +1,10 @@
-<!--Javascript initializations-->
+<?php //Javascript initializations, globals ?>
 <script type="text/javascript">
 	siteUrl = '<?php echo site_url() ?>';
 </script>
 
 <div id="body">
-	<!-- Invalid name in URL-->
+	<?php // Invalid name in URL ?>
 	<?php if (isset($video['err'])):
 		if ($video['err'] == 'INVALID_NAME'):
 			$suggestion = site_url(sprintf("video/watch/%d/%s", $video['id'], 
@@ -17,38 +17,75 @@
 			<p>Invalid ID in URL.</p>
 		<?php endif ?>
 		
-	<!-- Correct URL-->
+	<?php // Correct URL ?>
 	<?php else: ?>
 		<h1><?php echo $video['title'] ?></h1>
 		
 		<ul>
-			<li><a href="javascript: void(0)" onclick="retrieveNsVlcPlugin('<? echo $video['torrents'][0] ?>')">VLC</a></li>
+			<li><a id="a_ns-vlc" href="javascript: void(0)">VLC</a></li>
 		
-			<li><a href="javascript: void(0)" onclick="retrieveNsHtml5Plugin('<?php echo 'tribe://'. $video['torrents'][0] ?>')">HTML5</a></li>
+			<li><a id="a_ns-html5" href="javascript: void(0)">HTML5</a></li>
 		</ul>
 		
-		<div id="video_plugin"></div>
-		<!--TODO preload user preferred plugin-->
-		<script type="text/javascript"> retrieveNsHtml5Plugin('<?php echo 'tribe://'. $video['torrents'][0] ?>') </script>
+		<div id="video_plugin"><?php echo $plugin_content ?></div>
 		
 		<!--TODO user name-->
 		<!--TODO change format controls-->
 		<div id="video_date"><?php echo $video['date'] ?></div>
-		<div id="video_views"><?php echo $video['views'] ?> views</div>
-		<div id="video_likes"><?php echo $video['likes'] ?> likes</div>
-		<div id="video_dislikes"><?php echo $video['dislikes'] ?> dislikes</div>
+		<div id="video_views">
+			<?php echo $video['views'] . ' '
+				. ($video['views'] == 1 ? 
+					$this->lang->line('ui_view') : 
+					$this->lang->line('ui_views') );
+			?>
+		</div>
+		<div id="video_likes">
+			<?php echo $video['likes'] . ' '
+				. ($video['likes'] == 1 ? 
+					$this->lang->line('ui_like') : 
+					$this->lang->line('ui_likes') );
+			?>
+		</div>
+		<div id="video_dislikes">
+			<?php echo $video['dislikes'] . ' '
+				. ($video['dislikes'] == 1 ? 
+					$this->lang->line('ui_dislike') : 
+					$this->lang->line('ui_dislikes') );
+			?>
+		</div>
 		<div id="video_description"><?php echo $video['description'] ?></div>
-		<!-- TODO <div id="video_category">Category: <?php echo $video['category_name'] ?></div>-->
-		<div id="video_tags">Tags:
-		<?php print_r($video['tags']) ?>
-		<?php if (isset($video['tags'])): 
-		foreach ($video['tags'] as $tag => $score): ?>
+		<div id="video_category">
+			<?php echo ucwords($this->lang->line('ui_category'))
+				. ': '. $video['category_title'] ?>
+		</div>
+		<div id="video_tags">
+			<?php echo ucwords($this->lang->line('ui_tags')). ': ' ?>
+			<?php if (isset($video['tags'])): 
+			foreach ($video['tags'] as $tag => $score): ?>
 			<a href="<?php site_url('catalog/search/'. $tag) ?>">
-			<?php echo "$tag($score)" ?>
+				<?php echo "$tag($score)" ?>
 			</a>
-		<?php endforeach; endif ?>
-		<div id="video_license"><?php echo $video['license'] ?></div>
+			<?php endforeach; endif ?>
+		<div id="video_license">
+			<?php echo ucwords($this->lang->line('ui_license'))
+				. ': '. $video['license'] ?>
+		</div>
 		
 
 	<?php endif // if (isset($video['err'])): ?>
 </div>
+
+<?php // Javascript bindings when document is ready ?>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#a_ns-vlc').click(function() {
+			// TODO video definition
+			retrieveNsVlcPlugin('<? echo $video['url'][0] ?>');
+		});
+		
+		$('#a_ns-html5').click(function() {
+			// TODO video definition
+			retrieveNsHtml5Plugin('<?php echo $video['url'][0] ?>')
+		});
+	});
+</script>

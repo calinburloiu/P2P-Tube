@@ -11,17 +11,31 @@ class Catalog extends CI_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		
+		//$this->lang->load('catalog');
 	}	
 	
 	public function index()
 	{
 		// Retrieve videos summary.
-		$data['categories'] = $this->config->item('categories');
 		$this->load->model('videos_model');
-		foreach ($data['categories'] as $id => $name)
+		foreach ($this->config->item('categories') as $id => $name)
 		{
-			$data['videos'][$id] = $this->videos_model->get_videos_summary(
+			// Videos
+			$vs_data['videos'] = $this->videos_model->get_videos_summary(
 				$id, 0, $this->config->item('videos_per_row'));
+			
+			// Category
+			$vs_data['category_title'] = $name ?
+				$this->lang->line("ui_categ_$name") : $name;
+			$vs_data['category_id'] = $id;
+			
+			// Pagination (not required)
+			$vs_data['pagination'] = '';
+			
+			$data['videos_summaries'][] = 
+				$this->load->view('catalog/videos_summary_view', 
+				$vs_data, TRUE);
 		}
 		
 		$params = array(	'title' => $this->config->item('site_name'),
@@ -54,12 +68,16 @@ class Catalog extends CI_Controller {
 	{
 		// Retrieve videos summary.
 		$this->load->model('videos_model');
-		$data['videos'] = $this->videos_model->get_videos_summary(
+		$vs_data['videos'] = $this->videos_model->get_videos_summary(
 			$category_id, intval($offset),
 			$this->config->item('videos_per_page'));
+		
+		// Video Category
 		$categories = $this->config->item('categories');
-		$data['category'] = $categories[$category_id];
-		$data['category_id'] = $category_id;
+		$category_name = $categories[$category_id];
+		$vs_data['category_title'] = $category_name ?
+			$this->lang->line("ui_categ_$category_name") : $category_name;
+		$vs_data['category_id'] = $category_id;
 		
 		// Pagination
 		$this->load->library('pagination');
@@ -69,7 +87,11 @@ class Catalog extends CI_Controller {
 			$category_id);
 		$pg_config['per_page'] = $this->config->item('videos_per_page');
 		$this->pagination->initialize($pg_config);
-		$data['pagination'] = $this->pagination->create_links();
+		$vs_data['pagination'] = $this->pagination->create_links();
+		
+		// Video Summary
+		$data['video_summary'] = $this->load->view('catalog/videos_summary_view',
+			$vs_data, TRUE);
 		
 		$params = array(	'title' => $this->config->item('site_name'),
 							'css' => array('catalog.css'),

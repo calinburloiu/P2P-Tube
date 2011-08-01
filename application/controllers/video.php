@@ -12,6 +12,8 @@ class Video extends CI_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		
+		//$this->lang->load('video');
 	}
 	
 	public function index()
@@ -34,7 +36,7 @@ class Video extends CI_Controller {
 		// Retrieve video information.
 		$this->load->model('videos_model');
 		$data['video'] = $this->videos_model->get_video($id, $name);
-		$data['plugin'] = ($plugin === NULL ? 'auto' : $plugin);
+		$data['plugin_type'] = ($plugin === NULL ? 'auto' : $plugin);
 		
 		// Display page.
 		$params = array(	'title' => $data['video']['title'] . ' -- '
@@ -46,6 +48,11 @@ class Video extends CI_Controller {
 		$this->load->library('html_head_params', $params);
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header');
+		
+		// Preloading video plugin.
+		// TODO plugin auto (type + definition)
+		$data['plugin_content'] = $this->_plugin('ns-html5', 
+			$data['video']['url'][0], TRUE);
 		
 		$this->load->view('video/watch_view', $data);
 		
@@ -64,10 +71,31 @@ class Video extends CI_Controller {
 	 */
 	public function plugin($type)
 	{
-		$data['url'] = $this->input->post('url', TRUE);
+		$url = $this->input->post('url', TRUE);
 		
-		$this->load->view('video/'. $type . '_plugin_view', $data);
+		$this->_plugin($type, $url);
 	}
+	
+	/**
+	 * Video plugin controller
+	 *
+	 * See plugin function for details. If the second parameter is TRUE
+	 * the output is return instead of being displayed (used in preloading).
+	 */
+	public function _plugin($type, $url, $return_output=FALSE)
+	{	
+		if ($type == 'ns-html5')
+			$data['url'] = 'tribe://' . $url;
+		else if ($type == 'ns-vlc')
+			$data['url'] = $url;
+		
+		$output = $this->load->view('video/'. $type . '_plugin_view', $data, 
+			$return_output);
+		
+		if ($return_output)
+			return $output;
+	}
+	
 }
 
 /* End of file video.php */
