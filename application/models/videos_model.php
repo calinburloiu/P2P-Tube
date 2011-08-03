@@ -99,10 +99,12 @@ class Videos_model extends CI_Model {
 	 * @return		array	an associative list with information about a video
 	 * with the following keys:
 	 *   * all columns form DB with some exceptions that are overwritten or new
-	 *   * url => list of URLs for the video torrents formated as
+	 *   * formats content is moved in assets
+	 *   * assets => list of associative lists where each one represents a
+	 * video asset having keys: "src", "def" and "ext". Value of key "src" is
+	 * the video torrent formated as
 	 * {name}_{format}.{default_video_ext}.{default_torrent_ext}
 	 *   * user_name => TODO: user name from `users` table
-	 *   * formats => list of formats like 1080p
 	 *   * category_title => a human-friendly category name
 	 *   * tags => associative list of "tag => score"
 	 *   * date => date and time when the video was created
@@ -128,19 +130,20 @@ class Videos_model extends CI_Model {
 		}
 		
 		// Convert JSON encoded string to arrays.
-		$video['formats'] = json_decode($video['formats'], TRUE);
+		$video['assets'] = json_decode($video['formats'], TRUE);
+		unset($video['formats']);
 		$video['tags'] = json_decode($video['tags'], TRUE);
 		asort($video['tags']);
 		$video['tags'] = array_reverse($video['tags'], true);
 		
 		// Torrents
 		$video['url'] = array();
-		foreach ($video['formats'] as $format)
+		foreach ($video['assets'] as & $asset)
 		{
-			$ext = isset($format['ext']) ? 
-				$format['ext'] : $this->config->item('default_video_ext');
- 			$video['url'][] = site_url('data/torrents/'. $video['name'] . '_'
- 				. $format['def'] . '.'. $ext
+			$ext = isset($asset['ext']) ? 
+				$asset['ext'] : $this->config->item('default_video_ext');
+ 			$asset['src'] = site_url('data/torrents/'. $video['name'] . '_'
+ 				. $asset['def'] . '.'. $ext
  				. '.'. $this->config->item('default_torrent_ext'));
 		}
 		

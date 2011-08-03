@@ -27,46 +27,56 @@
 			<li><a id="a_ns-html5" href="javascript: void(0)">HTML5</a></li>
 		</ul>
 		
-		<div id="video_plugin"><?php echo $plugin_content ?></div>
+		<div id="video-widget-tabs">
+			<ul>
+				<li>
+					<a id="switch-to-ns-html5" href="#video-widget">HTML5</a>
+				</li>
+				<li>
+					<a id="switch-to-ns-vlc" href="#video-widget">VLC</a>
+				</li>
+			</ul>
+			
+			<div id="video-widget"></div>
+		</div>
 		
 		<!--TODO user name-->
-		<!--TODO change format controls-->
-		<div id="video_date"><?php echo $video['date'] ?></div>
-		<div id="video_views">
+		<div id="video-date"><?php echo $video['date'] ?></div>
+		<div id="video-views">
 			<?php echo $video['views'] . ' '
 				. ($video['views'] == 1 ? 
 					$this->lang->line('ui_view') : 
 					$this->lang->line('ui_views') );
 			?>
 		</div>
-		<div id="video_likes">
+		<div id="video-likes">
 			<?php echo $video['likes'] . ' '
 				. ($video['likes'] == 1 ? 
 					$this->lang->line('ui_like') : 
 					$this->lang->line('ui_likes') );
 			?>
 		</div>
-		<div id="video_dislikes">
+		<div id="video-dislikes">
 			<?php echo $video['dislikes'] . ' '
 				. ($video['dislikes'] == 1 ? 
 					$this->lang->line('ui_dislike') : 
 					$this->lang->line('ui_dislikes') );
 			?>
 		</div>
-		<div id="video_description"><?php echo $video['description'] ?></div>
-		<div id="video_category">
+		<div id="video-description"><?php echo $video['description'] ?></div>
+		<div id="video-category">
 			<?php echo ucwords($this->lang->line('ui_category'))
 				. ': '. $video['category_title'] ?>
 		</div>
-		<div id="video_tags">
+		<div id="video-tags">
 			<?php echo ucwords($this->lang->line('ui_tags')). ': ' ?>
 			<?php if (isset($video['tags'])): 
 			foreach ($video['tags'] as $tag => $score): ?>
-			<a href="<?php site_url('catalog/search/'. $tag) ?>">
+			<a href="<?php echo site_url('catalog/search/'. $tag) ?>">
 				<?php echo "$tag($score)" ?>
 			</a>
 			<?php endforeach; endif ?>
-		<div id="video_license">
+		<div id="video-license">
 			<?php echo ucwords($this->lang->line('ui_license'))
 				. ': '. $video['license'] ?>
 		</div>
@@ -77,15 +87,52 @@
 
 <?php // Javascript bindings when document is ready ?>
 <script type="text/javascript">
-	$(document).ready(function() {
+	$(function() {
+		// TODO remove this 2 bindings
 		$('#a_ns-vlc').click(function() {
-			// TODO video definition
-			retrieveNsVlcPlugin('<? echo $video['url'][0] ?>');
+			//retrieveNsVlcPlugin('<? //echo $video['url'][0] ?>');
+		});		
+		$('#a_ns-html5').click(function() {
+			//retrieveNsHtml5Plugin('<?php //echo $video['url'][0] ?>')
 		});
 		
-		$('#a_ns-html5').click(function() {
-			// TODO video definition
-			retrieveNsHtml5Plugin('<?php echo $video['url'][0] ?>')
+		// Switch video plugin facilities
+		$('#video-widget-tabs').tabs();	/*{
+			ajaxOptions: {
+				type: "POST",
+				data: { url: "<?php //echo $video['url'][0] ?>" },
+				error: function(xhr, status, index, anchor) {
+					$(anchor.hash).html('Could not load the video plugin.');
+				}
+			}
+		});*/
+		$('#switch-to-ns-html5')
+			.click(function() {
+				// TODO switch video plugin
+				console.log('switch-to-ns-html5');
+			});
+		$('#switch-to-ns-vlc')
+			.click(function() {
+				// TODO switch video plugin
+				console.log('switch-to-ns-vlc');
+			});
+			
+		// Video widget
+		$('#video-widget').nsvideo({
+			type: "<?php echo $plugin_type ?>",
+			definition:
+				"<?php echo $video['assets'][ $asset_index ]['def'] ?>",
+			src: {
+				<?php 
+					for ($i=0; $i < count($video['assets']); $i++)
+					{
+						$asset = $video['assets'][$i];
+						echo '"'. $asset['def'] . '": ';
+						echo '"'. $asset['src'] . '"'; 
+						echo ($i == count($video['assets']) - 1) ? '' : ', ';
+					}
+				?>
+			}
 		});
 	});
 </script>

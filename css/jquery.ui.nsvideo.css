@@ -1,0 +1,86 @@
+.ui-slider-horizontal
+{
+	height: 0.5em !important;
+}
+.ui-slider-horizontal .ui-slider-handle
+{
+	margin-left: -0.24em !important;
+	top: -0.3em !important;
+}
+.ui-slider-handle
+{
+	width: 0.5em !important;
+	height: 1em !important;
+}
+
+.ui-nsvideo-time
+{
+	height: 2em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	margin-left: 1em;
+	font-size: 1em;
+	line-height: 1em;
+}
+
+.ui-nsvideo-progress-container
+{
+	padding: 0.5em;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+.ui-nsvideo-progress
+{
+	position: relative;
+	/*height: 0.5em;*/
+}
+
+.ui-nsvideo-loaded-progress
+{
+	height: 100%;
+}
+
+.ui-nsvideo-nsplugin
+{
+	padding: 4px;
+}
+
+.ui-nsvideo-controls
+{
+	height: 2em;
+}
+.ui-nsvideo-controls button
+{
+	width: 2em;
+	height: 2em;
+}
+.ui-button-text
+{
+	width: 2em;
+	height: 1.5em;
+	padding-top: 0.5em !important;
+	padding-bottom: 0 !important;
+	line-height: 100% !important;
+	font-size: 1em;
+}
+
+.ui-nsvideo-control-left
+{
+	float: left;
+}
+
+.ui-nsvideo-control-right
+{
+	float: right;
+}
+
+.ui-nsvideo-volume
+{
+	width: 5em;
+	height: 0.5em;
+	margin-top: 0.7em;
+	margin-bottom: 0.8em;
+	margin-left: 0.3em;
+	margin-right: 1em;
+}

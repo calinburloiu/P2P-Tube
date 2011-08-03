@@ -56,12 +56,11 @@ class Catalog extends CI_Controller {
 	public function test($page = 0)
 	{
 		$this->load->helper('url');
-		$this->load->library('pagination');
 		
-		$config['base_url'] = site_url('catalog/test/');
-		$config['total_rows'] = '160';
-		$this->pagination->initialize($config);
-		echo $this->pagination->create_links();
+		$str = '[{"def":"1080p"},{"def":"600p"}]';
+		$a = json_decode($str);
+		
+		echo count($a);
 	}
 	
 	public function category($category_id, $offset = 0)

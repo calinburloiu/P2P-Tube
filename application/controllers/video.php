@@ -41,8 +41,16 @@ class Video extends CI_Controller {
 		// Display page.
 		$params = array(	'title' => $data['video']['title'] . ' -- '
 								. $this->config->item('site_name'),
-							'css' => array('jquery-ui.css', 'NextShare_VLC_plugin.css'),
-							'js' => array('jquery.min.js', 'jquery-ui.min.js', 'NextShare_VLC_plugin.js', 'video.js'),
+							'css' => array(
+								'jquery-ui-1.8.14.custom.css',
+								'jquery.ui.nsvideo.css',
+								'video.css'
+							),
+							'js' => array(
+								'jquery-1.6.2.min.js',
+								'jquery-ui-1.8.14.custom.min.js',
+								'jquery.ui.nsvideo.js'
+							),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
@@ -50,9 +58,14 @@ class Video extends CI_Controller {
 		$this->load->view('header');
 		
 		// Preloading video plugin.
-		// TODO plugin auto (type + definition)
-		$data['plugin_content'] = $this->_plugin('ns-html5', 
-			$data['video']['url'][0], TRUE);
+		// TODO plugin auto: type and format
+		if ($data['plugin_type'] == 'auto')
+			$data['plugin_type'] = 'ns-html5';
+		$data['asset_index'] = 0;
+		
+		// TODO remove old AJAX plugin content
+// 		$data['plugin_content'] = $this->_plugin('ns-html5', 
+// 			$data['video']['url'][0], TRUE);
 		
 		$this->load->view('video/watch_view', $data);
 		
