@@ -13,12 +13,13 @@
 	height: 1em !important;
 }
 
-.ui-nsvideo-time
+.ui-nsvideo-text
 {
 	height: 2em;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 	margin-left: 1em;
+	margin-right: 1em;
 	font-size: 1em;
 	line-height: 1em;
 }
@@ -58,7 +59,7 @@
 .ui-button-text
 {
 	width: 2em;
-	height: 1.5em;
+	height: 1.4em;
 	padding-top: 0.5em !important;
 	padding-bottom: 0 !important;
 	line-height: 100% !important;

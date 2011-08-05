@@ -21,12 +21,6 @@
 	<?php else: ?>
 		<h1><?php echo $video['title'] ?></h1>
 		
-		<ul>
-			<li><a id="a_ns-vlc" href="javascript: void(0)">VLC</a></li>
-		
-			<li><a id="a_ns-html5" href="javascript: void(0)">HTML5</a></li>
-		</ul>
-		
 		<div id="video-widget-tabs">
 			<ul>
 				<li>
@@ -108,13 +102,13 @@
 		});*/
 		$('#switch-to-ns-html5')
 			.click(function() {
-				// TODO switch video plugin
-				console.log('switch-to-ns-html5');
+				$('#video-widget')
+					.nsvideo('type', 'ns-html5');
 			});
 		$('#switch-to-ns-vlc')
 			.click(function() {
-				// TODO switch video plugin
-				console.log('switch-to-ns-vlc');
+				$('#video-widget')
+					.nsvideo('type', 'ns-vlc');
 			});
 			
 		// Video widget
