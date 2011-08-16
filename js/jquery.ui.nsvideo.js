@@ -17,7 +17,7 @@ $.widget( "ui.nsvideo", {
 	options: {
 		type: 'ns-html5',
 		width: 800,
-		height: 450,
+		height: 600,
 		showStatus: true,
 		refreshInterval: 0.1,	// seconds
 		autoplay: false
@@ -200,11 +200,14 @@ $.widget( "ui.nsvideo", {
 		
 		widget.$videoContainer.html('');
 		
+		var width = widget.options.width;
+		var height = widget.options.height;
+		
 		// HTML5
 		if (widget.options.type == 'ns-html5'
 			|| widget.options.type == 'html5')
 		{
-			widget.$video = $('<video id="' + widget.element.attr('id') + '-video" src="' + src + '" width="' + widget.options.width + '" height="' + widget.options.height + '" preload="auto"' + (widget.options.autoplay ? ' autoplay="autoplay"' : '') + '>'
+			widget.$video = $('<video id="' + widget.element.attr('id') + '-video" src="' + src + '"' + (width == 0 ? '' : ' width="' + width + '"') + (height == 0 ? '' : ' height="' + height + '"') + ' preload="auto"' + (widget.options.autoplay ? ' autoplay="autoplay"' : '') + '>'
 				+'Error: Your browser does not support HTML5 or the video format!'
 			+'</video>')
 				.appendTo(widget.$videoContainer)
@@ -227,6 +230,9 @@ $.widget( "ui.nsvideo", {
 					loadedmetadata: function() {
 						widget.html5.refreshTime();
 						widget.html5.refreshVolume();
+						if (widget.options.width == 0)
+							widget.element.css('width',
+										   widget.$video.width() + 8 + 'px');
 					},
 					seeked: function() {
 						widget.html5.play();
@@ -248,12 +254,12 @@ $.widget( "ui.nsvideo", {
 			
 			if (navigator.appName == "Netscape")
 			{
-				widget.$video = $('<embed type="' + embedType + '" name="vlcVideo" id="' + widget.element.attr('id') + '-video" autoplay="' + (widget.options.autoplay ? 'yes' : 'no') + '" loop="no" width="' + widget.options.width + '" height="' + widget.options.height + '" target="' + src + '" />')
+				widget.$video = $('<embed type="' + embedType + '" name="vlcVideo" id="' + widget.element.attr('id') + '-video" autoplay="' + (widget.options.autoplay ? 'yes' : 'no') + '" loop="no" width="' + (width == 0 ? '640' : width) + '" height="' + (height == 0 ? '480' : height) + '" target="' + src + '" />')
 					.appendTo(widget.$videoContainer);
 			}
 			else
 			{
-				widget.$video = $('<object classid="clsid:1800B8AF-4E33-43C0-AFC7-894433C13538" width="' + widget.options.width + '" height="' + widget.options.height + '" id="' + widget.element.attr('id') + '-video" name="vlcVideo" events="True" target="">'
+				widget.$video = $('<object classid="clsid:1800B8AF-4E33-43C0-AFC7-894433C13538" width="' + (width == 0 ? '640' : width) + '" height="' + (height == 0 ? '480' : height) + '" id="' + widget.element.attr('id') + '-video" name="vlcVideo" events="True" target="">'
 						+ '<param name="Src" value="' + src + '" />'
 						+ '<param name="ShowDisplay" value="True" />'
 						+ '<param name="Loop" value="False" />'
@@ -263,6 +269,9 @@ $.widget( "ui.nsvideo", {
 					.appendTo(widget.$videoContainer);
 			}
 		}
+		
+		widget.element.css('width',
+							widget.$video.width() + 8 + 'px');
 	},
 	
 	setPlayButton: function() {
@@ -381,7 +390,7 @@ $.widget( "ui.nsvideo", {
 		//lastTime: null,
 		
 		init: function() {
-			widget.html5.refreshAll();
+			//widget.html5.refreshAll();
 			
 			//if (widget.options.autoplay)
 			//	widget.html5.play();
