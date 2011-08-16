@@ -21,7 +21,6 @@ class VideosTable:
     default_thumb = 0
     
     directory = os.curdir
-    default_video_ext = 'ogv'
 
     def __init__(self, dbCur, directory, name, title, description, tags, category_id):
         self.dbCur = dbCur
@@ -41,18 +40,20 @@ class VideosTable:
                 self.tags[tag.strip()] = 0
         self.tags_json = json.dumps(self.tags, separators=(',', ':'))
         
-    def getVideoDefinition(self, fileName):
+    def getVideoResolution(self, fileName):
+        pipe = subprocess.Popen('mediainfo --Inform="Video;%Width%" ' + os.path.join(self.directory, fileName), shell=True, stdout=subprocess.PIPE).stdout
+        width = pipe.readline().strip()
+
         pipe = subprocess.Popen('mediainfo --Inform="Video;%Height%" ' + os.path.join(self.directory, fileName), shell=True, stdout=subprocess.PIPE).stdout
         height = pipe.readline().strip()
 
-        pipe = subprocess.Popen('mediainfo --Inform="Video;%ScanType%" ' + os.path.join(self.directory, fileName), shell=True, stdout=subprocess.PIPE).stdout
-        scanType = pipe.readline().strip()
-        if scanType == '' or scanType == 'Progressive':
-            scanType = 'p'
-        elif scanType == 'Interlaced':
-            scanType = 'i';
+        return width + 'x' + height
 
-        return height + scanType
+    def getVideoDar(self, fileName):
+        pipe = subprocess.Popen('mediainfo --Inform="Video;%DisplayAspectRatio/String%" ' + os.path.join(self.directory, fileName), shell=True, stdout=subprocess.PIPE).stdout
+        dar = pipe.readline().strip()
+
+        return dar
 
     def getVideoDuration(self, fileName):
         pipe = subprocess.Popen('mediainfo --Inform="General;%Duration/String3%" ' + os.path.join(self.directory, fileName), shell=True, stdout=subprocess.PIPE).stdout
@@ -69,7 +70,7 @@ class VideosTable:
     # Returns a pair with duration and formats list.
     def findVideosMeta(self):
         files = [f for f in os.listdir(self.directory) if os.path.isfile(os.path.join(self.directory, f))]
-        files = fnmatch.filter(files, self.name + "*")
+        files = fnmatch.filter(files, self.name + "_*")
 
         # Duration not set
         duration = None
@@ -78,23 +79,26 @@ class VideosTable:
         formats = []
         for f in files:
             if f.find('.tstream') == -1:
-                # Duration (if not set yet)
+                # Duration (set once)
                 if duration == None:
                     duration = self.getVideoDuration(f)
+
                 format_ = {}
-                format_['def'] = f[(f.rfind('_')+1):f.rfind('.')]
-                ext = f[(f.rfind('.')+1):]
-                if ext != self.default_video_ext:
-                    format_['ext'] = ext
-                if format_['def'] != self.getVideoDefinition(f):
+                format_['res'] = self.getVideoResolution(f)
+                format_['dar'] = self.getVideoDar(f)
+                format_['ext'] = f[(f.rfind('.')+1):]
+
+                fileDef = f[(f.rfind('_')+1):f.rfind('.')]
+                videoDef = format_['res'].split('x')[1] + 'p'
+                if fileDef != videoDef:
                     raise VideoDefException(f)
+
                 formats.append(format_)
 
         return (duration, formats)
 
     def insert(self):
-        if self.duration == None or self.formats_json == None or self.tags_json == None:
-            print "Bzzzz"
+        #if self.duration == None or self.formats_json == None or self.tags_json == None:
         query = "INSERT INTO `" + self.tableName + "` (name, title, description, duration, formats, category_id, user_id, tags, date, thumbs_count, default_thumb) VALUES ('" + self.name + "', '" + self.title + "', '" + self.description + "', '" + self.duration + "', '" + self.formats_json + "', " + str(self.category_id) + ", " + str(self.user_id) + ", '" + self.tags_json + "', NOW(), " + str(self.thumbs_count) + ", " + str(self.default_thumb) + ")"
         self.dbCur.execute(query)    
     
