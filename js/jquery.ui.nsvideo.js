@@ -1,5 +1,5 @@
 /*
- * jQuery UI NS-Video @VERSION
+ * jQuery UI NS-Video 1.0.0 beta
  *
  * Copyright 2011, Călin-Andrei Burloiu
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -13,11 +13,11 @@
 (function( $, undefined ) {
 
 $.widget( "ui.nsvideo", {
-	version: "@VERSION",
+	version: "1.0.0 beta",
 	options: {
 		type: 'ns-html5',
-		width: 800,
-		height: 600,
+		width: 320,
+		height: 240,
 		showStatus: true,
 		refreshInterval: 0.1,	// seconds
 		autoplay: false
@@ -54,7 +54,7 @@ $.widget( "ui.nsvideo", {
 			.slider({
 					value: 0,
 					min: 0,
-					max: 1000, //Math.floor(widget.$video[0].duration),
+					max: 1000,
 					slide: function(event, ui) {
 						widget.videoPlugin('crtTime', [ui.value]);
 					}
@@ -230,9 +230,7 @@ $.widget( "ui.nsvideo", {
 					loadedmetadata: function() {
 						widget.html5.refreshTime();
 						widget.html5.refreshVolume();
-						if (widget.options.width == 0)
-							widget.element.css('width',
-										   widget.$video.width() + 8 + 'px');
+						widget._setWidgetWidth();
 					},
 					seeked: function() {
 						widget.html5.play();
@@ -270,8 +268,24 @@ $.widget( "ui.nsvideo", {
 			}
 		}
 		
-		widget.element.css('width',
-							widget.$video.width() + 8 + 'px');
+		widget.$video.css('position', 'relative');
+		
+		widget._setWidgetWidth();
+	},
+	
+	_setWidgetWidth: function() {
+		if (widget.$video.width() < 640)
+		{
+			widget.element.css('width',
+							640 + 8 + 'px');
+			widget.$video.css('left', 
+				Math.round(widget.$videoContainer.width()/2 
+				- widget.$video.width()/2)
+				+ 'px');
+		}
+		else
+			widget.element.css('width',
+							widget.$video.width + 8 + 'px');
 	},
 	
 	setPlayButton: function() {
