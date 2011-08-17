@@ -57,10 +57,9 @@ class Catalog extends CI_Controller {
 	{
 		$this->load->helper('url');
 		
-		$str = '[{"def":"1080p"},{"def":"600p"}]';
-		$a = json_decode($str);
+		$str = '800x600';
 		
-		echo count($a);
+		echo substr($str, strpos($str, 'x') + 1);
 	}
 	
 	public function category($category_id, $offset = 0)

@@ -16,8 +16,11 @@ $.widget( "ui.nsvideo", {
 	version: "1.0.0 beta",
 	options: {
 		type: 'ns-html5',
-		width: 320,
-		height: 240,
+		srcIndex: 0,
+		width: 0,
+		height: 0,
+		minWidth: 0,
+		maxWidth: 0,
 		showStatus: true,
 		refreshInterval: 0.1,	// seconds
 		autoplay: false
@@ -86,26 +89,27 @@ $.widget( "ui.nsvideo", {
 				widget.videoPlugin('fullscreen');
 			});
 
-		// Video definition buttonset
+		// Video format buttonset
 		if (typeof widget.options.src == 'object')
 		{
-			var $definitions = $('<form><div class="ui-nsvideo-definitions ui-nsvideo-control-right"></div></form>')
+			var $formats = $('<form><div class="ui-nsvideo-formats ui-nsvideo-control-right"></div></form>')
 				.appendTo(widget.$controls);
-			$definitions = $('.ui-nsvideo-definitions', $definitions[0]);
+			$formats = $('.ui-nsvideo-formats', $formats[0]);
 			$.each(widget.options.src, function(index, value) {
-				id = widget.element.attr('id') + '-def-' + index;
-				$('<input type="radio" id="' + id + '" name="definition" />')
-					.appendTo($definitions)
-					.attr('checked', (index == widget.options.definition))
+				id = widget.element.attr('id') + '-format-' + index;
+				definition = value.res.substring(value.res.indexOf('x')+1)+'p';
+				$('<input type="radio" id="' + id + '" name="format" />')
+					.appendTo($formats)
+					.attr('checked', (index == widget.options.srcIndex))
 					.click(function() {
 						widget.videoPlugin('pause');
-						widget.definition(index);
+						widget.srcIndex(index);
 					});
-				$('<label for="' + id + '">' + index + '</label>')
-					.appendTo($definitions);
+				$('<label for="' + id + '">' + definition + '</label>')
+					.appendTo($formats);
 			});
 			
-			$definitions.buttonset();
+			$formats.buttonset();
 		}
 		
 		// Volume
@@ -148,7 +152,7 @@ $.widget( "ui.nsvideo", {
 			
 		// Initialize video plugin
 		widget.$video.ready(function() {
-			widget.videoPlugin('init');
+			//widget.videoPlugin('init');
 		});
 	},
 
@@ -192,8 +196,8 @@ $.widget( "ui.nsvideo", {
 		
 		// Select video source.
 		// If src option is string, that's the source.
-		// If src is an object, properties are definitions and values are
-		// sources.
+		// If src is an object, there is a list of associative arrays, each
+		// one having the mandatory keys "src" and "res" (resolution).
 		var src = widget.crtSrc();
 		if (src == null)
 			return widget;
@@ -270,6 +274,42 @@ $.widget( "ui.nsvideo", {
 		
 		widget.$video.css('position', 'relative');
 		
+		// Adjust video size for auto-resizing within ranges minWidth and
+		// maxWidth.
+		if (widget.options.minWidth != 0 && widget.options.maxWidth != 0
+			&& typeof widget.options.src == 'object'
+			&& (typeof widget.options.src[ widget.options.srcIndex ].res)
+				!= 'undefined'
+			&& (typeof widget.options.src[ widget.options.srcIndex ].dar)
+				!= 'undefined')
+		{
+			var resolution = widget.options.src[ widget.options.srcIndex ].res;
+			var dar = widget.options.src[ widget.options.srcIndex ].dar;
+			var darL = parseInt(
+				dar.substring(0, dar.indexOf(':')));
+			var darR = parseInt(
+				dar.substring(dar.indexOf(':') + 1));
+			var videoHeight = parseInt(
+				resolution.substring(resolution.indexOf('x') + 1));
+			var videoWidth = Math.round(videoHeight * darL / darR);
+			// Video width must be between minWidth and maxWidth pixels.
+			if (videoWidth > widget.options.maxWidth)
+			{
+				videoHeight = Math.round(widget.options.maxWidth / videoWidth
+					* videoHeight);
+				videoWidth = widget.options.maxWidth;
+			}
+			else if (videoWidth < widget.options.minWidth)
+			{
+				videoHeight = Math.round(widget.options.minWidth / videoWidth
+					* videoHeight);
+				videoWidth = widget.options.minWidth;
+			}
+			console.log(videoWidth + ' ' + videoHeight);
+			widget.$video.css('width', videoWidth);
+			widget.$video.css('height', videoHeight);
+		}
+		
 		widget._setWidgetWidth();
 	},
 	
@@ -284,8 +324,11 @@ $.widget( "ui.nsvideo", {
 				+ 'px');
 		}
 		else
+		{
 			widget.element.css('width',
-							widget.$video.width + 8 + 'px');
+							widget.$video.width() + 8 + 'px');
+			widget.$video.css('left', '0');
+		}
 	},
 	
 	setPlayButton: function() {
@@ -346,13 +389,15 @@ $.widget( "ui.nsvideo", {
 		return null;
 	},
 	
-	definition: function(def) {
+	srcIndex: function(srcIndex) {
 		var widget = this;
 		
-		if (typeof def == 'undefined')
-			return widget.options.definition;
+		if (typeof srcIndex == 'undefined')
+			return widget.options.srcIndex;
 		
-		widget.options.definition = def;
+		widget.options.srcIndex = srcIndex;
+		
+		// Refresh.
 		widget.video();
 		
 		return widget;
@@ -383,14 +428,14 @@ $.widget( "ui.nsvideo", {
 			src = widget.options.src;
 		else if (typeof widget.options.src == 'object')
 		{
-			if (typeof widget.options.definition == 'undefined')
+			if (typeof widget.options.srcIndex == 'undefined')
 				return null;
 			
-			if (typeof widget.options.src[ widget.options.definition ]
+			if (typeof widget.options.src[ widget.options.srcIndex ].src
 				== 'undefined')
 				return null;
 			
-			src = widget.options.src[ widget.options.definition ];
+			src = widget.options.src[ widget.options.srcIndex ].src;
 		}
 		
 		if (widget.options.type == 'ns-html5')

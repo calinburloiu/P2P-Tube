@@ -46,7 +46,7 @@ $config['default_js'] = '';
 
 /*
 |--------------------------------------------------------------------------
-| Default Video File Extension
+| Default Video File Extension (OBSOLETE)
 |--------------------------------------------------------------------------
 |
 | Sets the default video file extension, which must be set without '.' prefix. 

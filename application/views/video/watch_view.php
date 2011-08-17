@@ -91,15 +91,7 @@
 		});
 		
 		// Switch video plugin facilities
-		$('#video-widget-tabs').tabs();	/*{
-			ajaxOptions: {
-				type: "POST",
-				data: { url: "<?php //echo $video['url'][0] ?>" },
-				error: function(xhr, status, index, anchor) {
-					$(anchor.hash).html('Could not load the video plugin.');
-				}
-			}
-		});*/
+		$('#video-widget-tabs').tabs();
 		$('#switch-to-ns-html5')
 			.click(function() {
 				$('#video-widget')
@@ -110,23 +102,24 @@
 				$('#video-widget')
 					.nsvideo('type', 'ns-vlc');
 			});
-			
+		
 		// Video widget
-		$('#video-widget').nsvideo({
-			type: "<?php echo $plugin_type ?>",
-			definition:
-				"<?php echo $video['assets'][ $asset_index ]['def'] ?>",
-			src: {
-				<?php 
-					for ($i=0; $i < count($video['assets']); $i++)
-					{
-						$asset = $video['assets'][$i];
-						echo '"'. $asset['def'] . '": ';
-						echo '"'. $asset['src'] . '"'; 
-						echo ($i == count($video['assets']) - 1) ? '' : ', ';
-					}
-				?>
-			}
-		});
+		$('#video-widget')
+			.nsvideo({
+				type: "<?php echo $plugin_type ?>",
+				src: <?php echo json_encode($video['assets']) ?>,
+				//width: videoWidth,
+				//height: videoHeight
+				minWidth: 1200,
+				maxWidth: 1400
+			})
+			.resize(function(e) {
+				$('#video-widget-tabs')
+					.css('width', $('#video-widget').css('width'));
+				console.log($('#video-widget').css('width'));
+			});
+			
+		$('#video-widget-tabs')
+					.css('width', $('#video-widget').css('width'));
 	});
 </script>
