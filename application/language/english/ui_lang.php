@@ -18,6 +18,8 @@ $lang['ui_by'] = 'by';
 $lang['ui_category'] = 'category';
 $lang['ui_tags'] = 'tags';
 $lang['ui_license'] = 'license';
+$lang['ui_uploaded_by'] = 'Uploaded by';
+$lang['ui_on_date'] = 'on';
 
 /* End of file ui_lang.php */
 /* Location: ./application/language/english/ui_lang.php */

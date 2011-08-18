@@ -21,13 +21,12 @@ $.widget( "ui.nsvideo", {
 		height: 0,
 		minWidth: 0,
 		maxWidth: 0,
-		showStatus: true,
+		showState: true,
 		refreshInterval: 0.1,	// seconds
-		autoplay: false
+		autoplay: false,
+		initialDuration: "--:--"
 	},
-
-	min: 0,
-
+	
 	_create: function() {
 		var widget = this;
 		
@@ -60,6 +59,8 @@ $.widget( "ui.nsvideo", {
 					max: 1000,
 					slide: function(event, ui) {
 						widget.videoPlugin('crtTime', [ui.value]);
+						widget.videoPlugin('refreshTime');
+						widget.videoPlugin('refreshState');
 					}
 			});
 		
@@ -75,7 +76,7 @@ $.widget( "ui.nsvideo", {
 			});
 		
 		// Time information (current and total)
-		widget.$time = $('<div class="ui-nsvideo-time ui-nsvideo-text ui-nsvideo-control-left">--:-- / --:--</div>')
+		widget.$time = $('<div class="ui-nsvideo-time ui-nsvideo-text ui-nsvideo-control-left">00:00 / ' + widget.options.initialDuration + '</div>')
 			.appendTo(widget.$controls);
 			
 		// Full screen
@@ -136,24 +137,18 @@ $.widget( "ui.nsvideo", {
 			});
 			
 		// Status information
-		if (widget.options.showStatus)
-		{
-			widget.$stateText = $('<div class="ui-nsvideo-text ui-nsvideo-control-right">...</div>')
-				.appendTo(widget.$controls)
-				.css('cursor', 'pointer')
-				.click(function() {
-					widget.videoPlugin('refreshAll');
-				});
-		}
+		widget.$stateText = $('<div class="ui-nsvideo-text ui-nsvideo-control-right">...</div>')
+			.appendTo(widget.$controls)
+			.css('cursor', 'pointer')
+			.click(function() {
+				widget.videoPlugin('refreshAll');
+			});
+		if (! widget.options.showState)
+			widget.$stateText.hide();
 		
 		// Clear fix helper
 		$('<div class="ui-helper-clearfix"></div>')
 			.appendTo(widget.$controls);
-			
-		// Initialize video plugin
-		widget.$video.ready(function() {
-			//widget.videoPlugin('init');
-		});
 	},
 
 	_destroy: function() {
@@ -218,12 +213,15 @@ $.widget( "ui.nsvideo", {
 				.bind({
 					ended: function() {
 						widget.html5.pause();
+						widget.html5.refreshState();
 					},
 					play: function() {
 						widget.html5.play();
+						widget.html5.refreshState();
 					},
 					pause: function() {
 						widget.html5.pause();
+						widget.html5.refreshState();
 					},
 					timeupdate: function() {
 						widget.html5.refreshTime();
@@ -234,14 +232,44 @@ $.widget( "ui.nsvideo", {
 					loadedmetadata: function() {
 						widget.html5.refreshTime();
 						widget.html5.refreshVolume();
+						widget.html5.refreshState();
 						widget._setWidgetWidth();
 					},
 					seeked: function() {
 						widget.html5.play();
+						widget.html5.refreshState();
 					},
 					volumechange: function() {
 						widget.html5.refreshVolume();
-					}
+					},
+					
+					loadstart: function() {
+						widget.html5.refreshState();
+					},
+					suspend: function() {
+						widget.html5.refreshState();
+					},
+					abort: function() {
+						widget.html5.refreshState();
+					},
+					error: function() {
+						widget.html5.refreshState();
+					},
+					emptied: function() {
+						widget.html5.refreshState();
+					},
+					stalled: function() {
+						widget.html5.refreshState();
+					},
+					loadeddata: function() {
+						widget.html5.refreshState();
+					},
+					waiting: function() {
+						widget.html5.refreshState();
+					},
+					seeking: function() {
+						widget.html5.refreshState();
+					},
 				});
 		}
 		// VLC
@@ -272,12 +300,31 @@ $.widget( "ui.nsvideo", {
 			}
 		}
 		
-		widget.$video.css('position', 'relative');
+		//  BUG: this if is because of a NS-VLC bug.
+		if (widget.options.type != 'ns-vlc')
+			widget.$video.css('position', 'relative');
 		
 		// Adjust video size for auto-resizing within ranges minWidth and
 		// maxWidth.
-		if (widget.options.minWidth != 0 && widget.options.maxWidth != 0
-			&& typeof widget.options.src == 'object'
+		if ( (width == 0 || height == 0)
+			&& (widget.options.minWidth != 0 && widget.options.maxWidth != 0
+				|| this.options.type.indexOf('vlc') != -1) )
+		{
+			widget.adjustVideoSizeFromMeta();
+		}
+		
+		// Initialize video plugin
+		widget.$video.ready(function() {
+			widget.videoPlugin('init');
+		});
+		
+		widget._setWidgetWidth();
+	},
+	
+	adjustVideoSizeFromMeta: function() {
+		var widget = this;
+		
+		if (typeof widget.options.src == 'object'
 			&& (typeof widget.options.src[ widget.options.srcIndex ].res)
 				!= 'undefined'
 			&& (typeof widget.options.src[ widget.options.srcIndex ].dar)
@@ -292,25 +339,27 @@ $.widget( "ui.nsvideo", {
 			var videoHeight = parseInt(
 				resolution.substring(resolution.indexOf('x') + 1));
 			var videoWidth = Math.round(videoHeight * darL / darR);
+			
 			// Video width must be between minWidth and maxWidth pixels.
-			if (videoWidth > widget.options.maxWidth)
+			if (widget.options.minWidth != 0 && widget.options.maxWidth != 0)
 			{
-				videoHeight = Math.round(widget.options.maxWidth / videoWidth
-					* videoHeight);
-				videoWidth = widget.options.maxWidth;
+				if (videoWidth > widget.options.maxWidth)
+				{
+					videoHeight = Math.round(widget.options.maxWidth / videoWidth
+						* videoHeight);
+					videoWidth = widget.options.maxWidth;
+				}
+				else if (videoWidth < widget.options.minWidth)
+				{
+					videoHeight = Math.round(widget.options.minWidth / videoWidth
+						* videoHeight);
+					videoWidth = widget.options.minWidth;
+				}
 			}
-			else if (videoWidth < widget.options.minWidth)
-			{
-				videoHeight = Math.round(widget.options.minWidth / videoWidth
-					* videoHeight);
-				videoWidth = widget.options.minWidth;
-			}
-			console.log(videoWidth + ' ' + videoHeight);
+			
 			widget.$video.css('width', videoWidth);
 			widget.$video.css('height', videoHeight);
 		}
-		
-		widget._setWidgetWidth();
 	},
 	
 	_setWidgetWidth: function() {
@@ -329,6 +378,8 @@ $.widget( "ui.nsvideo", {
 							widget.$video.width() + 8 + 'px');
 			widget.$video.css('left', '0');
 		}
+		
+		this._trigger('resize');
 	},
 	
 	setPlayButton: function() {
@@ -409,6 +460,10 @@ $.widget( "ui.nsvideo", {
 		if (typeof type == 'undefined')
 			return widget.options.type;
 		
+		widget.videoPlugin('pause');
+		if (widget.vlc.timerHandle)
+			clearTimeout(widget.vlc.timerHandle);
+		
 		widget.options.type = type;
 		widget.video();
 		
@@ -448,8 +503,33 @@ $.widget( "ui.nsvideo", {
 		widget: this,
 		//lastTime: null,
 		
+		ERR_STATES: {
+			MEDIA_ERR_ABORTED: [1, "error: aborted"],
+			MEDIA_ERR_NETWORK: [2, "network error"],
+			MEDIA_ERR_DECODE: [3, "decode error"],
+			MEDIA_ERR_SRC_NOT_SUPPORTED: [4, "error: source not supported"]
+		},
+		
+		NETWORK_STATES: {
+			NETWORK_EMPTY: [0, "no data from network"],
+			NETWORK_IDLE: [1, ""],
+			NETWORK_LOADING: [2, "loading..."],
+			NETWORK_LOADED: [3, "loading completed"],
+			NETWORK_NO_SOURCE: [4, "network: no source"]
+		},
+		
+		READY_STATES: {
+			HAVE_NOTHING: [0, "please wait..."],
+			HAVE_METADATA: [1, ""],
+			HAVE_CURRENT_DATA: [2, ""],
+			HAVE_FUTURE_DATA: [3, ""],
+			HAVE_ENOUGH_DATA: [4, "have enough data"]
+		},
+		
 		init: function() {
 			//widget.html5.refreshAll();
+			
+			widget.html5.refreshState();
 			
 			//if (widget.options.autoplay)
 			//	widget.html5.play();
@@ -550,8 +630,6 @@ $.widget( "ui.nsvideo", {
 			widget.html5.refreshState();
 			widget.html5.refreshVolume();
 			widget.html5.refreshLoadedProgress();
-			widget.$time.html('--:-- / --:--');
-			widget.$stateText.html('...');
 			widget.html5.refreshTime();
 		},
 		
@@ -593,8 +671,68 @@ $.widget( "ui.nsvideo", {
 			return widget;
 		},
 		
+		_state: function(type, code) {
+			var r;
+			$.each(widget.html5[type + '_STATES'], function(index, value) {
+				if ('' + code == '' + value[0])
+				{
+					r = value;
+					return false;
+				}
+			});
+			
+			return r;
+		},
+		
 		refreshState: function() {
-			// TODO refresh HTML5 plugin state
+			var err = "";
+			var normal = "";
+			var network = "";
+			var ready = "";
+			var state = "";
+			
+			if (widget.$video[0].error)
+				err = widget.html5._state('ERR',
+										  widget.$video[0].error.code)[1];
+			  
+			if (! widget.$video[0].paused)
+				normal = "playing...";
+			else
+			{
+				normal = "paused";
+			}
+			if (widget.$video[0].seeking)
+				normal = "seeking";
+			if (widget.$video[0].ended)
+				normal = "ended";
+			
+			network = widget.html5._state('NETWORK',
+									widget.$video[0].networkState)[1]; 
+			
+			ready = widget.html5._state('READY',
+									widget.$video[0].readyState)[1];
+			
+			if (err !== "")
+				state = err;
+			else
+			{
+				state = normal;
+				
+				if (normal !== "" && (network !== "" || ready !== "") )
+					state += ' / ';
+				
+				if (network !== "")
+					state += network;
+				
+				if (network !== "" && ready !== "")
+					state += ' / ';
+				
+				if (ready !== "")
+					state += ready;
+			}
+			
+			widget.$stateText
+				.html(state);
 			
 			return widget;
 		},
@@ -648,15 +786,17 @@ $.widget( "ui.nsvideo", {
 	vlc: {
 		widget: this,
 		timerHandle: null,
+		idleRefreshInterval: 1, // seconds
 		
 		STATES: {
-			IDLE_CLOSE: [0, "Idle / Close"],
-			OPENING: [1, "Opening..."],
-			BUFFERING: [2, "Buffering..."],
-			PLAYING: [3, "Playing..."],
-			PAUSED: [4, "Paused"],
-			STOPPING: [5, "Stopping..."],
-			ERROR: [6, "Error!"]
+			IDLE: [0, "idle"],
+			OPENING: [1, "opening..."],
+			BUFFERING: [2, "buffering..."],
+			PLAYING: [3, "playing..."],
+			PAUSED: [4, "paused"],
+			STOPPING: [5, "stopping..."],
+			ENDED: [6, "ended"],
+			ERROR: [7, "error!"]
 		},
 		
 		init: function() {
@@ -788,7 +928,21 @@ $.widget( "ui.nsvideo", {
 										widget.options.refreshInterval * 1000);
 			}
 			else
-				widget.vlc.pause();
+			{
+				if (widget.$video[0].input.state == widget.vlc.STATES.ENDED[0])
+				{
+					widget.vlc.pause();
+					try {
+						widget.$video[0].playlist.stop();
+					} catch(e) {
+						console.log('Exception: ' + e);
+					}
+				}
+				
+				widget.vlc.refreshTime();
+				widget.vlc.timerHandle = setTimeout(widget.vlc.refreshHandler, 
+										widget.vlc.idleRefreshInterval * 1000);
+			}
 			
 			widget.vlc.refreshState();
 		},
@@ -801,8 +955,8 @@ $.widget( "ui.nsvideo", {
 			try {
 				widget.vlc.refreshTime();
 			} catch(e) {
-				console.log(e);
-				widget.$time.html('--:-- / --:--');
+				console.log('Exception: ' + e);
+				widget.$time.html('00:00 / ' + widget.options.initialDuration);
 			}
 		},
 		
@@ -856,6 +1010,8 @@ $.widget( "ui.nsvideo", {
 		refreshState: function() {
 			widget.$stateText
 				.html(widget.vlc._state(widget.$video[0].input.state)[1]);
+				
+			return widget;
 		},
 
 		refreshVolume: function() {

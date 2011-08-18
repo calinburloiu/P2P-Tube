@@ -38,7 +38,7 @@
 	position: absolute;
 	right: 6px;
 	bottom: 5px;
-	font-size: 10px;
+	font-size: 0.77em;
 	font-weight: bold;
 	color: white;
 	background: black;
@@ -52,14 +52,14 @@
 .video-icon .video-title
 {
 	margin-top: 2px;
-	font-size: 12px;
+	font-size: 1em;
 	line-height: 100%;
 }
 .video-icon .video-views
 {
-	font-size: 12px;
+	font-size: 1em;
 }
 .video-icon .video-username
 {
-	font-size: 12px;
+	font-size: 1em;
 }

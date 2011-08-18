@@ -66,6 +66,9 @@ class Videos_model extends CI_Model {
 			// Ellipsized title
 			//$video['shorted_title'] = ellipsize($video['title'], 45, 0.75);
 			$video['shorted_title'] = character_limiter($video['title'], 50);
+			
+			// TODO: user information
+			$video['user_name'] = 'TODO';
 		}
 		
 		return $videos;
@@ -154,6 +157,9 @@ class Videos_model extends CI_Model {
 		
 		// Thumbnails
 		$video['thumbs'] = $this->get_thumbs($video['name'], $video['thumbs_count']);
+		
+		// TODO: user information
+		$video['user_name'] = 'TODO';
 		
 		return $video;
 	}
