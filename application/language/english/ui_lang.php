@@ -1,5 +1,14 @@
 <?php
 
+// Navigation Menu
+$lang['ui_nav_menu_home'] = 'Home';
+$lang['ui_nav_menu_about'] = 'About';
+$lang['ui_nav_menu_log_in'] = 'Log In';
+$lang['ui_nav_menu_register'] = 'Register';
+$lang['ui_nav_menu_help'] = 'Help';
+
+$lang['ui_search'] = 'Search';
+
 // Video Categories
 $lang['ui_categ_movies'] = 'Movies';
 $lang['ui_categ_tech_talks'] = 'TechTalks';

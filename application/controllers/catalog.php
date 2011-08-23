@@ -17,6 +17,9 @@ class Catalog extends CI_Controller {
 	
 	public function index()
 	{
+		// **
+		// ** LOADING MODEL
+		// **
 		// Retrieve videos summary.
 		$this->load->model('videos_model');
 		foreach ($this->config->item('categories') as $id => $name)
@@ -39,13 +42,20 @@ class Catalog extends CI_Controller {
 		}
 		
 		$params = array(	'title' => $this->config->item('site_name'),
-							'css' => array('catalog.css'),
+							'css' => array(
+								'catalog.css', 
+								'jquery-ui.css'
+								),
 							//'js' => array(),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
+		
+		// **
+		// ** LOADING VIEWS
+		// **
 		$this->load->view('html_begin', $this->html_head_params);
-		$this->load->view('header');
+		$this->load->view('header', array('selected_menu' => 'Home'));
 		
 		$this->load->view('catalog/index_view', $data);
 		
@@ -64,6 +74,9 @@ class Catalog extends CI_Controller {
 	
 	public function category($category_id, $offset = 0)
 	{
+		// **
+		// ** LOADING MODEL
+		// **
 		// Retrieve videos summary.
 		$this->load->model('videos_model');
 		$vs_data['videos'] = $this->videos_model->get_videos_summary(
@@ -97,6 +110,10 @@ class Catalog extends CI_Controller {
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
+		
+		// **
+		// ** LOADING VIEWS
+		// **
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header');
 		

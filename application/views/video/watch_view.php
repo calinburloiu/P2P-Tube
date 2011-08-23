@@ -3,7 +3,7 @@
 	siteUrl = '<?php echo site_url() ?>';
 </script>
 
-<div id="body">
+<div id="main">
 	<?php // Invalid name in URL ?>
 	<?php if (isset($video['err'])):
 		if ($video['err'] == 'INVALID_NAME'):
@@ -106,7 +106,8 @@
 		});
 		
 		// Switch video plugin facilities
-		$('#video-widget-tabs').tabs();
+		$('#video-widget-tabs')
+			.tabs();
 		$('#switch-to-ns-html5')
 			.click(function() {
 				$('#video-widget')

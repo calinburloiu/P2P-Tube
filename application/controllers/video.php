@@ -42,13 +42,13 @@ class Video extends CI_Controller {
 		$params = array(	'title' => $data['video']['title'] . ' -- '
 								. $this->config->item('site_name'),
 							'css' => array(
-								'jquery-ui-1.8.15.custom.css',
+								'jquery-ui.css',
 								'jquery.ui.nsvideo.css',
 								'video.css'
 							),
 							'js' => array(
-								'jquery-1.6.2.min.js',
-								'jquery-ui-1.8.15.custom.min.js',
+								'jquery.js',
+								'jquery-ui.js',
 								'jquery.ui.nsvideo.js'
 							),
 							//'metas' => array('description'=>'','keywords'=>'')

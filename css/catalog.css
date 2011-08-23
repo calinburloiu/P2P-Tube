@@ -24,12 +24,13 @@
 	position: relative;
 	width: 132px;
 	height: 99px;
-	background: url('/devel/img/thumb_container.png') no-repeat left top;
+	/*background: url('/devel/img/thumb_container.png') no-repeat left top;*/
 }
 .video-icon .video-thumb img
 {
 	position: absolute;
 	margin: auto;
+	border: none;
 	left: 6px;
 	top: 4px;
 }
@@ -42,6 +43,10 @@
 	font-weight: bold;
 	color: white;
 	background: black;
+}
+.video-duration a:link
+{
+	color: white;
 }
 .video-icon .video-thumb a
 {

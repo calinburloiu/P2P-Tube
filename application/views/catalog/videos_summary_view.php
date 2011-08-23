@@ -11,7 +11,7 @@
 		$thumb_src = $video['thumbs'][ $video['default_thumb'] ];
 		?>
 	<div class="video-icon">
-		<div class="video-thumb">
+		<div class="video-thumb ui-widget-content ui-corner-all">
 			<a href="<?php echo $video['video_url'] ?>">
 				<img src="<?php echo $thumb_src ?>" />
 				<div class="video-duration"><?php echo $video['duration'] ?></div>
