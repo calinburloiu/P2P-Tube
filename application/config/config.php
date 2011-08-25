@@ -358,3 +358,30 @@ $config['rewrite_short_tags'] = FALSE;
 $config['proxy_ips'] = '';
 
 
+/*
+| -------------------------------------------------------------------
+|  Native Autoload - by Phil Sturgeon.
+| -------------------------------------------------------------------
+|
+| Nothing to do with config/autoload.php, this allows PHP autoload to work
+| for base controllers and some third-party libraries.
+|
+| If using HMVC you do not need this! HMVC will autoload.
+|
+| Place this code at the bottom of your application/config/config.php file.
+*/
+function __autoload($class)
+{
+    if (strpos($class, 'CI_') !== 0)
+    {
+        if (file_exists($file = APPPATH . 'core/' . $class . EXT))
+        {
+            include $file;
+        }
+        elseif (file_exists($file = APPPATH . 'libraries/' . $class . EXT))
+        {
+            include $file;
+        }
+    }
+} 
+

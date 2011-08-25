@@ -1,0 +1,1 @@
+* [[http://philsturgeon.co.uk/news/2010/02/CodeIgniter-Base-Classes-Keeping-it-DRY|Useful for more basic Controller classes]]

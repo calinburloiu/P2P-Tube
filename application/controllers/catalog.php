@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Catalog controlls video hierarchy and searching
+ * Class Catalog controls video hierarchy and searching
  *
  * @category	Controller
  * @author		Călin-Andrei Burloiu
@@ -55,7 +55,7 @@ class Catalog extends CI_Controller {
 		// ** LOADING VIEWS
 		// **
 		$this->load->view('html_begin', $this->html_head_params);
-		$this->load->view('header', array('selected_menu' => 'Home'));
+		$this->load->view('header', array('selected_menu' => 'home'));
 		
 		$this->load->view('catalog/index_view', $data);
 		
@@ -65,11 +65,7 @@ class Catalog extends CI_Controller {
 	
 	public function test($page = 0)
 	{
-		$this->load->helper('url');
 		
-		$str = '800x600';
-		
-		echo substr($str, strpos($str, 'x') + 1);
 	}
 	
 	public function category($category_id, $offset = 0)

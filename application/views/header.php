@@ -2,17 +2,20 @@
 	$selected_menu = ''; 
 endif ?>
 
-<ul id="nav-menu"><!--
-	Home--><li class="menu-left"><a href="<?php echo site_url() ?>" <?php echo ($selected_menu == 'Home' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_home') ?></a></li><!--
-	About--><li class="menu-left"><a href="#" 
-		<?php echo ($selected_menu == 'About' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_about') ?></a></li><!--
-	Help--><li class="menu-left"><a href="#" 
-		<?php echo ($selected_menu == 'Help' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_help') ?></a></li><!--
+<ul id="nav-menu">
+	<li class="menu-left"><a href="<?php echo site_url() ?>" <?php echo ($selected_menu == 'home' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_home') ?></a></li>
 	
-	Register--><li class="menu-right"><a href="#" 
-		<?php echo ($selected_menu == 'Register' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_register') ?></a></li><!--
-	Log In--><li class="menu-right"><a href="#" 
-		<?php echo ($selected_menu == 'Log In' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_log_in') ?></a></li>
+	<li class="menu-left"><a href="<?php echo site_url('about') ?>" 
+		<?php echo ($selected_menu == 'about' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_about') ?></a></li>
+	
+	<li class="menu-left"><a href="<?php echo site_url('help') ?>" 
+		<?php echo ($selected_menu == 'help' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_help') ?></a></li>
+	
+	<li class="menu-right"><a href="#<?php //echo site_url('register') ?>" 
+		<?php echo ($selected_menu == 'register' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_register') ?></a></li>
+		
+	<li class="menu-right"><a href="#<?php //echo site_url('login') ?>" 
+		<?php echo ($selected_menu == 'login' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_log_in') ?></a></li>
 </ul>
 
 <div id="header">

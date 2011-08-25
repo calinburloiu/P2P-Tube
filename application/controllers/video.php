@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Video controlls video items handling: watching, commenting, rating,
+ * Class Video controls video items handling: watching, commenting, rating,
  * adding etc.
  *
  * @category	Controller

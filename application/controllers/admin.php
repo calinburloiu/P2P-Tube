@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Admin controlls site administration features
+ * Class Admin controls site administration features
  *
  * @category	Controller
  * @author		Călin-Andrei Burloiu

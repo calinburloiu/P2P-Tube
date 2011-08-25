@@ -29,11 +29,13 @@ class Videos_model extends CI_Model {
 	 * @param		int $offset
 	 * @param		int $count
 	 * @return		array	a list of videos, each one being an assoc array with:
-	 *   * id, name, title, duration, thumbs_count, default_thumb, views => from DB
-	 *   * shorted_title => ellipsized title
-	 *   * video_url => P2P-Tube video URl
-	 *   * TODO: user_id, user_name
-	 *   * thumbs => thumbnail images' URLs
+	 * <ul>
+	 *   <li>id, name, title, duration, thumbs_count, default_thumb, views => from DB</li>
+	 *   <li>shorted_title => ellipsized title</li>
+	 *   <li>video_url => P2P-Tube video URl</li>
+	 *   <li>TODO: user_id, user_name</li>
+	 *   <li>thumbs => thumbnail images' URLs</li>
+	 * </ul>
 	 */
 	public function get_videos_summary($category_id, $offset, $count)
 	{
@@ -101,17 +103,19 @@ class Videos_model extends CI_Model {
 	 * table. NULL means there is no name provided.
 	 * @return		array	an associative list with information about a video
 	 * with the following keys:
-	 *   * all columns form DB with some exceptions that are overwritten or new
-	 *   * formats content is moved in assets
-	 *   * assets => list of associative lists where each one represents a
+	 * <ul>
+	 *   <li>all columns form DB with some exceptions that are overwritten or new</li>
+	 *   <li>content is moved in assets</li>
+	 *   <li>assets => list of associative lists where each one represents a</li>
 	 * video asset having keys: "src", "res", "par" and "ext". Value of key
 	 * "src" is the video torrent formated as
-	 * {name}_{format}.{video_ext}.{default_torrent_ext}
-	 *   * user_name => TODO: user name from `users` table
-	 *   * category_title => a human-friendly category name
-	 *   * tags => associative list of "tag => score"
-	 *   * date => date and time when the video was created
-	 *   * thumbs => thumbnail images' URLs
+	 * {name}_{format}.{video_ext}.{default_torrent_ext}</li>
+	 *   <li>user_name => TODO: user name from `users` table</li>
+	 *   <li>category_title => a human-friendly category name</li>
+	 *   <li>tags => associative list of "tag => score"</li>
+	 *   <li>date => date and time when the video was created</li>
+	 *   <li>thumbs => thumbnail images' URLs</li>
+	 * </ul>
 	 */
 	public function get_video($id, $name = NULL)
 	{

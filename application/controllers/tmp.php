@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Tmp controlls video hierarchy and searching
+ * Class Tmp controls video hierarchy and searching
  *
  * @category	Controller
  * @author		Călin-Andrei Burloiu

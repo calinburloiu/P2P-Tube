@@ -40,9 +40,13 @@
 
 $route['default_controller'] = "catalog";
 $route['404_override'] = '';
-
+// Watch pages
 $route['watch/([\d]+)/?'] = "video/watch/$1";
 $route['watch/([\d]+)/(.+)'] = "video/watch/$1/$2";
+// Article pages
+$route['about'] = 'article/about';
+$route['help'] = 'article/help';
+
 
 
 /* End of file routes.php */
