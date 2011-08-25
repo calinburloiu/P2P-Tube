@@ -33,6 +33,9 @@ class Video extends CI_Controller {
 	{
 		$this->load->helper('url');
 		
+		// **
+		// ** LOADING MODEL
+		// **
 		// Retrieve video information.
 		$this->load->model('videos_model');
 		$data['video'] = $this->videos_model->get_video($id, $name);
@@ -54,8 +57,6 @@ class Video extends CI_Controller {
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
-		$this->load->view('html_begin', $this->html_head_params);
-		$this->load->view('header');
 		
 		// Preloading video plugin.
 		// TODO plugin auto: type and format
@@ -67,6 +68,13 @@ class Video extends CI_Controller {
 // 		$data['plugin_content'] = $this->_plugin('ns-html5', 
 // 			$data['video']['url'][0], TRUE);
 		
+		// **
+		// ** LOADING VIEWS
+		// **
+		$this->load->view('html_begin', $this->html_head_params);
+		$this->load->view('header');
+		
+		//$main_params['content'] = $this->load->view('video/watch_view', $data, TRUE);
 		$this->load->view('video/watch_view', $data);
 		
 		$this->load->view('footer');

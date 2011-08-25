@@ -3,6 +3,7 @@
 	siteUrl = '<?php echo site_url() ?>';
 </script>
 
+<div id="watch-main">
 <?php // Invalid name in URL ?>
 <?php if (isset($video['err'])):
 	if ($video['err'] == 'INVALID_NAME'):
@@ -91,6 +92,7 @@
 	
 
 <?php endif // if (isset($video['err'])): ?>
+</div>
 
 <?php // Javascript bindings when document is ready ?>
 <script type="text/javascript">
