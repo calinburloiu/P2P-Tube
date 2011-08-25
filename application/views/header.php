@@ -3,7 +3,11 @@
 endif ?>
 
 <ul id="nav-menu">
-	<li class="menu-left"><a href="<?php echo site_url() ?>" <?php echo ($selected_menu == 'home' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_home') ?></a></li>
+	<li class="menu-left"><a href="<?php echo site_url() ?>"
+		<?php echo ($selected_menu == 'home' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_home') ?></a></li>
+	
+	<li class="menu-left"><a href="<?php echo site_url('install-plugins') ?>"
+		<?php echo ($selected_menu == 'install-plugins' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_install_plugins') ?></a></li>
 	
 	<li class="menu-left"><a href="<?php echo site_url('about') ?>" 
 		<?php echo ($selected_menu == 'about' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_about') ?></a></li>

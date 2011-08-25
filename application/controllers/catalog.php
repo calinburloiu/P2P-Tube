@@ -57,7 +57,10 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header', array('selected_menu' => 'home'));
 		
-		$this->load->view('catalog/index_view', $data);
+		$main_params['content'] = $this->load->view('catalog/index_view', $data, TRUE);
+		// TODO: side
+		$main_params['side'] = '<h1>Side Box</h1><p>TODO: Put side box content here</p>';
+		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
 		$this->load->view('html_end');
@@ -65,7 +68,25 @@ class Catalog extends CI_Controller {
 	
 	public function test($page = 0)
 	{
+		$params = array(	'title' => 'Test - '. $this->config->item('site_name'),
+							'css' => array(
+								'jquery-ui.css'
+								),
+							//'js' => array(),
+							//'metas' => array('description'=>'','keywords'=>'')
+			);
+		$this->load->library('html_head_params', $params);
 		
+		// **
+		// ** LOADING VIEWS
+		// **
+		$this->load->view('html_begin', $this->html_head_params);
+		$this->load->view('header', array('selected_menu' => 'home'));
+		
+		$this->load->view('echo', array('output'=>'Test Page', 'clear'=>TRUE));
+		
+		$this->load->view('footer');
+		$this->load->view('html_end');
 	}
 	
 	public function category($category_id, $offset = 0)
@@ -101,7 +122,10 @@ class Catalog extends CI_Controller {
 			$vs_data, TRUE);
 		
 		$params = array(	'title' => $this->config->item('site_name'),
-							'css' => array('catalog.css'),
+							'css' => array(
+								'catalog.css', 
+								'jquery-ui.css'
+								),
 							//'js' => array(),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
@@ -113,7 +137,10 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header');
 		
-		$this->load->view('catalog/category_view', $data);
+		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
+		// TODO: side
+		$main_params['side'] = '<h1>Side Box</h1><p>TODO: Put side box content here</p>';
+		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
 		$this->load->view('html_end');

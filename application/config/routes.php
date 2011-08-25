@@ -46,6 +46,7 @@ $route['watch/([\d]+)/(.+)'] = "video/watch/$1/$2";
 // Article pages
 $route['about'] = 'article/about';
 $route['help'] = 'article/help';
+$route['install-plugins'] = 'article/install-plugins';
 
 
 

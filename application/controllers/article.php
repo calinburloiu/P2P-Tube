@@ -43,11 +43,11 @@ class Article extends Article_Controller {
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header', array('selected_menu' => $method));
 		
-		$this->load->view('echo', 
-			array('output' => $this->_load($method, $params),
-				'clear' => TRUE)
-			);
-		
+		$main_params['content'] = $this->_load($method, $params);
+		// TODO side
+		$main_params['side'] = '<h1>Side Box</h1><p>TODO: Put side box content here</p>';
+		$this->load->view('main', $main_params); 
+				
 		$this->load->view('footer');
 		$this->load->view('html_end');
 	}

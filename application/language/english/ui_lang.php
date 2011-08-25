@@ -2,6 +2,7 @@
 
 // Navigation Menu
 $lang['ui_nav_menu_home'] = 'Home';
+$lang['ui_nav_menu_install_plugins'] = 'Install Plugins';
 $lang['ui_nav_menu_about'] = 'About';
 $lang['ui_nav_menu_log_in'] = 'Log In';
 $lang['ui_nav_menu_register'] = 'Register';

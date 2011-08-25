@@ -7,7 +7,7 @@
  * @author		Călin-Andrei Burloiu
  */
 class Videos_model extends CI_Model {
-	private $db = NULL;
+	public $db = NULL;
 	
 	public function __construct()
 	{
@@ -119,6 +119,8 @@ class Videos_model extends CI_Model {
 	 */
 	public function get_video($id, $name = NULL)
 	{
+		$this->load->helper('video');
+		
 		$query = $this->db->query('SELECT * 
 								FROM `videos` 
 								WHERE id = ?', $id);
@@ -142,6 +144,12 @@ class Videos_model extends CI_Model {
 		$video['tags'] = json_decode($video['tags'], TRUE);
 		asort($video['tags']);
 		$video['tags'] = array_reverse($video['tags'], TRUE);
+		
+		// Sort assets by their megapixels number.
+		function access_function($a) { return $a['res']; }
+		function assets_cmp($a, $b) 
+			{ return megapixels_cmp($a, $b, "access_function"); }
+		usort($video['assets'], "assets_cmp");
 		
 		// Torrents
 		$video['url'] = array();

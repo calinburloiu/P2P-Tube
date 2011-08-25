@@ -2,6 +2,7 @@
 
 // Navigation Menu
 $lang['ui_nav_menu_home'] = 'Acasă';
+$lang['ui_nav_menu_install_plugins'] = 'Instalare Plugin-uri';
 $lang['ui_nav_menu_about'] = 'Despre';
 $lang['ui_nav_menu_log_in'] = 'Autentificare';
 $lang['ui_nav_menu_register'] = 'Înregistrare';

@@ -1,12 +1,12 @@
 .videos-summary
 {
 	position: relative;
+	margin-bottom: 1em;
 }
 
 .category-title
 {
-	border-bottom: 1px solid rgb(108,162,222);
-	/*border-bottom: 1px solid rgb(171,209,255);*/
+	/* border-bottom: 1px solid rgb(108,162,222); */
 }
 
 .video-icon
