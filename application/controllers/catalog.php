@@ -146,8 +146,7 @@ class Catalog extends CI_Controller {
 		$this->load->view('header');
 		
 		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
-		// TODO: side
-		$main_params['side'] = '<h1>Side Box</h1><p>TODO: Put side box content here</p>';
+		$main_params['side'] = $this->load->view('side_default.php', NULL, TRUE);
 		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
