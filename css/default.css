@@ -3,7 +3,7 @@ body
 	margin: 0;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 75%;
-	background: white url('/devel/img/bg.png') repeat-x left 90px;
+	background: white url('/devel/img/bg.png') repeat-x left 88px;
 }
 
 a:link
@@ -22,6 +22,19 @@ a:hover, a:active
 
 h1
 {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
+
+.inline
+{
+	vertical-align: middle;
+}
+
+.container-install
+{
+	width: 192px;
+	margin: 0 auto;
 	margin-top: 8px;
 	margin-bottom: 8px;
 }
@@ -49,7 +62,7 @@ h1
 #nav-menu a:link, #nav-menu a:visited
 {
 	display: block;
-	height: 14px;
+	height: 12px;
 	color: white;
 	text-align: center;
 	line-height: 100%;
@@ -58,17 +71,25 @@ h1
 	padding-bottom: 5px;
 	padding-left: 16px;
 	padding-right: 16px;
+	border: 1px solid transparent;
 	text-decoration: none;
+}
+#nav-menu a:hover
+{
+	background-color: rgb(90,148,216);
+	border: 1px outset rgb(0,90,192);
+}
+#nav-menu a:active
+{
+	background-color: rgb(90,148,216);
+	border: 1px inset rgb(60,128,208);
 }
 #nav-menu a.selected
 {
 	background-color: rgb(60,128,208);
+	border: 1px inset rgb(60,128,208);
 	color: #FFE4B5;
 	font-weight: bold;
-}
-#nav-menu a:hover, #nav-menu a:active
-{
-	background-color: rgb(90,148,216);
 }
 
 #header
@@ -78,9 +99,9 @@ h1
 	top: 24px;
 	left: 0;
 	width: 100%;*/
-	height: 64px;
+	height: 62px;
 	background: #e5ecf5;
-	border-bottom: 2px ridge rgb(60,128,208);
+	border: 1px outset #e5ecf5;
 }
 
 #logo
@@ -123,8 +144,10 @@ h1
 	font-weight: bold;
 	color: #000D60;
 	text-align: left;
-	padding: 10px 0px 0px 10px;
+	padding: 0px 0px 0px 8px;
+	margin: 8px 0px 8px 0px;
 	background: url(/devel/img/header.png) top repeat-x;
+	outline: 1px outset rgb(108,162,222);
 	clear: both;
 }
 
@@ -141,6 +164,11 @@ h1
 #main table img
 {
 	vertical-align: middle;
+}
+
+#main dt
+{
+	font-weight: bold;
 }
 
 #content
@@ -162,10 +190,11 @@ h1
 #footer
 {
 	clear: both;
-	border-top: 2px ridge rgb(60,128,208);
-	padding-top: 8px;
-	padding-bottom: 8px;
+	border: 1px outset #e5ecf5;
+	padding-top: 0.5em;
+	padding-bottom: 0.4em;
 	background: #e5ecf5;
+	font-size: 0.9em;
 	text-align: center;
 }
 

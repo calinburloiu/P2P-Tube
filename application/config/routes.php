@@ -44,9 +44,10 @@ $route['404_override'] = '';
 $route['watch/([\d]+)/?'] = "video/watch/$1";
 $route['watch/([\d]+)/(.+)'] = "video/watch/$1/$2";
 // Article pages
+$route['install-plugins'] = 'article/install-plugins';
 $route['about'] = 'article/about';
 $route['help'] = 'article/help';
-$route['install-plugins'] = 'article/install-plugins';
+$route['contact'] = 'article/contact';
 
 
 

@@ -14,6 +14,9 @@ endif ?>
 	
 	<li class="menu-left"><a href="<?php echo site_url('help') ?>" 
 		<?php echo ($selected_menu == 'help' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_help') ?></a></li>
+		
+	<li class="menu-left"><a href="<?php echo site_url('contact') ?>" 
+		<?php echo ($selected_menu == 'contact' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_contact') ?></a></li>
 	
 	<li class="menu-right"><a href="#<?php //echo site_url('register') ?>" 
 		<?php echo ($selected_menu == 'register' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_register') ?></a></li>

@@ -17,6 +17,8 @@ debug/*
 docs/tmp/*
 config.mk
 *~
+*.exe
+*.dmg
 *.zip
 *.gz
 *.bz2

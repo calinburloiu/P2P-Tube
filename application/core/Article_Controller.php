@@ -3,30 +3,68 @@
  * Library Article_Controller can be extended by a controller to be used for 
  * content pages that depend on the language.
  *
- * Several language specific parameters can be coded in language files.
- * Non language specific parameters can be putted in config files.
+ * The page views are usually located in
+ * "application/views/article/$language/$method".
+ * Parameters:
+ * <ul>
+ * 	<li><strong>Article Title:</strong> in language file 'article_lang.php':
+ * an entry named "article_$method".
+ * If not present "$method" is used as a name.</li>
+ * 	<li><strong>Article Meta Description:</strong> in language file..:
+ * an entry "article_${method}_description"</li>
+ * 	<li><strong>Helpers, Libraries:</strong> in config file 'article.php':
+ * an entry named "article_${method}_helpers" or "article_${method}_libraries"
+ * respectively with an array of helpers or libraries to be loaded for the
+ * article.</li>
+ * </ul> 
  *
- * @category	Library
+ * @category	Base Controller Library
  * @author		Călin-Andrei Burloiu
  */
 class Article_Controller extends CI_Controller {
 	
+	protected $title = NULL;
+	protected $metaDescription = NULL;
+	protected $helpers = array();
+	protected $libraries = array();
+	
 	function __construct()
 	{
 		parent::__construct();
+		
+		// Language, title and description
+		$this->lang->load('article');
+		
+		// Helpers and libraries.
+		$this->config->load('article');
 	}
 	
 	/**
-	 * Override this with site specific information (header, menus...) and call
+	 * Extend this with site specific information (header, menus...) and call
 	 * $this->_load which is a generic method that loads the article.
 	 * Both parameters must be passed to $this->_load.
 	 */
 	public function _remap($method, $params = array())
 	{
-		$this->load->view('echo', 
-			array('output' => $this->_load($method, $params),
-				'clear' => TRUE)
-			);
+		// Title
+		$this->title = $this->lang->line("article_$method");
+		if ($this->title === FALSE)
+			$this->title = $method;
+
+		// Meta Description
+		$this->metaDescription = $this->lang->line("article_${method}_description");
+		if ($this->metaDescription === FALSE)
+			$this->metaDescription = '';
+		
+		// Helpers
+		$this->helpers = $this->config->item("article_${method}_helpers");
+		if ($this->helpers !== FALSE)
+			$this->load->helper($this->helpers);
+		
+		// Libraries
+		$this->libraries = $this->config->item("article_${method}_library");
+		if ($this->libraries !== FALSE)
+			$this->load->library($libraries);
 	}
 	
 	/**

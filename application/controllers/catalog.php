@@ -45,8 +45,11 @@ class Catalog extends CI_Controller {
 							'css' => array(
 								'catalog.css', 
 								'jquery-ui.css'
-								),
-							//'js' => array(),
+							),
+							'js' => array(
+								'jquery.js',
+								'jquery-ui.js'
+							),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
@@ -58,8 +61,7 @@ class Catalog extends CI_Controller {
 		$this->load->view('header', array('selected_menu' => 'home'));
 		
 		$main_params['content'] = $this->load->view('catalog/index_view', $data, TRUE);
-		// TODO: side
-		$main_params['side'] = '<h1>Side Box</h1><p>TODO: Put side box content here</p>';
+		$main_params['side'] = $this->load->view('side_default.php', NULL, TRUE);
 		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
@@ -72,7 +74,10 @@ class Catalog extends CI_Controller {
 							'css' => array(
 								'jquery-ui.css'
 								),
-							//'js' => array(),
+							'js' => array(
+								'jquery.js',
+								'jquery-ui.js'
+							),
 							//'metas' => array('description'=>'','keywords'=>'')
 			);
 		$this->load->library('html_head_params', $params);
@@ -125,8 +130,11 @@ class Catalog extends CI_Controller {
 							'css' => array(
 								'catalog.css', 
 								'jquery-ui.css'
-								),
-							//'js' => array(),
+							),
+							'js' => array(
+								'jquery.js',
+								'jquery-ui.js'
+							),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);

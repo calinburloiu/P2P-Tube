@@ -5,35 +5,36 @@
  * Their content depends on the language.
  *
  * The page views are located in "application/views/article/$language/$method".
- * Article's name can be set in language file 'article_lang.php' by using an
- * entry named "article_$method". If not present "$method" is used as a name.
- * Article meta description has the entry "article_$method_description"
  *
  * @category	Controller
  * @author		Călin-Andrei Burloiu
  */
 class Article extends Article_Controller {
+	
+	public function __construct()
+	{
+		parent::__construct();
+	}
 
 	public function _remap($method, $params = array())
-	{
+	{	
+		parent::_remap($method, $params);
+		
 		// **
 		// ** DATA
 		// **
-		$this->lang->load('article');
-		$title = $this->lang->line("article_$method");
-		if ($title == FALSE)
-			$title = $method;
-		$descr = $this->lang->line("article_${method}_description");
-		if ($descr == FALSE)
-			$descr = '';
 		
-		$html_params = array(	'title' => 
-								$title.' - '. $this->config->item('site_name'),
+		$html_params = array('title' => $this->title.' - '
+									. $this->config->item('site_name'),
 							'css' => array(
 								'jquery-ui.css'
-								),
-							//'js' => array(),
-							'metas' => array('description'=>$descr)
+							),
+							'js' => array(
+								'jquery.js',
+								'jquery-ui.js'
+							),
+							'metas' => 
+								array('description'=>$this->metaDescription)
 							);
 		$this->load->library('html_head_params', $html_params);
 
@@ -44,8 +45,7 @@ class Article extends Article_Controller {
 		$this->load->view('header', array('selected_menu' => $method));
 		
 		$main_params['content'] = $this->_load($method, $params);
-		// TODO side
-		$main_params['side'] = '<h1>Side Box</h1><p>TODO: Put side box content here</p>';
+		$main_params['side'] = $this->load->view('side_default.php', NULL, TRUE);
 		$this->load->view('main', $main_params); 
 				
 		$this->load->view('footer');
