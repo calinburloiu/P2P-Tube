@@ -68,7 +68,7 @@
 
 <h1>The Platform</h1>
 
-<p>The P2P video distribution platform used by this site is written in <a href="http://www.php.net/">PHP</a>. It makes use of the excellent <a href="http://codeigniter.com/">CodeIgniter"</a> web application framework.</p>
+<p>The P2P video distribution platform used by this site is written in <a href="http://www.php.net/">PHP</a>. It makes use of the excellent <a href="http://codeigniter.com/">CodeIgniter</a> web application framework.</p>
 
 <p>To install and configure the platform on your local system, please download <a href="http://p2p-next.cs.pub.ro/gitweb/?p=living-lab-site.git;a=snapshot;h=HEAD;sf=tgz">the latest tarball</a> and follow the instructions in the INSTALL file or the wiki (<strong>TODO</strong>).</p>
 
