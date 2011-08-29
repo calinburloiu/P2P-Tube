@@ -76,6 +76,6 @@
 <ul>
 	<li>... ask questions or provide answers on the <a href="https://p2p-next.cs.pub.ro/redmine/projects/site/boards">forums</a>;</li>
 	<li>... add issues to the <a href="https://p2p-next.cs.pub.ro/redmine/site/issues">issue tracker</a>, signaling problems and absent features;</li>
-	<li>... clone the Git repository, do code reviews and send patches;<li>
+	<li>... clone the Git repository, do code reviews and send patches;</li>
 	<li>... <?php echo safe_mailto('p2p-next-contact@cs.pub.ro', 'ask us') ?> for write access to the <a href="https://p2p-next.cs.pub.ro/redmine/site/wiki">wiki</a> and update pages.</li>
 </ul>
