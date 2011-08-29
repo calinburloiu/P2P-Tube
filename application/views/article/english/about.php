@@ -70,12 +70,12 @@
 
 <p>The P2P video distribution platform used by this site is written in <a href="http://www.php.net/">PHP</a>. It makes use of the excellent <a href="http://codeigniter.com/">CodeIgniter"</a> web application framework.</p>
 
-<p>To install and configure the platform on your local system, please download <a href="http://p2p-next.cs.pub.ro/gitweb/?p=living-lab-site.git;a=snapshot;h=HEAD;sf=tgz">the latest tarball</a> and follow the instructions in the INSTALL page or the wiki (<strong>TODO</strong>).</p>
+<p>To install and configure the platform on your local system, please download <a href="http://p2p-next.cs.pub.ro/gitweb/?p=living-lab-site.git;a=snapshot;h=HEAD;sf=tgz">the latest tarball</a> and follow the instructions in the INSTALL file or the wiki (<strong>TODO</strong>).</p>
 
-<p>We welcome contributors to the development and testing of the platform. If you would like to contribute you may, we recommend you <a href="">register on the Redmine development site</a> and ...
+<p>We welcome contributions to the development and testing of this platform. If you would like to contribute, we recommend you <a href="https://p2p-next.cs.pub.ro/redmine/account/register">register on the Redmine development site</a> and ...
 <ul>
-	<li>... ask questions or provide answers on the <a href="https://p2p-next.cs.pub.ro/redmine/projects/site/boards">forums</a></li>;
-	<li>... add issues to the <a href="https://p2p-next.cs.pub.ro/redmine/site/issues">issue tracker</a>, signaling problems and absent features</li>;
-	<li>... clone the Git repository, do code reviews and send patches<li>;
-	<li>... <?php echo safe_mailto('p2p-next-contact@cs.pub.ro', 'ask us') ?> for write access to the <a href="https://p2p-next.cs.pub.ro/redmine/site/wiki">wiki</a></li> and update pages.</li>
+	<li>... ask questions or provide answers on the <a href="https://p2p-next.cs.pub.ro/redmine/projects/site/boards">forums</a>;</li>
+	<li>... add issues to the <a href="https://p2p-next.cs.pub.ro/redmine/site/issues">issue tracker</a>, signaling problems and absent features;</li>
+	<li>... clone the Git repository, do code reviews and send patches;<li>
+	<li>... <?php echo safe_mailto('p2p-next-contact@cs.pub.ro', 'ask us') ?> for write access to the <a href="https://p2p-next.cs.pub.ro/redmine/site/wiki">wiki</a> and update pages.</li>
 </ul>
