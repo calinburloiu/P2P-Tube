@@ -7,4 +7,8 @@
 		<?php echo safe_mailto('p2p-next-contact@cs.pub.ro', 'p2p-next-contact@cs.pub.ro') ?>
 		<!--<a href="mailto:p2p-next-contact@cs.pub.ro">p2p-next-contact@cs.pub.ro</a>-->
 	</dd>
+	<dt><img src="<?php echo site_url('img/redmine-logo.svg') ?>" class="inline" alt="email" width="48" height="33" /> Redmine Issue Tracker: </dt>
+	<dd>
+		<a href="http://p2p-next.cs.pub.ro/redmine/site/issues">http://p2p-next.cs.pub.ro/redmine/site/issues</a>
+	</dd>
 </dl>
