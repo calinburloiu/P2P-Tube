@@ -8,7 +8,7 @@
 <p>To install the SwarmPlayer video plugin (based on <a href="http://www.w3.org/TR/html5/">HTML5</a>) visit P2P-Next's <a href="http://swarmplayer.p2p-next.org/" target="_blank">SwarmPlayer Site</a>. You'll find a page such as the one in the screenshot below.
 </p>
 
-<a href="http://swarmplayer.p2p-next.org/" target="_blank" style="text-align:center"><img src="<?php echo site_url('img/SwarmPlayer-site.jpg') ?>" alt="SwarmPlayer Site" width="288" height="240" /></a>
+<a href="http://swarmplayer.p2p-next.org/" target="_blank" style="display:block; text-align:center"><img src="<?php echo site_url('img/SwarmPlayer-site.jpg') ?>" alt="SwarmPlayer Site" width="288" height="240" /></a>
 
 <p>
 Find the green button labeled "Add Swarmplayer ...". Click it and follow the instructions.</p>
