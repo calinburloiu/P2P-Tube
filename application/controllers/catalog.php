@@ -43,13 +43,9 @@ class Catalog extends CI_Controller {
 		
 		$params = array(	'title' => $this->config->item('site_name'),
 							'css' => array(
-								'catalog.css', 
-								'jquery-ui.css'
+								'catalog.css'
 							),
-							'js' => array(
-								'jquery.js',
-								'jquery-ui.js'
-							),
+							//'js' => array(),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
@@ -71,13 +67,8 @@ class Catalog extends CI_Controller {
 	public function test($page = 0)
 	{
 		$params = array(	'title' => 'Test - '. $this->config->item('site_name'),
-							'css' => array(
-								'jquery-ui.css'
-								),
-							'js' => array(
-								'jquery.js',
-								'jquery-ui.js'
-							),
+							//'css' => array(),
+							//'js' => array(),
 							//'metas' => array('description'=>'','keywords'=>'')
 			);
 		$this->load->library('html_head_params', $params);
@@ -128,13 +119,9 @@ class Catalog extends CI_Controller {
 		
 		$params = array(	'title' => $this->config->item('site_name'),
 							'css' => array(
-								'catalog.css', 
-								'jquery-ui.css'
+								'catalog.css'
 							),
-							'js' => array(
-								'jquery.js',
-								'jquery-ui.js'
-							),
+							//'js' => array(),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);

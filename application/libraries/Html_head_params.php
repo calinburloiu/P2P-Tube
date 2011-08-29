@@ -5,9 +5,10 @@
  * included inside the head tag like: title, stylesheets, scripts and meta
  * information.
  *
- * The constructor automatically adds the default stylesheet and default script
- * if any from 'application/config/p2p-tube.php' so they don't have to be added
- * manually.
+ * The constructor automatically adds the autoload-configured CSSs and JSs 
+ * if any from "application/config/${site_config}.php" so they don't have to be
+ * added manually. The configuration parameters are:
+ * 'autoload_css', 'autoload_js'.
  *
  * The variables are passed as data in 'application/views/html_begin.php' which
  * is going to generate the tags based on their information.
@@ -27,6 +28,8 @@ class Html_head_params {
 	// Dictionary for meta tags: name => content
 	public $metas;
 	
+	protected $site_config = 'p2p-tube';
+	
 	/**
 	 * Initializes member variables with the parameters provided and adds the
 	 * default stylesheet to member $css and the default script to
@@ -45,7 +48,11 @@ class Html_head_params {
 	{
 		$CI =& get_instance();
 		$CI->load->helper('url');
-		$CI->load->config('p2p-tube');
+		
+		if (isset($this->site_config))
+			$CI->load->config($this->site_config);
+		else
+		{ /* TODO: no site config*/ }
 		
 		if (isset($params['title']))
 			$this->title = $params['title'];
@@ -68,10 +75,10 @@ class Html_head_params {
 			$this->metas = array();
 			
 		// Default parameters from configuration file
-		if ($CI->config->item('default_css') != '')
-			$this->css[] = $CI->config->item('default_css');
-		if ($CI->config->item('default_js') != '')
-			$this->js[] = $CI->config->item('default_js');
+		$this->css = array_merge(
+			$CI->config->item('autoload_css'), $this->css);
+		$this->js = array_merge(
+			$CI->config->item('autoload_js'), $this->js);
 		
 		// URL correct prefixes
 		foreach ($this->css as $i => $val)

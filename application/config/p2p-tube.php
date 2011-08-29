@@ -14,35 +14,38 @@ $config['site_name'] = 'P2P-Next UPB LivingLab';
 
 /*
 |--------------------------------------------------------------------------
-| Default Stylesheet
+| Autoload Stylesheets
 |--------------------------------------------------------------------------
 |
-| Sets the default CSS that is going to be automatically added on any HTML
+| Sets the default CSSs that are going to be automatically added on any HTML
 | page generated with 'application/views/html_begin.php' view and
 | HTML_head_params library.
 |
 | Do not include any path to the file! 'css/' is going to be used.
 |
-| Leave blank for no default stylesheet.
+| Use "array()" for no default stylesheet.
 |
 */
-$config['default_css'] = 'default.css';
+$config['autoload_css'] = array('default.css',
+								'jquery-ui.css');
 
 /*
 |--------------------------------------------------------------------------
-| Default Javascript
+| Autoload Javascript
 |--------------------------------------------------------------------------
 |
-| Sets the default Javascript that is going to be automatically added in any
+| Sets the default Javascripts that are going to be automatically added in any
 | HTML page generated with 'application/views/html_begin.php' view and
 | HTML_head_params library.
 |
 | Do not include any path to the file! 'js/' is going to be used.
 |
-| Leave blank for no default javascript.
+| Use "array()" for no default javascript.
 |
 */
-$config['default_js'] = '';
+$config['autoload_js'] = array('jquery.js',
+								'jquery-ui.js',
+								'jquery.ui.nsinstall.js');
 
 /*
 |--------------------------------------------------------------------------

@@ -11,6 +11,13 @@ $lang['ui_nav_menu_register'] = 'Register';
 
 $lang['ui_search'] = 'Search';
 
+// Install Video Plugins
+$lang['ui_install'] = 'Install ';
+$lang['ui_install_os_not_supported'] = ' is not supported for your operating system';
+$lang['ui_install_browser_not_supported'] = ' is not supported for your browser';
+$lang['ui_install_browser_version_not_supported'] = ' is not supported for your browser version';
+$lang['ui_install_already_installed'] = ' is installed';
+
 // Video Categories
 $lang['ui_categ_movies'] = 'Movies';
 $lang['ui_categ_tech_talks'] = 'TechTalks';

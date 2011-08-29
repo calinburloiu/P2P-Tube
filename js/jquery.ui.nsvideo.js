@@ -199,6 +199,15 @@ $.widget( "ui.nsvideo", {
 		
 		widget.$videoContainer.html('');
 		
+		// Install buttons or not supported message if required
+		var $installContainer = $('<div class="container-install-in-widget"></div>')
+			.appendTo(widget.$videoContainer);
+		$installContainer
+			.nsinstall({
+				type: widget.options.type,
+				hideIfAlreadyInstalled: true
+			});
+		
 		var width = widget.options.width;
 		var height = widget.options.height;
 		
@@ -833,6 +842,9 @@ $.widget( "ui.nsvideo", {
 		},
 		
 		pause: function() {
+			if (typeof widget.$video[0].playlist === 'undefined')
+				return widget;
+			
 			if (widget.$video[0].playlist.isPlaying)
 				widget.$video[0].playlist.togglePause();
 			
