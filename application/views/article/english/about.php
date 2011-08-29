@@ -65,3 +65,17 @@
 	<li>from <a href="<?php site_url('catalog/category/4') ?>">karaoke parties</a> in <a href="http://acs.pub.ro/" target="_blank" ref="nofollow">Automatic Control and Computers Faculty</a></li>
 </ul>
 <p>All available movies are currently seeded by 5 peers with high bandwidth (1Gbit) kindly provided by the<a title="NCIT-Cluster" href="http://cluster.ncit.pub.ro/" target="_blank" ref="nofollow"> NCIT-Cluster</a>. Anyone that watches a movie will take part in the swarm and ensure greater availability to provided content.</p>
+
+<h1>The Platform</h1>
+
+<p>The P2P video distribution platform used by this site is written in <a href="http://www.php.net/">PHP</a>. It makes use of the excellent <a href="http://codeigniter.com/">CodeIgniter"</a> web application framework.</p>
+
+<p>To install and configure the platform on your local system, please download <a href="http://p2p-next.cs.pub.ro/gitweb/?p=living-lab-site.git;a=snapshot;h=HEAD;sf=tgz">the latest tarball</a> and follow the instructions in the INSTALL page or the wiki (<strong>TODO</strong>).</p>
+
+<p>We welcome contributors to the development and testing of the platform. If you would like to contribute you may, we recommend you <a href="">register on the Redmine development site</a> and ...
+<ul>
+	<li>... ask questions or provide answers on the <a href="https://p2p-next.cs.pub.ro/redmine/projects/site/boards">forums</a></li>;
+	<li>... add issues to the <a href="https://p2p-next.cs.pub.ro/redmine/site/issues">issue tracker</a>, signaling problems and absent features</li>;
+	<li>... clone the Git repository, do code reviews and send patches<li>;
+	<li>... <?php echo safe_mailto('p2p-next-contact@cs.pub.ro', 'ask us') ?> for write access to the <a href="https://p2p-next.cs.pub.ro/redmine/site/wiki">wiki</a></li> and update pages.</li>
+</ul>
