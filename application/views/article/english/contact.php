@@ -5,7 +5,6 @@
 	<dt><img src="<?php echo site_url('img/email-icon.png') ?>" class="inline" alt="email" /> E-mail: </dt>
 	<dd>
 		<?php echo safe_mailto('p2p-next-contact@cs.pub.ro', 'p2p-next-contact@cs.pub.ro') ?>
-		<!--<a href="mailto:p2p-next-contact@cs.pub.ro">p2p-next-contact@cs.pub.ro</a>-->
 	</dd>
 	<dt><img src="<?php echo site_url('img/redmine-logo.svg') ?>" class="inline" alt="email" width="48" height="33" /> Redmine Issue Tracker: </dt>
 	<dd>
