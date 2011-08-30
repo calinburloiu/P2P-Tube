@@ -124,10 +124,15 @@
 			.nsvideo({
 				type: "<?php echo $plugin_type ?>",
 				src: <?php echo json_encode($video['assets']) ?>,
-				//width: videoWidth,
-				//height: videoHeight
-				minWidth: 640,
-				maxWidth: 1024,
+
+						
+				width: 427,
+				height: 240,
+				showState: false,
+
+				
+				//minWidth: 640,
+				//maxWidth: 1024,
 				initialDuration: "<?php echo $video['duration'] ?>",
 				
 				resize: function() {

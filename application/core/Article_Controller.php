@@ -16,6 +16,11 @@
  * an entry named "article_${method}_helpers" or "article_${method}_libraries"
  * respectively with an array of helpers or libraries to be loaded for the
  * article.</li>
+ * <li><strong>CSSs, JSs:</strong> in config file 'article.php':
+ * an entry named "article_${method}_css" or "article_${method}_js"
+ * respectively with an array of .css or .js to be loaded into members $css
+ * and $js. It's up to the programmer to define how this members are going
+ * to be used.</li>
  * </ul> 
  *
  * @category	Base Controller Library
@@ -27,6 +32,8 @@ class Article_Controller extends CI_Controller {
 	protected $metaDescription = NULL;
 	protected $helpers = array();
 	protected $libraries = array();
+	protected $css = array();
+	protected $js = array();
 	
 	function __construct()
 	{
@@ -65,6 +72,16 @@ class Article_Controller extends CI_Controller {
 		$this->libraries = $this->config->item("article_${method}_library");
 		if ($this->libraries !== FALSE)
 			$this->load->library($libraries);
+		
+		// CSSs
+		$css =& $this->config->item("article_${method}_css");
+		if ($css !== FALSE)
+			$this->css = $css;
+		
+		// JavaScripts
+		$js =& $this->config->item("article_${method}_js");
+		if ($js !== FALSE)
+			$this->js = $js;
 	}
 	
 	/**

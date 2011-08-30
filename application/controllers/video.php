@@ -38,6 +38,7 @@ class Video extends CI_Controller {
 		// **
 		// Retrieve video information.
 		$this->load->model('videos_model');
+		$this->videos_model->inc_video_var($id, 'views');
 		$data['video'] = $this->videos_model->get_video($id, $name);
 		$data['plugin_type'] = ($plugin === NULL ? 'auto' : $plugin);
 		

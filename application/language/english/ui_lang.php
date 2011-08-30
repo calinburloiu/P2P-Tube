@@ -24,6 +24,12 @@ $lang['ui_categ_tech_talks'] = 'TechTalks';
 $lang['ui_categ_events'] = 'Events';
 $lang['ui_categ_karaoke'] = 'Karaoke';
 
+// Pagination
+$lang['ui_page_first'] = 'First';
+$lang['ui_page_previous'] = 'Previous';
+$lang['ui_page_next'] = 'Next';
+$lang['ui_page_last'] = 'Last';
+
 // Video asset metrics
 $lang['ui_view'] = 'view';
 $lang['ui_views'] = 'views';

@@ -200,13 +200,19 @@ $.widget( "ui.nsvideo", {
 		widget.$videoContainer.html('');
 		
 		// Install buttons or not supported message if required
-		var $installContainer = $('<div class="container-install-in-widget"></div>')
-			.appendTo(widget.$videoContainer);
-		$installContainer
-			.nsinstall({
-				type: widget.options.type,
-				hideIfAlreadyInstalled: true
-			});
+		if (typeof $.fn.nsinstall == 'function')
+		{
+			widget.$installContainer = $('<div class="container-install-in-widget"></div>')
+				.appendTo(widget.$videoContainer);
+			widget.$installContainer
+				.nsinstall({
+					type: widget.options.type,
+					hideIfAlreadyInstalled: true
+				});
+			if (widget.$installContainer.nsinstall('option', 'error')
+					== 'already installed')
+				widget.$installContainer.hide();
+		}
 		
 		var width = widget.options.width;
 		var height = widget.options.height;
@@ -243,6 +249,10 @@ $.widget( "ui.nsvideo", {
 						widget.html5.refreshVolume();
 						widget.html5.refreshState();
 						widget._setWidgetWidth();
+						
+						if (widget.$video[0].error != 3
+								&& widget.$video[0].error != 4)
+							widget.$installContainer.hide();
 					},
 					seeked: function() {
 						widget.html5.play();
@@ -375,7 +385,7 @@ $.widget( "ui.nsvideo", {
 		if (widget.$video.width() < 640)
 		{
 			widget.element.css('width',
-							640 + 8 + 'px');
+							427 + 8 + 'px');//TODO 640 + 8
 			widget.$video.css('left', 
 				Math.round(widget.$videoContainer.width()/2 
 				- widget.$video.width()/2)
@@ -826,6 +836,11 @@ $.widget( "ui.nsvideo", {
 		},
 		
 		play: function() {
+			if(typeof widget.$video[0].playlist.isPlaying == 'undefined')
+				return widget;
+			
+			widget.$installContainer.hide();
+			
 			if (! widget.$video[0].playlist.isPlaying)
 				widget.$video[0].playlist.play();
 			

@@ -176,6 +176,21 @@ class Videos_model extends CI_Model {
 		return $video;
 	}
 	
+	/**
+	 * Increment a video parameter from DB: `views`, `likes` or `dislikes`.
+	 * 
+	 * @param int $id	DB video id
+	 * @param string $param	DB parameter column name.
+	 * @return void
+	 */
+	public function inc_video_var($id, $var)
+	{
+		// TODO error report if query returns FALSE
+		$this->db->query('UPDATE `videos` '
+						. 'SET `'. $var. '`=`'. $var. '`+1 '
+						. 'WHERE id='. $id); 
+	}
+	
 	public function get_thumbs($name, $count)
 	{
 		$thumbs = array();

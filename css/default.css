@@ -210,4 +210,5 @@ h1
 .pagination
 {
 	clear: both;
+	word-spacing: 0.5em;
 }

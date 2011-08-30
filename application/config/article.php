@@ -6,5 +6,9 @@
  */
 
 // Examples
-$config['article_$method_helpers'] = array();
-$config['article_$method_libraries'] = array();
+// $config['article_$method_helpers'] = array();
+// $config['article_$method_libraries'] = array();
+
+
+// Help article
+$config['article_help_js'] = array('jquery.ui.imagemap.js');
