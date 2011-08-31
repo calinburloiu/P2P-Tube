@@ -3,7 +3,7 @@ body
 	margin: 0;
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 75%;
-	background: white url('/devel/img/bg.png') repeat-x left 88px;
+	background: white url('/img/bg.png') repeat-x left 88px;
 }
 
 a:link
@@ -153,7 +153,7 @@ h1
 	text-align: left;
 	padding: 0px 0px 0px 8px;
 	margin: 8px 0px 8px 0px;
-	background: url(/devel/img/header.png) top repeat-x;
+	background: url(/img/header.png) top repeat-x;
 	outline: 1px outset rgb(108,162,222);
 	clear: both;
 }

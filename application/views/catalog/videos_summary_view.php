@@ -1,6 +1,6 @@
 <div class="videos-summary">
 	<h1 class="category-title">
-		<a href="<?php echo site_url("catalog/category/$category_id") ?>">
+		<a href="<?php echo site_url("catalog/category/$category_name") ?>">
 			<?php echo $category_title ?>
 		</a>
 	</h1>

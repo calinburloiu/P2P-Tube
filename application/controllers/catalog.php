@@ -29,6 +29,7 @@ class Catalog extends CI_Controller {
 				$id, 0, $this->config->item('videos_per_row'));
 			
 			// Category
+			$vs_data['category_name'] = $name;
 			$vs_data['category_title'] = $name ?
 				$this->lang->line("ui_categ_$name") : $name;
 			$vs_data['category_id'] = $id;
@@ -106,7 +107,7 @@ class Catalog extends CI_Controller {
 		
 		// Pagination
 		$this->load->library('pagination');
-		$pg_config['base_url'] = site_url("catalog/category/$category_id/");
+		$pg_config['base_url'] = site_url("catalog/category/$category_name/");
 		$pg_config['uri_segment'] = 4;
 		$pg_config['total_rows'] = $this->videos_model->get_videos_count(
 			$category_id);

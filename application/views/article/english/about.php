@@ -59,10 +59,10 @@
 <p>To take a look at the NextShare plugins in action, all you have to do is <a href="<?php echo site_url('install-plugins'); ?>">install them</a> and then watch any video asset from this site.</p>
 <p>Through the use of P2P technology, you will be able to stream movies from various categories:</p>
 <ul>
-	<li>from <a href="<?php site_url('catalog/category/1') ?>">feature films</a></li>
-	<li>from <a href="<?php echo site_url('catalog/category/2') ?>"><em>TechTalks</em> technical presentations</a></li>
-	<li>or from <a href="<?php site_url('catalog/category/3') ?>">various events</a> from our faculty</li>
-	<li>from <a href="<?php site_url('catalog/category/4') ?>">karaoke parties</a> in <a href="http://acs.pub.ro/" target="_blank" rel="nofollow">Automatic Control and Computers Faculty</a></li>
+	<li>from <a href="<?php echo site_url('catalog/category/movies') ?>">feature films</a></li>
+	<li>from <a href="<?php echo site_url('catalog/category/tech-talks') ?>"><em>TechTalks</em> technical presentations</a></li>
+	<li>or from <a href="<?php echo site_url('catalog/category/events') ?>">various events</a> from our faculty</li>
+	<li>from <a href="<?php echo site_url('catalog/category/karaoke') ?>">karaoke parties</a> in <a href="http://acs.pub.ro/" target="_blank" rel="nofollow">Automatic Control and Computers Faculty</a></li>
 </ul>
 <p>All available movies are currently seeded by 5 peers with high bandwidth (1Gbit) kindly provided by the<a title="NCIT-Cluster" href="http://cluster.ncit.pub.ro/" target="_blank" rel="nofollow"> NCIT-Cluster</a>. Anyone that watches a movie will take part in the swarm and ensure greater availability to provided content.</p>
 
