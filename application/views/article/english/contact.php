@@ -6,8 +6,14 @@
 	<dd>
 		<?php echo safe_mailto('p2p-next-contact@cs.pub.ro', 'p2p-next-contact@cs.pub.ro') ?>
 	</dd>
+	
 	<dt><img src="<?php echo site_url('img/redmine-logo.svg') ?>" class="inline" alt="redmine" width="48" height="33" /> Redmine Issue Tracker: </dt>
 	<dd>
 		<a href="http://p2p-next.cs.pub.ro/redmine/site/issues">http://p2p-next.cs.pub.ro/redmine/site/issues</a>
+	</dd>
+	
+	<dt><img src="<?php echo site_url('img/redmine-logo.svg') ?>" class="inline" alt="redmine" width="48" height="33" /> Redmine Forums: </dt>
+	<dd>
+		<a href="https://p2p-next.cs.pub.ro/redmine/projects/site/boards">https://p2p-next.cs.pub.ro/redmine/projects/site/boards</a>
 	</dd>
 </dl>
