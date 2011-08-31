@@ -143,7 +143,7 @@ class Catalog extends CI_Controller {
 	
 	public function search($query_str)
 	{
-		echo $query_str;
+		echo '<h1>Search not yet implemented</h1>';
 	}
 }
 
