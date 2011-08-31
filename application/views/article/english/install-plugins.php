@@ -4,7 +4,7 @@
 	<li><a href="#NextSharePC">NextSharePC (based on VLC)</a></li>
 </ol>
 
-<h1><a name="SwarmPlayer">SwarmPlayer</a></h1>
+<h1><a id="SwarmPlayer">SwarmPlayer</a></h1>
 <p>To install the SwarmPlayer video plugin (based on <a href="http://www.w3.org/TR/html5/">HTML5</a>) visit P2P-Next's <a href="http://swarmplayer.p2p-next.org/" target="_blank">SwarmPlayer Site</a>. You'll find a page such as the one in the screenshot below.
 </p>
 
@@ -13,7 +13,7 @@
 <p>
 Find the green button labeled "Add Swarmplayer ...". Click it and follow the instructions.</p>
 
-<h1><a name="NextSharePC">NextSharePC</a></h1>
+<h1><a id="NextSharePC">NextSharePC</a></h1>
 <p>To install the NextSharePC video plugin (based on <a href="http://www.videolan.org/vlc/">VLC</a>) follow the steps below:</p>
 <ol>
 	<li>If you are using ...

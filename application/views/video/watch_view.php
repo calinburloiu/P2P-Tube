@@ -3,7 +3,7 @@
 	siteUrl = '<?php echo site_url() ?>';
 </script>
 
-<div id="watch-main">
+<div id="main">
 <?php // Invalid name in URL ?>
 <?php if (isset($video['err'])):
 	if ($video['err'] == 'INVALID_NAME'):
@@ -19,7 +19,7 @@
 	
 <?php // Correct URL ?>
 <?php else: ?>
-	<h1><?php echo $video['title'] ?></h1>
+	<h1><a href="<?php echo site_url('catalog/category/'. $video['category_name']) ?>"><?php echo $video['category_title'] ?></a> &rsaquo; <?php echo $video['title'] ?></h1>
 	
 	<div id="video-widget-tabs">
 		<ul>
@@ -125,14 +125,10 @@
 				type: "<?php echo $plugin_type ?>",
 				src: <?php echo json_encode($video['assets']) ?>,
 
-						
-				width: 427,
-				height: 240,
 				showState: false,
-
 				
-				//minWidth: 640,
-				//maxWidth: 1024,
+				minWidth: 640,
+				maxWidth: 1024,
 				initialDuration: "<?php echo $video['duration'] ?>",
 				
 				resize: function() {

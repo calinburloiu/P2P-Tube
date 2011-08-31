@@ -12,7 +12,7 @@ $lang['ui_search'] = 'Search';
 
 // Video Categories
 $lang['ui_categ_movies'] = 'Filme';
-$lang['ui_categ_tech_talks'] = 'TechTalks';
+$lang['ui_categ_tech-talks'] = 'TechTalks';
 $lang['ui_categ_events'] = 'Evenimente';
 $lang['ui_categ_karaoke'] = 'Karaoke';
 

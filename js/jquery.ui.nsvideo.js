@@ -385,7 +385,7 @@ $.widget( "ui.nsvideo", {
 		if (widget.$video.width() < 640)
 		{
 			widget.element.css('width',
-							427 + 8 + 'px');//TODO 640 + 8
+							640 + 8 + 'px');
 			widget.$video.css('left', 
 				Math.round(widget.$videoContainer.width()/2 
 				- widget.$video.width()/2)

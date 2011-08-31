@@ -90,7 +90,7 @@ $config['default_torrent_ext'] = 'tstream';
 | IDs must be numeric and must preferably start from 1.
 |
 */
-$config['categories'] = array(1 => 'movies', 2 => 'tech_talks', 3 => 'events', 4 => 'karaoke');
+$config['categories'] = array(1 => 'movies', 2 => 'tech-talks', 3 => 'events', 4 => 'karaoke');
 
 /*
 |--------------------------------------------------------------------------

@@ -20,7 +20,7 @@ $lang['ui_install_already_installed'] = ' is installed';
 
 // Video Categories
 $lang['ui_categ_movies'] = 'Movies';
-$lang['ui_categ_tech_talks'] = 'TechTalks';
+$lang['ui_categ_tech-talks'] = 'TechTalks';
 $lang['ui_categ_events'] = 'Events';
 $lang['ui_categ_karaoke'] = 'Karaoke';
 

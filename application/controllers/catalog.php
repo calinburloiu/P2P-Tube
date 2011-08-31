@@ -85,23 +85,24 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_end');
 	}
 	
-	public function category($category_id, $offset = 0)
+	public function category($category_name, $offset = 0)
 	{
 		// **
 		// ** LOADING MODEL
 		// **
+		// Video Category
+		$categories = $this->config->item('categories');
+		$category_id = array_search($category_name, $categories);
+		$vs_data['category_name'] = $category_name;
+		$vs_data['category_id'] = $category_id;
+		$vs_data['category_title'] = $category_name ?
+		$this->lang->line("ui_categ_$category_name") : $category_name;		
+		
 		// Retrieve videos summary.
 		$this->load->model('videos_model');
 		$vs_data['videos'] = $this->videos_model->get_videos_summary(
-			$category_id, intval($offset),
+			$vs_data['category_id'], intval($offset),
 			$this->config->item('videos_per_page'));
-		
-		// Video Category
-		$categories = $this->config->item('categories');
-		$category_name = $categories[$category_id];
-		$vs_data['category_title'] = $category_name ?
-			$this->lang->line("ui_categ_$category_name") : $category_name;
-		$vs_data['category_id'] = $category_id;
 		
 		// Pagination
 		$this->load->library('pagination');

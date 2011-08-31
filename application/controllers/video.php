@@ -40,6 +40,9 @@ class Video extends CI_Controller {
 		$this->load->model('videos_model');
 		$this->videos_model->inc_video_var($id, 'views');
 		$data['video'] = $this->videos_model->get_video($id, $name);
+		$categories = $this->config->item('categories');
+		$data['video']['category_name'] = 
+			$categories[ $data['video']['category_id'] ];
 		$data['plugin_type'] = ($plugin === NULL ? 'auto' : $plugin);
 		
 		// Display page.
