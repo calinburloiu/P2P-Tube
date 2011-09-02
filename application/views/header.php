@@ -28,8 +28,8 @@ endif ?>
 <div id="header">
 	<!-- TODO: resize logo image-->
 	<a href="<?php echo site_url() ?>" id="logo"><img src="<?php echo site_url('img/p2p-next--big.png') ?>" alt="P2P-Next" width="119" height="48" /></a>
-	<form id="quick-search">
+	<form id="quick-search" action="<?php echo site_url('catalog/search') ?>" method="POST">
 		<label for="quick-search-box"><?php echo $this->lang->line('ui_search') . ': ' ?></label>
-		<input type="text" id="quick-search-box" name="quick-search-box" disabled="disabled" value="not yet implemented" />
+		<input type="text" id="search" name="search" value="" />
 	</form>
 </div>

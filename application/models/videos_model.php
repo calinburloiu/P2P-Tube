@@ -200,6 +200,51 @@ class Videos_model extends CI_Model {
 		
 		return $thumbs;
 	}
+
+	public function search_videos($str_search)
+	{
+		// TODO offset, count for search
+		$offset = 0;
+		$count = 100;
+
+		$str_search = trim($str_search);
+
+		$this->load->helper('text');
+		
+		$query = $this->db->query(
+			"SELECT id, name, title, duration, user_id, views, thumbs_count,
+				default_thumb
+			FROM `videos`
+			WHERE title LIKE '%". $str_search . "%'
+			ORDER BY name
+			LIMIT ?, ?", // TODO summary order 
+			array($offset, $count)); 
+		
+		if ($query->num_rows() > 0)
+			$videos = $query->result_array();
+		else
+			return NULL;
+		
+		foreach ($videos as & $video)
+		{
+			// P2P-Tube Video URL
+			$video['video_url'] = site_url(sprintf("watch/%d/%s",
+				$video['id'], $video['name']));
+			
+			// Thumbnails
+			$video['thumbs'] = $this->get_thumbs($video['name'], 
+				$video['thumbs_count']);
+				
+			// Ellipsized title
+			//$video['shorted_title'] = ellipsize($video['title'], 45, 0.75);
+			$video['shorted_title'] = character_limiter($video['title'], 50);
+			
+			// TODO: user information
+			$video['user_name'] = 'TODO';
+		}
+		
+		return $videos;
+	}
 }
 
 /* End of file videos_model.php */

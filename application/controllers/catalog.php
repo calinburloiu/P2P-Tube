@@ -142,9 +142,53 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_end');
 	}
 	
-	public function search($query_str)
+	public function search($str_search = "")
 	{
-		echo '<h1>Search not yet implemented</h1>';
+		// TODO get query string from URL.
+		$str_search = $this->input->post('search', TRUE);
+
+		// **
+		// ** LOADING MODEL
+		// **
+		// Video Category
+		$vs_data['category_name'] = "";
+		$vs_data['category_title'] = "Search Results for &laquo;$str_search&raquo;";
+
+		// Retrieve videos summary.
+		$this->load->model('videos_model');
+		$vs_data['videos'] = $this->videos_model->search_videos(
+			$str_search);
+		if ($vs_data['videos'] === NULL)
+			$vs_data['videos'] = array();
+
+		$vs_data['pagination'] = '';
+		
+		// Video Summary
+		$data['video_summary'] = $this->load->view('catalog/videos_summary_view',
+			$vs_data, TRUE);
+		
+		$params = array(	'title' => $this->config->item('site_name'),
+							'css' => array(
+								'catalog.css'
+							),
+							//'js' => array(),
+							//'metas' => array('description'=>'','keywords'=>'')
+							);
+		$this->load->library('html_head_params', $params);
+		
+		// **
+		// ** LOADING VIEWS
+		// **
+		$this->load->view('html_begin', $this->html_head_params);
+		$this->load->view('header');
+		
+		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
+		$main_params['side'] = $this->load->view('side_default.php', NULL, TRUE);
+		$this->load->view('main', $main_params);
+		
+		$this->load->view('footer');
+		$this->load->view('html_end');
+
 	}
 }
 
