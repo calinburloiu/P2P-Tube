@@ -31,8 +31,6 @@ class Video extends CI_Controller {
 	 */
 	public function watch($id, $name = NULL, $plugin = NULL)
 	{
-		$this->load->helper('url');
-		
 		// **
 		// ** LOADING MODEL
 		// **

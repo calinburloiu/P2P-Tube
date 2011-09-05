@@ -145,12 +145,14 @@ class Catalog extends CI_Controller {
 	public function search($str_search = "")
 	{
 		// TODO get query string from URL.
-		$str_search = $this->input->post('search', TRUE);
+		if ($str_search === "") 
+			redirect('catalog/search/'. $this->input->post('search', TRUE));
 
 		// **
 		// ** LOADING MODEL
 		// **
 		// Video Category
+		// TODO
 		$vs_data['category_name'] = "";
 		$vs_data['category_title'] = "Search Results for &laquo;$str_search&raquo;";
 

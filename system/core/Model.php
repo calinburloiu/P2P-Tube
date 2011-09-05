@@ -75,11 +75,11 @@ class CI_Model {
 // 	 * @var CI_Pagination
 // 	 */
 // 	var $pagination;
-	// My declarations
+// 	/* My declarations */
 // 	/**
 // 	 * @var Videos_model
 // 	 */
-//	var $videos_model;
+	// var $videos_model;
 	
 	
 	/**

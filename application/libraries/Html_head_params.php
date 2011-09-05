@@ -47,7 +47,6 @@ class Html_head_params {
 	public function __construct($params)
 	{
 		$CI =& get_instance();
-		$CI->load->helper('url');
 		
 		if (isset($this->site_config))
 			$CI->load->config($this->site_config);

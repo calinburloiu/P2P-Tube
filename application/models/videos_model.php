@@ -16,8 +16,6 @@ class Videos_model extends CI_Model {
 			$this->load->library('singleton_db');
 			$this->db = $this->singleton_db->connect();
 		}
-		
-		$this->load->helper('url');
 	}
 	
 	/**
@@ -208,22 +206,22 @@ class Videos_model extends CI_Model {
 		$count = 100;
 
 		$str_search = trim($str_search);
-
-		$this->load->helper('text');
 		
 		$query = $this->db->query(
 			"SELECT id, name, title, duration, user_id, views, thumbs_count,
 				default_thumb
 			FROM `videos`
-			WHERE title LIKE '%". $str_search . "%'
+			WHERE MATCH (title, description, tags) AGAINST (?)
 			ORDER BY name
-			LIMIT ?, ?", // TODO summary order 
-			array($offset, $count)); 
+			LIMIT ?, ?",
+			array($str_search, $offset, $count)); 
 		
 		if ($query->num_rows() > 0)
 			$videos = $query->result_array();
 		else
 			return NULL;
+		
+		$this->load->helper('text');
 		
 		foreach ($videos as & $video)
 		{
