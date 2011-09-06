@@ -4,6 +4,12 @@
 	margin-bottom: 1em;
 }
 
+.search-results
+{
+	position: relative;
+	margin-bottom: 1em;
+}
+
 .category-title
 {
 	/* border-bottom: 1px solid rgb(108,162,222); */

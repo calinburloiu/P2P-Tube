@@ -83,7 +83,7 @@ class Videos_model extends CI_Model {
 			$category_id);
 		
 		if ($query->num_rows() > 0)
-			return $row = $query->row()->count;
+			return $query->row()->count;
 		
 		// Error
 		return NULL;
@@ -199,25 +199,53 @@ class Videos_model extends CI_Model {
 		return $thumbs;
 	}
 
-	public function search_videos($str_search)
+	/**
+	 * Searches videos in DB based on a search query string and returns an
+	 * associative array of results.
+	 * If count is zero the function only return the number of results.
+	 * @param string $search_query
+	 * @param int $offset
+	 * @param int $count
+	 * @param int $category_id	if NULL, all categories are searched
+	 * @return array	an associative array with the same keys as that from
+	 * get_videos_summary's result, but with two additional keys: 
+	 * description and date.
+	 */
+	public function search_videos($search_query, $offset = 0, $count = 0, 
+									$category_id = NULL)
 	{
-		// TODO offset, count for search
-		$offset = 0;
-		$count = 100;
+		if ($count === 0)
+		{
+			$selected_columns = "COUNT(*) count";
+			$limit = "";
+		}
+		else
+		{ 
+			$selected_columns = "id, name, title, duration, user_id, views, thumbs_count, default_thumb, date, description";
+			$limit = "LIMIT $offset, $count";
+		}
+		
+		if ($category_id !== NULL)
+			$category_cond = "category_id = '$category_id' AND ";
+		else
+			$category_cond = "";
 
-		$str_search = trim($str_search);
+		$search_query = trim($search_query);
 		
 		$query = $this->db->query(
-			"SELECT id, name, title, duration, user_id, views, thumbs_count,
-				default_thumb
+			"SELECT $selected_columns
 			FROM `videos`
-			WHERE MATCH (title, description, tags) AGAINST (?)
-			ORDER BY name
-			LIMIT ?, ?",
-			array($str_search, $offset, $count)); 
+			WHERE  $category_cond MATCH (title, description, tags) AGAINST (?)
+			$limit",
+			array($search_query)); 
 		
 		if ($query->num_rows() > 0)
-			$videos = $query->result_array();
+		{
+			if ($count === 0)
+				return $query->row()->count;
+			else
+				$videos = $query->result_array();
+		}
 		else
 			return NULL;
 		

@@ -9,7 +9,10 @@ $lang['ui_nav_menu_contact'] = 'Contact';
 $lang['ui_nav_menu_log_in'] = 'Log In';
 $lang['ui_nav_menu_register'] = 'Register';
 
+// Search
 $lang['ui_search'] = 'Search';
+$lang['ui_search_results_for'] = 'Search Results for';
+$lang['ui_results'] = 'result(s)';
 
 // Install Video Plugins
 $lang['ui_install'] = 'Install ';

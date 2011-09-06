@@ -58,7 +58,7 @@ class Catalog extends CI_Controller {
 		$this->load->view('header', array('selected_menu' => 'home'));
 		
 		$main_params['content'] = $this->load->view('catalog/index_view', $data, TRUE);
-		$main_params['side'] = $this->load->view('side_default.php', NULL, TRUE);
+		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
 		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
@@ -92,12 +92,7 @@ class Catalog extends CI_Controller {
 		// ** LOADING MODEL
 		// **
 		// Video Category
-		$categories = $this->config->item('categories');
-		$category_id = array_search($category_name, $categories);
-		$vs_data['category_name'] = $category_name;
-		$vs_data['category_id'] = $category_id;
-		$vs_data['category_title'] = $category_name ?
-		$this->lang->line("ui_categ_$category_name") : $category_name;		
+		$vs_data = $this->_get_category_data($category_name);
 		
 		// Retrieve videos summary.
 		$this->load->model('videos_model');
@@ -110,14 +105,14 @@ class Catalog extends CI_Controller {
 		$pg_config['base_url'] = site_url("catalog/category/$category_name/");
 		$pg_config['uri_segment'] = 4;
 		$pg_config['total_rows'] = $this->videos_model->get_videos_count(
-			$category_id);
+			$vs_data['category_id']);
 		$pg_config['per_page'] = $this->config->item('videos_per_page');
 		$this->pagination->initialize($pg_config);
 		$vs_data['pagination'] = $this->pagination->create_links();
 		
 		// Video Summary
-		$data['video_summary'] = $this->load->view('catalog/videos_summary_view',
-			$vs_data, TRUE);
+// 		$data['video_summary'] = $this->load->view('catalog/videos_summary_view',
+// 			$vs_data, TRUE);
 		
 		$params = array(	'title' => $this->config->item('site_name'),
 							'css' => array(
@@ -134,41 +129,63 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header');
 		
-		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
-		$main_params['side'] = $this->load->view('side_default.php', NULL, TRUE);
+// 		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
+		$main_params['content'] = 
+			$this->load->view('catalog/videos_summary_view', $vs_data, TRUE);
+		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
 		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
 		$this->load->view('html_end');
 	}
 	
-	public function search($str_search = "")
+	public function search($search_query = "", $offset = 0, $category_name = NULL)
 	{
-		// TODO get query string from URL.
-		if ($str_search === "") 
+		// Redirect to an URL which contains search string if data was passed
+		// via POST method and not via URL segments.
+		$str_post_search = $this->input->post('search', TRUE);
+		if ($search_query === "" && $str_post_search !== FALSE) 
 			redirect('catalog/search/'. $this->input->post('search', TRUE));
-
+		
 		// **
 		// ** LOADING MODEL
 		// **
-		// Video Category
-		// TODO
-		$vs_data['category_name'] = "";
-		$vs_data['category_title'] = "Search Results for &laquo;$str_search&raquo;";
-
-		// Retrieve videos summary.
-		$this->load->model('videos_model');
-		$vs_data['videos'] = $this->videos_model->search_videos(
-			$str_search);
-		if ($vs_data['videos'] === NULL)
-			$vs_data['videos'] = array();
-
-		$vs_data['pagination'] = '';
+		// Category
+		$results_data = $this->_get_category_data($category_name);
+		if ($results_data === NULL)
+			$results_data = array('category_id'=>NULL);
 		
-		// Video Summary
-		$data['video_summary'] = $this->load->view('catalog/videos_summary_view',
-			$vs_data, TRUE);
+		$results_data['search_query'] = $search_query;
 		
+		// Check if search string is valid.
+		if (strlen($search_query) < 4)
+		{
+			$results_data['videos'] = NULL;
+		}
+		else
+		{
+			// Retrieve search results.
+			$this->load->model('videos_model');
+			$results_data['count'] = $this->videos_model->search_videos(
+				$search_query);
+			$results_data['videos'] = $this->videos_model->search_videos(
+				$search_query, intval($offset),
+				$this->config->item('search_results_per_page'),
+				$results_data['category_id']);
+			if ($results_data['videos'] === NULL)
+				$results_data['videos'] = array();
+	
+			// Pagination
+			$this->load->library('pagination');
+			$pg_config['base_url'] = site_url("catalog/search/$search_query/");
+			$pg_config['uri_segment'] = 4;
+			$pg_config['total_rows'] = $results_data['count'];
+			$pg_config['per_page'] =
+				$this->config->item('search_results_per_page');
+			$this->pagination->initialize($pg_config);
+			$results_data['pagination'] = $this->pagination->create_links();
+		}
+			
 		$params = array(	'title' => $this->config->item('site_name'),
 							'css' => array(
 								'catalog.css'
@@ -184,14 +201,31 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header');
 		
-		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
-		$main_params['side'] = $this->load->view('side_default.php', NULL, TRUE);
+		// Search Results
+		$main_params['content'] = 
+			$this->load->view('catalog/search_results_view',
+				$results_data, TRUE);
+		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
 		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
 		$this->load->view('html_end');
-
 	}
+	
+	public function _get_category_data($category_name)
+	{
+		if ($category_name === NULL)
+			return NULL;
+		
+		$categories = $this->config->item('categories');
+		$category_id = array_search($category_name, $categories);
+		$results_data['category_name'] = $category_name;
+		$results_data['category_id'] = $category_id;
+		$results_data['category_title'] = $category_name ?
+			$this->lang->line("ui_categ_$category_name") : $category_name;
+		
+		return $results_data;
+	} 
 }
 
 /* End of file catalog.php */

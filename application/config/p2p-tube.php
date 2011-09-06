@@ -94,7 +94,7 @@ $config['categories'] = array(1 => 'movies', 2 => 'tech-talks', 3 => 'events', 4
 
 /*
 |--------------------------------------------------------------------------
-| Videos per page
+| Videos per Page
 |--------------------------------------------------------------------------
 |
 | The number of video icons shown per page (as in catalog/category).
@@ -104,10 +104,20 @@ $config['videos_per_page'] = 16;
 
 /*
 |--------------------------------------------------------------------------
-| Videos per row
+| Videos per Row
 |--------------------------------------------------------------------------
 |
 | The number of video icons shown on a single line (as in home page).
 |
 */
 $config['videos_per_row'] = 4;
+
+/*
+|--------------------------------------------------------------------------
+| Search Results per Page
+|--------------------------------------------------------------------------
+|
+| The number of search results shown per page (as in catalog/search).
+|
+*/
+$config['search_results_per_page'] = 10;

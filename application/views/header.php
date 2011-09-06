@@ -68,21 +68,22 @@ endif ?>
 		// Fake JS submit via CI URI segments
 		var fakeSubmit = function() {
 			var searchQuery = $('#search').val();
-			searchQuery = searchQuery.replace(/\+/g, '%2B');	// +
+			searchQuery = searchQuery.replace(/\*/g, '*2A');  // *
+			searchQuery = searchQuery.replace(/\+/g, '*2B');	// +
 			searchQuery = searchQuery.replace(/\s/g, '+');	// <white spaces>
-			searchQuery = searchQuery.replace(/>/g, '%3E');	// >
-			searchQuery = searchQuery.replace(/\</g, '%3C');	// <
-			searchQuery = searchQuery.replace(/\(/g, '%28');	// (
-			searchQuery = searchQuery.replace(/\)/g, '%29');	// )
-			searchQuery = searchQuery.replace(/~/g, '%7E');	// ~ 
-			searchQuery = searchQuery.replace(/\*/g, '%2A');  // *
-			searchQuery = searchQuery.replace(/"/g, '%22');	// " 
+			searchQuery = searchQuery.replace(/>/g, '*3E');	// >
+			searchQuery = searchQuery.replace(/\</g, '*3C');	// <
+			searchQuery = searchQuery.replace(/\(/g, '*28');	// (
+			searchQuery = searchQuery.replace(/\)/g, '*29');	// )
+			searchQuery = searchQuery.replace(/~/g, '*7E');	// ~ 
+			searchQuery = searchQuery.replace(/"/g, '*22');	// " 
 			searchQuery = encodeURI(searchQuery);
+			searchQuery = searchQuery.replace(/\*/g, '%');  // *
 
 			alert(searchQuery);
 			
-			//window.location = "<?php echo site_url('catalog/search') ?>" 
-			//	+ searchQuery;
+			window.location = "<?php echo site_url('catalog/search') ?>/" 
+				+ searchQuery;
 		};
 		
 		$('#button-js-quick-search')
