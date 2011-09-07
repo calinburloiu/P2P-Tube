@@ -4,6 +4,21 @@
 			<?php echo $category_title ?>
 		</a>
 	</h1>
+	
+	<?php
+	if ( isset($ordering))
+	{
+		$ordering_opts = array(
+			'hottest'=> $this->lang->line('ui_show_hottest'),
+			'newest'=> $this->lang->line('ui_show_newest'),
+			'alphabetically'=> $this->lang->line('ui_sort_alphabetically')
+		);
+		
+		echo '<p>';
+		echo form_dropdown('ordering', $ordering_opts, $ordering, 'id="ordering"');
+		echo '</p>';
+	}
+	?>
 
 	<?php echo $pagination ?>
 
@@ -39,3 +54,18 @@
 	<div style="clear: both"></div>
 
 </div>
+
+<script type="text/javascript">
+	$(function() {
+		$('#ordering').change(function(e) {
+			var uri = "<?php echo site_url("catalog/category/$category_name") ?>";
+			
+			// Default ordering
+			if ($(this).val() != "hottest")
+				uri += "/" + $(this).val();
+				
+			window.location = uri;
+		});
+	});
+
+</script>

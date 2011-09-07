@@ -1,6 +1,6 @@
 <div class="search_results">
 	<h1><?php echo $this->lang->line('ui_search_results_for')
-		. " &laquo;$search_query&raquo;" ?></h1>
+		. " <em>&laquo;" . htmlentities($search_query) . "&raquo;</em>" ?></h1>
 		
 	<p><?php echo "$count ". $this->lang->line('ui_results'); ?></p>
 

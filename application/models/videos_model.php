@@ -22,10 +22,18 @@ class Videos_model extends CI_Model {
 	 * Retrieves information about a set of videos which are going to be
 	 * displayed in the catalog.
 	 *
-	 * TODO: filter, limit, ordering parameters
 	 * @param		int $category_id	DB category ID
 	 * @param		int $offset
 	 * @param		int $count
+	 * @param		string $ordering	control videos ording by these
+	 * possibilities:
+	 * <ul>
+	 *   <li><strong>'hottest':</strong> newest most appreciated first. An
+	 *   appreciated video is one which has a bigger
+	 *   score = views + likes - dislikes.</li>
+	 *   <li><strong>'newest':</strong> newest first.</li>
+	 *   <li><strong>'alphabetically':</strong> sort alphabetically.</li>
+	 * </ul>
 	 * @return		array	a list of videos, each one being an assoc array with:
 	 * <ul>
 	 *   <li>id, name, title, duration, thumbs_count, default_thumb, views => from DB</li>
@@ -35,17 +43,34 @@ class Videos_model extends CI_Model {
 	 *   <li>thumbs => thumbnail images' URLs</li>
 	 * </ul>
 	 */
-	public function get_videos_summary($category_id, $offset, $count)
+	public function get_videos_summary($category_id, $offset, $count, $ordering = 'hottest')
 	{
 		$this->load->helper('text');
 		
+		// Ordering
+		switch ($ordering)
+		{
+		case 'hottest':
+			$order_statement = "ORDER BY date DESC, score DESC, RAND()";
+			break;
+		case 'newest':
+			$order_statement = "ORDER BY date DESC";
+			break;
+		case 'alphabetically':
+			$order_statement = "ORDER BY title";
+			break;
+			
+		default:
+			$order_statement = "";
+		}
+		
 		$query = $this->db->query(
-			'SELECT id, name, title, duration, user_id, views, thumbs_count,
-				default_thumb
+			"SELECT id, name, title, duration, user_id, views, thumbs_count,
+				default_thumb, (views + likes - dislikes) AS score
 			FROM `videos`
 			WHERE category_id = ?
-			ORDER BY name
-			LIMIT ?, ?', // TODO summary order 
+			$order_statement
+			LIMIT ?, ?", 
 			array(intval($category_id), $offset, $count)); 
 		
 		if ($query->num_rows() > 0)
@@ -213,15 +238,36 @@ class Videos_model extends CI_Model {
 	 */
 	public function search_videos($search_query, $offset = 0, $count = 0, 
 									$category_id = NULL)
-	{
+	{		
+		if (! $this->is_advanced_search_query($search_query)) // if natural language mode
+		{
+			$search_cond = "MATCH (title, description, tags)
+					AGAINST ('$search_query')";
+			$relevance = "$search_cond AS relevance";
+		}	// if boolean mode
+		else
+		{
+			$against = "AGAINST ('$search_query' IN BOOLEAN MODE)";
+			$search_cond = "MATCH (title, description, tags)
+					$against";
+			$relevance = "( (0.5 * (MATCH(title) $against))
+					+ (0.3 * (MATCH(tags) $against))
+					+ (0.2 * (MATCH(description) $against)) ) AS relevance";
+		}
+		
 		if ($count === 0)
 		{
 			$selected_columns = "COUNT(*) count";
+			$order = "";
 			$limit = "";
 		}
 		else
 		{ 
-			$selected_columns = "id, name, title, duration, user_id, views, thumbs_count, default_thumb, date, description";
+			$selected_columns = "id, name, title, duration, user_id, views,
+					thumbs_count, default_thumb, date, description,
+					(views + likes - dislikes) AS score, 
+					$relevance";
+			$order = "ORDER BY relevance DESC, score DESC";
 			$limit = "LIMIT $offset, $count";
 		}
 		
@@ -232,12 +278,12 @@ class Videos_model extends CI_Model {
 
 		$search_query = trim($search_query);
 		
-		$query = $this->db->query(
-			"SELECT $selected_columns
+		$str_query = "SELECT $selected_columns
 			FROM `videos`
-			WHERE  $category_cond MATCH (title, description, tags) AGAINST (?)
-			$limit",
-			array($search_query)); 
+			WHERE  $category_cond $search_cond
+			$order
+			$limit";
+		$query = $this->db->query($str_query);
 		
 		if ($query->num_rows() > 0)
 		{
@@ -270,6 +316,34 @@ class Videos_model extends CI_Model {
 		}
 		
 		return $videos;
+	}
+	
+	public function decode_search_query($search_query)
+	{
+		$search_query = urldecode($search_query);
+		
+		$search_query = str_replace('_AST_', '*', $search_query);
+		$search_query = str_replace('_AND_', '+', $search_query);
+		$search_query = str_replace('_GT_', '>', $search_query);
+		$search_query = str_replace('_LT_', '<', $search_query);
+		$search_query = str_replace('_PO_', '(', $search_query);
+		$search_query = str_replace('_PC_', ')', $search_query);
+		$search_query = str_replace('_LOW_', '~', $search_query);
+		$search_query = str_replace('_QUO_', '"', $search_query);
+		
+		return $search_query;
+	}
+	
+	/**
+	 * Return TRUE if it contains any special caracter from an advanced search
+	 * query.
+	 * @param string $search_query
+	 * @return boolean
+	 */
+	public function is_advanced_search_query($search_query)
+	{
+		return (preg_match('/\*|\+|\-|>|\<|\(|\)|~|"/', $search_query) == 0
+			? FALSE : TRUE);
 	}
 }
 

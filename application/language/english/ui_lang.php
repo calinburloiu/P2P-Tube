@@ -11,6 +11,7 @@ $lang['ui_nav_menu_register'] = 'Register';
 
 // Search
 $lang['ui_search'] = 'Search';
+$lang['ui_search_in'] = 'Search in';
 $lang['ui_search_results_for'] = 'Search Results for';
 $lang['ui_results'] = 'result(s)';
 
@@ -26,6 +27,11 @@ $lang['ui_categ_movies'] = 'Movies';
 $lang['ui_categ_tech-talks'] = 'TechTalks';
 $lang['ui_categ_events'] = 'Events';
 $lang['ui_categ_karaoke'] = 'Karaoke';
+
+// Ordering
+$lang['ui_show_hottest'] = "Show Hottest";
+$lang['ui_show_newest'] = "Show Newest";
+$lang['ui_sort_alphabetically'] = "Sort Alphabetically";
 
 // Pagination
 $lang['ui_page_first'] = 'First';

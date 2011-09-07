@@ -96,7 +96,7 @@ $autoload['config'] = array('p2p-tube');
 |
 */
 
-$autoload['language'] = array('ui');
+$autoload['language'] = array('ui', 'error');
 
 
 /*

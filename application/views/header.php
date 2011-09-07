@@ -1,6 +1,11 @@
-<?php if (! isset($selected_menu)):
-$selected_menu = '';
-endif ?>
+<?php 
+	if (! isset($selected_menu))
+		$selected_menu = '';
+	if (! isset($search_query))
+		$search_query = '';
+	if (! isset($search_category_name))
+		$search_category_name = NULL;
+?>
 
 <ul
 	id="nav-menu">
@@ -52,7 +57,15 @@ endif ?>
 	
 	
 	<?php echo form_open('catalog/search', array('id'=>'quick-search')); ?>
-		<input type="text" id="search" name="search" value="" />
+		<label for="search"><?php 
+			if ($search_category_name === NULL)
+				echo $this->lang->line('ui_search') . ':';
+			else
+				echo $this->lang->line('ui_search_in') . ' <em>'
+				. $search_category_title . '</em>:';
+		?>
+		</label>
+		<input type="text" id="search" name="search" value="<?php echo $search_query ?>" />
 		<input type="submit" id="button-quick-search" value="<?php echo $this->lang->line('ui_search') ?>" />
 		<a href="#" id="button-js-quick-search" style="display:none">
 			<?php echo $this->lang->line('ui_search') ?>
@@ -68,22 +81,28 @@ endif ?>
 		// Fake JS submit via CI URI segments
 		var fakeSubmit = function() {
 			var searchQuery = $('#search').val();
-			searchQuery = searchQuery.replace(/\*/g, '*2A');  // *
-			searchQuery = searchQuery.replace(/\+/g, '*2B');	// +
-			searchQuery = searchQuery.replace(/\s/g, '+');	// <white spaces>
-			searchQuery = searchQuery.replace(/>/g, '*3E');	// >
-			searchQuery = searchQuery.replace(/\</g, '*3C');	// <
-			searchQuery = searchQuery.replace(/\(/g, '*28');	// (
-			searchQuery = searchQuery.replace(/\)/g, '*29');	// )
-			searchQuery = searchQuery.replace(/~/g, '*7E');	// ~ 
-			searchQuery = searchQuery.replace(/"/g, '*22');	// " 
-			searchQuery = encodeURI(searchQuery);
-			searchQuery = searchQuery.replace(/\*/g, '%');  // *
 
-			alert(searchQuery);
+			if (searchQuery.length < 4)
+			{
+				alert('<?php echo $this->lang->line('error_search_query_too_short') ?>');
+				return;
+			}
+			
+			searchQuery = searchQuery.replace(/\*/g, '_AST_');  // *
+			searchQuery = searchQuery.replace(/\+/g, '_AND_');	// +
+			//searchQuery = searchQuery.replace(/\-/g, '_');	// -
+			searchQuery = searchQuery.replace(/\s/g, '+');	// <white spaces>
+			searchQuery = searchQuery.replace(/>/g, '_GT_');	// >
+			searchQuery = searchQuery.replace(/\</g, '_LT_');	// <
+			searchQuery = searchQuery.replace(/\(/g, '_PO_');	// (
+			searchQuery = searchQuery.replace(/\)/g, '_PC_');	// )
+			searchQuery = searchQuery.replace(/~/g, '_LOW_');	// ~ 
+			searchQuery = searchQuery.replace(/"/g, '_QUO_');	// " 
+			searchQuery = encodeURI(searchQuery);
 			
 			window.location = "<?php echo site_url('catalog/search') ?>/" 
-				+ searchQuery;
+				+ searchQuery + '/0'
+				+ "<?php echo ($search_category_name === NULL ? '' : '/'. $search_category_name) ?>";
 		};
 		
 		$('#button-js-quick-search')
