@@ -82,9 +82,9 @@
 		var fakeSubmit = function() {
 			var searchQuery = $('#search').val();
 
-			if (searchQuery.length < 4)
+			if (searchQuery.length === 0)
 			{
-				alert('<?php echo $this->lang->line('error_search_query_too_short') ?>');
+				alert('<?php echo $this->lang->line('error_search_query_empty') ?>');
 				return;
 			}
 			

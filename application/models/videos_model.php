@@ -238,13 +238,25 @@ class Videos_model extends CI_Model {
 	 */
 	public function search_videos($search_query, $offset = 0, $count = 0, 
 									$category_id = NULL)
-	{		
-		if (! $this->is_advanced_search_query($search_query)) // if natural language mode
+	{
+		// very short queries
+		if (strlen($search_query) < 4)
+		{
+			$search_cond = "(title LIKE '%$search_query%'
+					OR description LIKE '%$search_query%'
+					OR tags LIKE '%$search_query%')";
+			$relevance = "( 0.5 * (title LIKE '%git%')
+					+ 0.2 * (description LIKE '%git%')
+					+ 0.3 * (tags LIKE '%git%') ) AS relevance";
+		}
+		// natural language mode
+		else if (! $this->is_advanced_search_query($search_query))
 		{
 			$search_cond = "MATCH (title, description, tags)
 					AGAINST ('$search_query')";
 			$relevance = "$search_cond AS relevance";
-		}	// if boolean mode
+		}
+		// boolean mode
 		else
 		{
 			$against = "AGAINST ('$search_query' IN BOOLEAN MODE)";
@@ -262,9 +274,10 @@ class Videos_model extends CI_Model {
 			$limit = "";
 		}
 		else
-		{ 
+		{
+			// TODO select data, description if details are needed
 			$selected_columns = "id, name, title, duration, user_id, views,
-					thumbs_count, default_thumb, date, description,
+					thumbs_count, default_thumb,
 					(views + likes - dislikes) AS score, 
 					$relevance";
 			$order = "ORDER BY relevance DESC, score DESC";

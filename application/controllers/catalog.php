@@ -176,10 +176,10 @@ class Catalog extends CI_Controller {
 		}
 		
 		// Check if search string is valid.
-		if (strlen($search_query) < 4)
+		if (strlen($search_query) === 0)
 		{
 			//$results_data['videos'] = NULL;
-			$this->error($this->lang->line('error_search_query_too_short'),
+			$this->error($this->lang->line('error_search_query_empty'),
 				$header_data);
 			return;
 		}
