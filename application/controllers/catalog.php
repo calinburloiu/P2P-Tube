@@ -148,11 +148,12 @@ class Catalog extends CI_Controller {
 	{
 		// Redirect to an URL which contains search string if data was passed
 		// via POST method and not via URL segments.
-		$str_post_search = $this->input->post('search', TRUE);
+		$str_post_search = $this->input->post('search');
 		if ($search_query === "" && $str_post_search !== FALSE) 
-			redirect('catalog/search/'. $this->input->post('search', TRUE));
+			redirect('catalog/search/'. $str_post_search);
 
 		$this->load->model('videos_model');
+		$this->load->library('security');
 		
 		// **
 		// ** LOADING MODEL
@@ -160,6 +161,9 @@ class Catalog extends CI_Controller {
 		// Search query is encoded for URL and must be decoded.
 		$enc_search_query = $search_query;
 		$search_query = $this->videos_model->decode_search_query($search_query);
+		
+		// Security filtering
+		$search_query = $this->security->xss_clean($search_query);
 		$results_data['search_query'] = $search_query;
 
 		// Category
