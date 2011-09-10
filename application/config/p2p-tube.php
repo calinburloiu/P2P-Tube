@@ -100,7 +100,7 @@ $config['categories'] = array(1 => 'movies', 2 => 'tech-talks', 3 => 'events', 4
 | The number of video icons shown per page (as in catalog/category).
 |
 */
-$config['videos_per_page'] = 16;
+$config['videos_per_page'] = 20;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,7 +110,7 @@ $config['videos_per_page'] = 16;
 | The number of video icons shown on a single line (as in home page).
 |
 */
-$config['videos_per_row'] = 4;
+$config['videos_per_row'] = 5;
 
 /*
 |--------------------------------------------------------------------------
