@@ -40,11 +40,11 @@
 	<?php echo ($selected_menu == 'contact' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_contact') ?>
 	</a></li>
 
-	<!--<li class="menu-right"><a href="#<?php //echo site_url('register') ?>"
+	<li class="menu-right"><a href="<?php echo '#'//site_url('register') ?>"
 		<?php echo ($selected_menu == 'register' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_register') ?></a></li>
 		
-	<li class="menu-right"><a href="#<?php //echo site_url('login') ?>" 
-		<?php echo ($selected_menu == 'login' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_log_in') ?></a></li>-->
+	<li class="menu-right"><a href="<?php echo site_url('user/login') ?>" 
+		<?php echo ($selected_menu == 'login' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_log_in') ?></a></li>
 </ul>
 
 <div id="header">
