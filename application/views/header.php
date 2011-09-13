@@ -65,7 +65,7 @@
 				. $search_category_title . '</em>:';
 		?>
 		</label>
-		<input type="text" id="search" name="search" value="<?php echo $search_query ?>" />
+		<input type="text" id="search" name="search" value="<?php echo htmlentities($search_query) ?>" />
 		<input type="submit" id="button-quick-search" value="<?php echo $this->lang->line('ui_search') ?>" />
 		<a href="#" id="button-js-quick-search" style="display:none">
 			<?php echo $this->lang->line('ui_search') ?>

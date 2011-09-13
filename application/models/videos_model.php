@@ -239,32 +239,49 @@ class Videos_model extends CI_Model {
 	public function search_videos($search_query, $offset = 0, $count = 0, 
 									$category_id = NULL)
 	{
-		// very short queries
-		if (strlen($search_query) < 4)
+		$search_query = trim($search_query);
+		
+		// Search word fragments.
+		// sfc = search fragment condition
+		$sfc = "( ";
+		// sfr = serach fragment relevation
+		$sfr = "( ";
+		$sep = ' +-*<>()~"';
+		$fragm = strtok($search_query, $sep);
+		while ($fragm !== FALSE)
 		{
-			$search_cond = "(title LIKE '%$search_query%'
-					OR description LIKE '%$search_query%'
-					OR tags LIKE '%$search_query%')";
-			$relevance = "( 0.5 * (title LIKE '%git%')
-					+ 0.2 * (description LIKE '%git%')
-					+ 0.3 * (tags LIKE '%git%') ) AS relevance";
+			$sfc .= "(title LIKE '%$fragm%'
+					OR description LIKE '%$fragm%'
+					OR tags LIKE '%$fragm%') OR ";
+			
+			// Frament relevations are half of boolean relevations such
+			// that they will appear at the end of the results.
+			$sfr .= "0.25 * (title LIKE '%$fragm%')
+					+ 0.1 * (description LIKE '%$fragm%')
+					+ 0.15 * (tags LIKE '%$fragm%') + ";
+			
+			$fragm = strtok($sep);
 		}
-		// natural language mode
-		else if (! $this->is_advanced_search_query($search_query))
+		$sfc = substr($sfc, 0, -4) . " )";
+		$sfr = substr($sfr, 0, -3) . " )";
+		
+		if (! $this->is_advanced_search_query($search_query))
 		{
 			$search_cond = "MATCH (title, description, tags)
-					AGAINST ('$search_query')";
-			$relevance = "$search_cond AS relevance";
+					AGAINST ('$search_query') OR $sfc";
+			$relevance = "( MATCH (title, description, tags)
+					AGAINST ('$search_query') + $sfr ) AS relevance";
 		}
 		// boolean mode
 		else
 		{
 			$against = "AGAINST ('$search_query' IN BOOLEAN MODE)";
-			$search_cond = "MATCH (title, description, tags)
-					$against";
-			$relevance = "( (0.5 * (MATCH(title) $against))
-					+ (0.3 * (MATCH(tags) $against))
-					+ (0.2 * (MATCH(description) $against)) ) AS relevance";
+			$search_cond = "( MATCH (title, description, tags)
+					$against) OR $sfc";
+			$relevance = "( 0.5 * (MATCH(title) $against)
+					+ 0.3 * (MATCH(tags) $against)
+					+ 0.2 * (MATCH(description) $against)
+					+ $sfr) AS relevance";
 		}
 		
 		if ($count === 0)
@@ -289,13 +306,12 @@ class Videos_model extends CI_Model {
 		else
 			$category_cond = "";
 
-		$search_query = trim($search_query);
-		
 		$str_query = "SELECT $selected_columns
 			FROM `videos`
 			WHERE  $category_cond $search_cond
 			$order
 			$limit";
+		//echo "<p>$str_query</p>";
 		$query = $this->db->query($str_query);
 		
 		if ($query->num_rows() > 0)
