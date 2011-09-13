@@ -240,6 +240,7 @@ class Videos_model extends CI_Model {
 									$category_id = NULL)
 	{
 		$search_query = trim($search_query);
+		$search_query = str_replace("'", " ", $search_query);
 		
 		// Search word fragments.
 		// sfc = search fragment condition

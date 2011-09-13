@@ -120,4 +120,4 @@ $config['videos_per_row'] = 5;
 | The number of search results shown per page (as in catalog/search).
 |
 */
-$config['search_results_per_page'] = 10;
+$config['search_results_per_page'] = 20;
