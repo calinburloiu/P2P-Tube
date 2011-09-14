@@ -131,7 +131,6 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header', array(
 			'search_category_name'=>$vs_data['category_name'],
-			'search_category_title'=>$vs_data['category_title']
 		));
 		
 // 		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
@@ -146,15 +145,22 @@ class Catalog extends CI_Controller {
 	
 	public function search($search_query = "", $offset = 0, $category_name = NULL)
 	{
-		// Redirect to an URL which contains search string if data was passed
-		// via POST method and not via URL segments.
-		$str_post_search = $this->input->post('search');
-		if ($search_query === "" && $str_post_search !== FALSE) 
-			redirect('catalog/search/'. $str_post_search);
-
 		$this->load->model('videos_model');
 		$this->load->library('security');
 		
+		// Redirect to an URL which contains search string if data was passed
+		// via POST method and not via URL segments.
+		$str_post_search = $this->input->post('search');
+		$str_post_category = $this->input->post('search-category');
+		if ($search_query === "" && $str_post_search !== FALSE) 
+		{
+			redirect('catalog/search/'
+				. $this->videos_model->encode_search_query($str_post_search)
+				. '/0'
+				. ($str_post_category === FALSE ? '' : "/$str_post_category"));
+			return;
+		}
+
 		// **
 		// ** LOADING MODEL
 		// **
@@ -176,7 +182,6 @@ class Catalog extends CI_Controller {
 		if ($category_name !== NULL)
 		{
 			$header_data['search_category_name'] = $results_data['category_name'];
-			$header_data['search_category_title'] = $results_data['category_title'];
 		}
 		
 		// Check if search string is valid.

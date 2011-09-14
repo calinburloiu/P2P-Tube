@@ -23,6 +23,7 @@ $lang['ui_install_browser_version_not_supported'] = ' is not supported for your 
 $lang['ui_install_already_installed'] = ' is installed';
 
 // Video Categories
+$lang['ui_categ_all-categories'] = 'All Categories';
 $lang['ui_categ_movies'] = 'Movies';
 $lang['ui_categ_tech-talks'] = 'TechTalks';
 $lang['ui_categ_events'] = 'Events';

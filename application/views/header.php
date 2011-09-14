@@ -4,7 +4,13 @@
 	if (! isset($search_query))
 		$search_query = '';
 	if (! isset($search_category_name))
-		$search_category_name = NULL;
+		$search_category_name = 'all-categories';
+	
+	$categories['all-categories'] = $this->lang->line('ui_categ_all-categories');
+	foreach ($this->config->item('categories') as $id => $name)
+	{
+		$categories[$name] = $this->lang->line("ui_categ_$name");
+	}
 ?>
 
 <ul
@@ -53,18 +59,10 @@
 		src="<?php echo site_url('img/p2p-next--big.png') ?>" alt="P2P-Next"
 		width="119" height="48" /> </a>
 	
-	
-	
-	
 	<?php echo form_open('catalog/search', array('id'=>'quick-search')); ?>
-		<label for="search"><?php 
-			if ($search_category_name === NULL)
-				echo $this->lang->line('ui_search') . ':';
-			else
-				echo $this->lang->line('ui_search_in') . ' <em>'
-				. $search_category_title . '</em>:';
-		?>
-		</label>
+		<label for="search-category"><?php echo $this->lang->line('ui_search_in') ?></label> <?php 
+			echo form_dropdown('search-category', $categories, 
+				$search_category_name, 'id=search-category') ?>:
 		<input type="text" id="search" name="search" value="<?php echo htmlentities($search_query) ?>" />
 		<input type="submit" id="button-quick-search" value="<?php echo $this->lang->line('ui_search') ?>" />
 		<a href="#" id="button-js-quick-search" style="display:none">
@@ -99,10 +97,12 @@
 			searchQuery = searchQuery.replace(/~/g, '_LOW_');	// ~ 
 			searchQuery = searchQuery.replace(/"/g, '_QUO_');	// " 
 			searchQuery = encodeURI(searchQuery);
-			
+
+			searchCategoryName = $('#search-category').val();
 			window.location = "<?php echo site_url('catalog/search') ?>/" 
 				+ searchQuery + '/0'
-				+ "<?php echo ($search_category_name === NULL ? '' : '/'. $search_category_name) ?>";
+				+ (searchCategoryName == 'all-categories' ? '' : '/'
+					+ searchCategoryName);
 		};
 		
 		$('#button-js-quick-search')

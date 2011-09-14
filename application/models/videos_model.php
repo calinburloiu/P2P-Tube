@@ -309,10 +309,10 @@ class Videos_model extends CI_Model {
 
 		$str_query = "SELECT $selected_columns
 			FROM `videos`
-			WHERE  $category_cond $search_cond
+			WHERE  $category_cond ( $search_cond )
 			$order
 			$limit";
-		//echo "<p>$str_query</p>";
+// 		echo "<p>$str_query</p>";
 		$query = $this->db->query($str_query);
 		
 		if ($query->num_rows() > 0)
@@ -361,6 +361,22 @@ class Videos_model extends CI_Model {
 		$search_query = str_replace('_LOW_', '~', $search_query);
 		$search_query = str_replace('_QUO_', '"', $search_query);
 		
+		return $search_query;
+	}
+	
+	public function encode_search_query($search_query)
+	{
+		$search_query = str_replace('*', '_AST_', $search_query);
+		$search_query = str_replace('+', '_AND_', $search_query);
+		$search_query = str_replace('>', '_GT_', $search_query);
+		$search_query = str_replace('<', '_LT_', $search_query);
+		$search_query = str_replace('(', '_PO_', $search_query);
+		$search_query = str_replace(')', '_PC_', $search_query);
+		$search_query = str_replace('~', '_LOW_', $search_query);
+		$search_query = str_replace('"', '_QUO_', $search_query);
+		
+		$search_query = urlencode($search_query);
+	
 		return $search_query;
 	}
 	
