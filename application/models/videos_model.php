@@ -11,6 +11,8 @@ class Videos_model extends CI_Model {
 	
 	public function __construct()
 	{
+		parent::__construct();
+		
 		if ($this->db === NULL)
 		{
 			$this->load->library('singleton_db');

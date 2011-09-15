@@ -10,7 +10,13 @@
 |
 */
 
-
+$hook['pre_controller'][] = array(
+	'class'    => '',
+	'function' => 'select_language',
+	'filename' => 'hooks.php',
+	'filepath' => 'hooks',
+	'params'   => array()
+);
 
 /* End of file hooks.php */
 /* Location: ./application/config/hooks.php */

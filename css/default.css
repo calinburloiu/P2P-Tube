@@ -26,6 +26,17 @@ h1
 	margin-bottom: 8px;
 }
 
+table.form th
+{
+	text-align: right;
+}
+
+.error
+{
+	color: red;
+	font-weight:bold;
+}
+
 .inline
 {
 	vertical-align: middle;

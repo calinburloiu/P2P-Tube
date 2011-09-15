@@ -55,7 +55,10 @@ class Catalog extends CI_Controller {
 		// ** LOADING VIEWS
 		// **
 		$this->load->view('html_begin', $this->html_head_params);
-		$this->load->view('header', array('selected_menu' => 'home'));
+		$this->load->view('header', array(
+			'selected_menu'=> 'home',
+			'username'=> $this->session->userdata('username')
+		));
 		
 		$main_params['content'] = $this->load->view('catalog/index_view', $data, TRUE);
 		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
@@ -67,23 +70,7 @@ class Catalog extends CI_Controller {
 	
 	public function test($page = 0)
 	{
-		$params = array(	'title' => 'Test - '. $this->config->item('site_name'),
-							//'css' => array(),
-							//'js' => array(),
-							//'metas' => array('description'=>'','keywords'=>'')
-			);
-		$this->load->library('html_head_params', $params);
-		
-		// **
-		// ** LOADING VIEWS
-		// **
-		$this->load->view('html_begin', $this->html_head_params);
-		$this->load->view('header', array('selected_menu' => 'home'));
-		
-		$this->load->view('echo', array('output'=>'Test Page', 'clear'=>TRUE));
-		
-		$this->load->view('footer');
-		$this->load->view('html_end');
+		echo $this->uri->segment(1);
 	}
 	
 	public function category($category_name, $ordering = 'hottest', $offset = 0)
