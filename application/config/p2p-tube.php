@@ -121,3 +121,17 @@ $config['videos_per_row'] = 5;
 |
 */
 $config['search_results_per_page'] = 20;
+
+/*
+|--------------------------------------------------------------------------
+| A list with all available languages in which the site is translated
+|--------------------------------------------------------------------------
+|
+| Keys are language codes and values are language names as they appear in
+| languages folder.
+|
+*/
+$config['available_languages_list'] = array(
+	'en'=>'english',
+	'ro'=>'romanian'
+);

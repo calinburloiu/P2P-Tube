@@ -8,6 +8,10 @@ $lang['ui_nav_menu_help'] = 'Help';
 $lang['ui_nav_menu_contact'] = 'Contact';
 $lang['ui_nav_menu_log_in'] = 'Log In';
 $lang['ui_nav_menu_register'] = 'Register';
+$lang['ui_nav_menu_account'] = 'Account';
+$lang['ui_nav_menu_logout'] = 'Logout';
+
+$lang['ui_hello'] = 'Hello';
 
 // Search
 $lang['ui_search'] = 'Search';

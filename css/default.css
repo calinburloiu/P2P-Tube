@@ -29,9 +29,19 @@ h1
 table.form th
 {
 	text-align: right;
+	/*width: 25%;*/
+}
+table.form td
+{
+	vertical-align: bottom;
 }
 
 .error
+{
+	color: red;
+	font-weight:bold;
+}
+.required
 {
 	color: red;
 	font-weight:bold;
@@ -108,6 +118,21 @@ table.form th
 	border: 1px inset rgb(60,128,208);
 	color: #FFE4B5;
 	font-weight: bold;
+}
+.menu-greeting
+{
+	display: block;
+	height: 12px;
+	color: #FFE4B5;
+	text-align: center;
+	line-height: 100%;
+	font-size: 14px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 16px;
+	padding-right: 16px;
+	border: 1px solid transparent;
+	text-decoration: none;
 }
 
 #header

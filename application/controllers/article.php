@@ -24,7 +24,7 @@ class Article extends Article_Controller {
 		// ** DATA
 		// **
 		
-		$html_params = array('title' => $this->title.' - '
+		$html_params = array('title' => $this->title.' &ndash; '
 									. $this->config->item('site_name'),
 							'css' => $this->css,
 							'js' => $this->js,

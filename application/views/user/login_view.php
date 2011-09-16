@@ -1,5 +1,4 @@
-
-<?php echo form_open('user/login') ?>
+<?php echo form_open("user/login/$redirect") ?>
 <table class="form">
 	<tr>
 		<th><?php echo $this->lang->line('user_username_or_email'). ': ' ?></th>

@@ -11,6 +11,7 @@ class User extends CI_Controller {
 	private $username = NULL;
 	private $email = NULL;
 	private $user_id = NULL;
+	private $ldap_user_info = NULL;
 
 	public function __construct()
 	{
@@ -23,40 +24,28 @@ class User extends CI_Controller {
 	{
 	}
 
-	public function login()
+	/**
+	* Login a user and then redirect it to the last page which must be encoded
+	* in $redirect.
+	*
+	* @param string $redirect	contains the last page URI segments encoded
+	* with helper url_encode_segments.
+	*/
+	public function login($redirect = '')
 	{
 		$this->load->library('form_validation');
 		$this->load->model('users_model');
-
-		$username = $this->input->post('username');
-		$password = $this->input->post('password');
 			
-		$form_validation_config = array(
-		array(
-				'field'=>'username',
-				'label'=>'lang:user_username_or_email',
-				'rules'=>'trim|required|min_length[5]|max_length[32]'
-		. '|strtolower|callback__valid_username'
-		. '|callback__do_login[password]'
-		),
-		array(
-				'field'=>'password',
-				'label'=>'lang:user_password',
-				'rules'=>'required|min_length[5]|max_length[32]'
-		)
-		);
-		$this->form_validation->set_rules($form_validation_config);
 		$this->form_validation->set_error_delimiters('<span class="error">',
 			'</span>');
 
-		if ($this->form_validation->run() === FALSE)
+		if ($this->form_validation->run('signin') === FALSE)
 		{
-			$params = array(	'title' => $this->config->item('site_name'),
-										'css' => array(
-											'catalog.css'
-			),
-			//'js' => array(),
-			//'metas' => array('description'=>'')
+			$params = array(	'title' =>
+									$this->lang->line('ui_nav_menu_login')
+										.' &ndash; '
+										. $this->config->item('site_name'),
+								//'metas' => array('description'=>'')
 			);
 			$this->load->library('html_head_params', $params);
 				
@@ -66,7 +55,9 @@ class User extends CI_Controller {
 			$this->load->view('html_begin', $this->html_head_params);
 			$this->load->view('header', array('selected_menu' => 'login'));
 				
-			$this->load->view('user/login_view', array());
+			$this->load->view('user/login_view', array(
+				'redirect'=> $redirect
+			));
 				
 			$this->load->view('footer');
 			$this->load->view('html_end');
@@ -79,21 +70,111 @@ class User extends CI_Controller {
 					'user_id'=> $this->user_id,
 					'username'=> $this->username
 				));
+				
+				// Redirect to last page before login. 
+				header('Location: '. site_url(urldecode_segments($redirect)));
 			}
-			
-			header('Location: '. site_url());
-			return;
+			else
+			{
+				$this->session->set_userdata(array(
+					'username'=> $this->username
+				));
+				
+				// Redirect to register page because an user authenticates here
+				// for the first time with LDAP.
+				// TODO
+				header('Location: '. site_url(urldecode_segments($redirect)));
+			}
 		}
 	}
-
+	
+	/**
+	 * Logout user and then redirect it to the last page which must be encoded
+	 * in $redirect.
+	 * 
+	 * @param string $redirect	contains the last page URI segments encoded
+	 * with helper url_encode_segments.
+	 */
+	public function logout($redirect = '')
+	{
+		$this->session->unset_userdata('user_id');
+		$this->session->unset_userdata('username');
+		
+		header('Location: '. site_url(urldecode_segments($redirect)));
+	}
+	
+	public function register($redirect = '')
+	{
+		$this->load->library('form_validation');
+		$this->load->model('users_model');
+		$this->load->helper('localization');
+		$this->load->helper('date');
+			
+		$this->form_validation->set_error_delimiters('<span class="error">',
+					'</span>');
+		
+		if ($this->form_validation->run('register') === FALSE)
+		{
+			$params = array('title' =>
+								$this->lang->line('ui_nav_menu_register')
+									.' &ndash; '
+									. $this->config->item('site_name'),
+							//'metas' => array('description'=>'')
+			);
+			$this->load->library('html_head_params', $params);
+		
+			// **
+			// ** LOADING VIEWS
+			// **
+			$this->load->view('html_begin', $this->html_head_params);
+			$this->load->view('header', array('selected_menu' => 'register'));
+		
+			$this->load->view('user/register_view', array(
+				'redirect'=> $redirect
+			));
+		
+			$this->load->view('footer');
+			$this->load->view('html_end');
+		}
+		else
+		{
+			if ($this->user_id !== NULL)
+			{
+				$this->session->set_userdata(array(
+							'user_id'=> $this->user_id,
+							'username'=> $this->username
+				));
+		
+				// Redirect to last page before login.
+				header('Location: '. site_url(urldecode_segments($redirect)));
+			}
+			else
+			{
+				$this->session->set_userdata(array(
+							'username'=> $this->username
+				));
+		
+				// Redirect to register page because an user authenticates here
+				// for the first time with LDAP.
+				// TODO
+				header('Location: '. site_url(urldecode_segments($redirect)));
+			}
+		}
+	}
+	
 	public function _valid_username($username)
+	{
+		return (preg_match('/^[a-z0-9\._]+$/', $username) == 1);
+	}
+
+	public function _valid_username_or_email($username)
 	{
 		$this->load->helper('email');
 
 		if (valid_email($username))
-		return TRUE;
+			return TRUE;
 		else
-		return (preg_match('/^[a-z0-9\._]+$/', $username) == 1);
+			return $this->_valid_username($username);
 	}
 
 	public function _do_login($username, $field_password)
@@ -101,21 +182,27 @@ class User extends CI_Controller {
 		$password = $this->input->post('password');
 
 		$this->load->model('users_model');
-		$res_login = $this->users_model->login($username, $password);
+		$user = $this->users_model->login($username, $password);
 
-		// First authentication of a user with LDAP, i.e. the user does not
-		// have an user_id in `users` DB table yet.
-		if ($res_login === TRUE)
-			return TRUE;
 		// Authentication failed
-		else if ($res_login === FALSE)
+		if ($user === FALSE)
 			return FALSE;
 		
+		// First authentication of a user with LDAP, i.e. the user does not
+		// have an user_id in `users` DB table yet.
+		if ($user['auth_src'] == 'ldap_first_time')
+		{
+			$this->ldap_user_info = $user;
+			$this->username = $user['uid'][0];
+			$this->email = $user['mail'][0];
+			return TRUE;
+		}
+		
 		// Authentication when the user has an user_id in the DB.
-		$this->username = $res_login['username'];
-		$this->email = $res_login['email'];
-		$this->user_id = $res_login['id'];
-
+		$this->username = $user['username'];
+		$this->email = $user['email'];
+		$this->user_id = $user['id'];
+		
 		return TRUE;
 	}
 }

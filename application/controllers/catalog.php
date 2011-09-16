@@ -56,8 +56,7 @@ class Catalog extends CI_Controller {
 		// **
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header', array(
-			'selected_menu'=> 'home',
-			'username'=> $this->session->userdata('username')
+			'selected_menu'=> 'home'
 		));
 		
 		$main_params['content'] = $this->load->view('catalog/index_view', $data, TRUE);
@@ -103,7 +102,9 @@ class Catalog extends CI_Controller {
 // 		$data['video_summary'] = $this->load->view('catalog/videos_summary_view',
 // 			$vs_data, TRUE);
 		
-		$params = array(	'title' => $this->config->item('site_name'),
+		$params = array(	'title' =>
+								$vs_data['category_title'].' &ndash; '
+									. $this->config->item('site_name'),
 							'css' => array(
 								'catalog.css'
 							),
@@ -117,7 +118,7 @@ class Catalog extends CI_Controller {
 		// **
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header', array(
-			'search_category_name'=>$vs_data['category_name'],
+			'search_category_name'=> $vs_data['category_name']
 		));
 		
 // 		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
@@ -203,7 +204,8 @@ class Catalog extends CI_Controller {
 		}
 		
 		// HTML head parameters
-		$params = array(	'title' => $this->config->item('site_name'),
+		$params = array(	'title' => 'Search Results &ndash; '
+								. $this->config->item('site_name'),
 							'css' => array(
 								'catalog.css'
 							),
@@ -231,10 +233,11 @@ class Catalog extends CI_Controller {
 	
 	public function error($msg, $header_data)
 	{
-		$params = array(	'title' => 'Error - '. $this->config->item('site_name'),
-			//'css' => array(),
-			//'js' => array(),
-			//'metas' => array('description'=>'','keywords'=>'')
+		$params = array(	'title' => 'Error &ndash; '
+								. $this->config->item('site_name'),
+							//'css' => array(),
+							//'js' => array(),
+							//'metas' => array('description'=>'','keywords'=>'')
 		);
 		$this->load->library('html_head_params', $params);
 		

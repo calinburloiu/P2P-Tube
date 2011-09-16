@@ -1,16 +1,20 @@
-<?php 
+<?php
+	// Selected menu
 	if (! isset($selected_menu))
 		$selected_menu = '';
+	//  Searching
 	if (! isset($search_query))
 		$search_query = '';
 	if (! isset($search_category_name))
 		$search_category_name = 'all-categories';
-	
+	// Categories
 	$categories['all-categories'] = $this->lang->line('ui_categ_all-categories');
 	foreach ($this->config->item('categories') as $id => $name)
 	{
 		$categories[$name] = $this->lang->line("ui_categ_$name");
 	}
+	// Username
+	$username = $this->session->userdata('username');
 ?>
 
 <ul
@@ -46,15 +50,27 @@
 	<?php echo ($selected_menu == 'contact' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_contact') ?>
 	</a></li>
 
-	<?php if (isset($username) && $username): ?>
-	<li class="menu-right"><a href="<?php echo '#'//site_url('register') ?>"
-		<?php echo ($selected_menu == 'account' ? 'class="selected"' : '') ?>><?php echo $username ?></a></li>
+	<?php if ($username): ?>
+	<li class="menu-right"><a href="<?php echo site_url('user/logout/' . urlencode_segments(uri_string())) ?>"
+		<?php echo ($selected_menu == 'logout' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_logout') ?></a>
+	</li>
+	
+	<li class="menu-right"><a href="<?php echo site_url('user/account') ?>"
+		<?php echo ($selected_menu == 'account' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_account') ?></a>
+	</li>
+	
+	<li class="menu-right"><span class="menu-greeting">
+		<?php echo $this->lang->line('ui_hello'). ', '. $username. '!&nbsp;&nbsp;&nbsp;' ?></span>
+	</li> 
+	
 	<?php else: ?>
-	<li class="menu-right"><a href="<?php echo '#'//site_url('register') ?>"
-		<?php echo ($selected_menu == 'register' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_register') ?></a></li>
+	<li class="menu-right"><a href="<?php echo site_url('user/register/'. urlencode_segments(uri_string(), 'user/register')) ?>"
+		<?php echo ($selected_menu == 'register' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_register') ?></a>
+	</li>
 		
-	<li class="menu-right"><a href="<?php echo site_url('user/login') ?>" 
-		<?php echo ($selected_menu == 'login' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_log_in') ?></a></li>
+	<li class="menu-right"><a href="<?php echo site_url('user/login/'. urlencode_segments(uri_string(), 'user/login')) ?>" 
+		<?php echo ($selected_menu == 'login' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_log_in') ?></a>
+	</li>
 	<?php endif; ?>
 </ul>
 

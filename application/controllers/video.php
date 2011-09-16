@@ -44,7 +44,7 @@ class Video extends CI_Controller {
 		$data['plugin_type'] = ($plugin === NULL ? 'auto' : $plugin);
 		
 		// Display page.
-		$params = array(	'title' => $data['video']['title'] . ' -- '
+		$params = array(	'title' => $data['video']['title'] . ' &ndash; '
 								. $this->config->item('site_name'),
 							'css' => array(
 								'jquery.ui.nsvideo.css',
