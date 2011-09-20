@@ -20,6 +20,8 @@ $lang['user_role'] = 'Roles';
 $lang['user_auth_src'] = 'Authentication Source';
 $lang['user_video_prefs'] = 'Video Preferences';
 $lang['user_note_required_fields'] = '* Required fields!';
+$lang['user_submit_register'] = 'Register';
+$lang['user_submit_save'] = 'Save';
 
 /* End of file user_lang.php */
 /* Location: ./application/language/english/user_lang.php */

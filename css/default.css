@@ -29,11 +29,11 @@ h1
 table.form th
 {
 	text-align: right;
-	/*width: 25%;*/
+	width: 24em;
 }
 table.form td
 {
-	vertical-align: bottom;
+	vertical-align: top;
 }
 
 .error

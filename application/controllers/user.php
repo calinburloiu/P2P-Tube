@@ -8,16 +8,14 @@
  */
 class User extends CI_Controller {
 
-	private $username = NULL;
-	private $email = NULL;
-	private $user_id = NULL;
-	private $ldap_user_info = NULL;
+	private $import = FALSE;
 
 	public function __construct()
 	{
 		parent::__construct();
 
 		$this->lang->load('user');
+		$this->load->model('users_model');
 	}
 
 	public function index()
@@ -34,7 +32,6 @@ class User extends CI_Controller {
 	public function login($redirect = '')
 	{
 		$this->load->library('form_validation');
-		$this->load->model('users_model');
 			
 		$this->form_validation->set_error_delimiters('<span class="error">',
 			'</span>');
@@ -54,36 +51,28 @@ class User extends CI_Controller {
 			// **
 			$this->load->view('html_begin', $this->html_head_params);
 			$this->load->view('header', array('selected_menu' => 'login'));
-				
-			$this->load->view('user/login_view', array(
-				'redirect'=> $redirect
-			));
+
+			$main_params['content'] = $this->load->view('user/login_view',
+				array('redirect'=> $redirect), TRUE);
+			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+			$this->load->view('main', $main_params);
 				
 			$this->load->view('footer');
 			$this->load->view('html_end');
 		}
 		else
 		{
-			if ($this->user_id !== NULL)
+			if (! $this->import)
 			{
-				$this->session->set_userdata(array(
-					'user_id'=> $this->user_id,
-					'username'=> $this->username
-				));
-				
 				// Redirect to last page before login. 
 				header('Location: '. site_url(urldecode_segments($redirect)));
 			}
 			else
 			{
-				$this->session->set_userdata(array(
-					'username'=> $this->username
-				));
-				
-				// Redirect to register page because an user authenticates here
-				// for the first time with LDAP.
-				// TODO
-				header('Location: '. site_url(urldecode_segments($redirect)));
+				// Redirect to account page because an user authenticates here
+				// for the first time with external authentication. The page
+				// will display imported data.
+				header('Location: '. site_url('user/account'));
 			}
 		}
 	}
@@ -106,7 +95,6 @@ class User extends CI_Controller {
 	public function register($redirect = '')
 	{
 		$this->load->library('form_validation');
-		$this->load->model('users_model');
 		$this->load->helper('localization');
 		$this->load->helper('date');
 			
@@ -115,6 +103,16 @@ class User extends CI_Controller {
 		
 		if ($this->form_validation->run('register') === FALSE)
 		{
+			// Edit account data if logged in, otherwise register.
+			if ($user_id = $this->session->userdata('user_id'))
+			{
+				$userdata = $this->users_model->get_userdata($user_id);
+			}
+			else
+			{
+				$userdata = FALSE;
+			}
+			
 			$params = array('title' =>
 								$this->lang->line('ui_nav_menu_register')
 									.' &ndash; '
@@ -128,43 +126,59 @@ class User extends CI_Controller {
 			// **
 			$this->load->view('html_begin', $this->html_head_params);
 			$this->load->view('header', array('selected_menu' => 'register'));
-		
-			$this->load->view('user/register_view', array(
-				'redirect'=> $redirect
-			));
+			
+			$main_params['content'] = $this->load->view('user/register_view', 
+				array('userdata'=> $userdata, 'redirect'=> $redirect),
+				TRUE);
+			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+			$this->load->view('main', $main_params);
 		
 			$this->load->view('footer');
 			$this->load->view('html_end');
 		}
 		else
 		{
-			if ($this->user_id !== NULL)
+			$user_id = $this->input->post('user-id');
+			$data['email'] = $this->input->post('email');
+			$data['first_name'] = $this->input->post('first-name');
+			$data['last_name'] = $this->input->post('last-name');
+			$data['birth_date'] = $this->input->post('birth-date');
+			$data['country'] = $this->input->post('country');
+			$data['locality'] = $this->input->post('locality');
+			$data['ui_lang'] = $this->input->post('ui-lang');
+			$data['time_zone'] = $this->input->post('time-zone');
+			
+			// Edit account data
+			if ($user_id)
 			{
-				$this->session->set_userdata(array(
-							'user_id'=> $this->user_id,
-							'username'=> $this->username
-				));
-		
-				// Redirect to last page before login.
-				header('Location: '. site_url(urldecode_segments($redirect)));
+				$password = $this->input->post('new-password');
+				if ($password)
+					$data['password'] = $this->input->post('new-password');
+				
+				$this->users_model->set_userdata($user_id, $data);
 			}
+			// Registration
 			else
 			{
-				$this->session->set_userdata(array(
-							'username'=> $this->username
-				));
-		
-				// Redirect to register page because an user authenticates here
-				// for the first time with LDAP.
-				// TODO
-				header('Location: '. site_url(urldecode_segments($redirect)));
+				$data['username'] = $this->input->post('username');
+				$data['password'] = $this->input->post('password');
+				
+				$this->users_model->register($data);
 			}
+			
+			// Redirect to last page before login.
+			header('Location: '. site_url(urldecode_segments($redirect)));
 		}
+	}
+	
+	public function account($redirect = '')
+	{
+		$this->register($redirect);
 	}
 	
 	public function _valid_username($username)
 	{
-		return (preg_match('/^[a-z0-9\._]+$/', $username) == 1);
+		return (preg_match('/^[a-z0-9\._]+$/', $username) === 1);
 	}
 
 	public function _valid_username_or_email($username)
@@ -176,33 +190,65 @@ class User extends CI_Controller {
 		else
 			return $this->_valid_username($username);
 	}
+	
+	public function _valid_date($date)
+	{
+		if (! $date)
+			return TRUE;
+		
+		return (preg_match('/[\d]{4}-[\d]{2}-[\d]{2}/', $date) === 1);
+	}
+	
+	public function _valid_old_password($old_password, $field_username)
+	{
+		if (! $old_password)
+			return TRUE;
+		
+		$username= $this->input->post($field_username);
+		
+		if ($this->users_model->login($username, $old_password))
+			return TRUE;
+		
+		return FALSE;
+	}
+	
+	public function _change_password_cond($param)
+	{
+		$old = $this->input->post('old-password');
+		$new = $this->input->post('new-password');
+		$newc = $this->input->post('new-password-confirmation');
+		
+		return (!$old && !$new && !$newc)
+			|| ($old && $new && $newc);
+	}
+	
+	public function _required_by_register($param)
+	{
+		$user_id = $this->input->post('user-id');
+		
+		if (! $user_id && ! $param)
+			return FALSE;
+		
+		return TRUE;
+	}
 
 	public function _do_login($username, $field_password)
 	{
-		$password = $this->input->post('password');
+		$password = $this->input->post($field_password);
 
-		$this->load->model('users_model');
 		$user = $this->users_model->login($username, $password);
 
-		// Authentication failed
+		// Authentication failed.
 		if ($user === FALSE)
 			return FALSE;
 		
-		// First authentication of a user with LDAP, i.e. the user does not
-		// have an user_id in `users` DB table yet.
-		if ($user['auth_src'] == 'ldap_first_time')
-		{
-			$this->ldap_user_info = $user;
-			$this->username = $user['uid'][0];
-			$this->email = $user['mail'][0];
-			return TRUE;
-		}
-		
-		// Authentication when the user has an user_id in the DB.
-		$this->username = $user['username'];
-		$this->email = $user['email'];
-		$this->user_id = $user['id'];
-		
+		// Authentication successful: set session with user data.
+		$this->session->set_userdata(array(
+			'user_id'=> $user['id'],
+			'username'=> $user['username'],
+			'auth_src'=> $user['auth_src']
+		));
+		$this->import = $user['import'];
 		return TRUE;
 	}
 }

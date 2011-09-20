@@ -19,43 +19,58 @@ $config = array(
 		array(
 			'field'=>'username',
 			'label'=>'lang:user_username',
-			'rules'=>'trim|required|min_length[5]|max_length[32]'
-				. '|strtolower|callback__valid_username'
+			'rules'=>'trim|callback__required_by_register|min_length[5]|max_length[32]'
+				. '|strtolower|xss_clean|callback__valid_username'
 		),
 		array(
 			'field'=>'password',
 			'label'=>'lang:user_password',
-			'rules'=>'required'
+			'rules'=>'callback__required_by_register|min_length[5]|max_length[32]'
 		),
 		array(
 			'field'=>'password-confirmation',
 			'label'=>'lang:user_password_confirmation',
-			'rules'=>'required'
+			'rules'=>'callback__required_by_register|matches[password]'
+		),
+		array(
+			'field'=>'old-password',
+			'label'=>'lang:user_old_password',
+			'rules'=>'min_length[5]|max_length[32]|callback__valid_old_password[username]'
+		),
+		array(
+			'field'=>'new-password',
+			'label'=>'lang:user_new_password',
+			'rules'=>'min_length[5]|max_length[32]'
+		),
+		array(
+			'field'=>'new-password-confirmation',
+			'label'=>'lang:user_new_password_confirmation',
+			'rules'=>'callback__change_password_cond|matches[new-password]'
 		),
 		array(
 			'field'=>'email',
 			'label'=>'lang:user_email',
-			'rules'=>'required'
+			'rules'=>'trim|required|xss_clean|valid_email'
 		),
 		array(
 			'field'=>'first-name',
 			'label'=>'lang:user_first_name',
-			'rules'=>'required'
+			'rules'=>'trim|required|ucwords|xss_clean|prep_for_form'
 		),
 		array(
 			'field'=>'last-name',
 			'label'=>'lang:user_last_name',
-			'rules'=>'required'
+			'rules'=>'trim|required|ucwords|xss_clean|prep_for_form'
 		),
 		array(
 			'field'=>'birth-date',
 			'label'=>'lang:user_birth_date',
-			'rules'=>''
+			'rules'=>'trim|callback__valid_date'
 		),
 		array(
 			'field'=>'locality',
 			'label'=>'lang:user_locality',
-			'rules'=>''
+			'rules'=>'trim|ucwords|xss_clean|prep_for_form'
 		)
 	)
 );

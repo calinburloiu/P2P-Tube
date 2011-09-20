@@ -55,7 +55,7 @@
 		<?php echo ($selected_menu == 'logout' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_logout') ?></a>
 	</li>
 	
-	<li class="menu-right"><a href="<?php echo site_url('user/account') ?>"
+	<li class="menu-right"><a href="<?php echo site_url('user/account/'. urlencode_segments(uri_string(), 'user/account')) ?>"
 		<?php echo ($selected_menu == 'account' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_account') ?></a>
 	</li>
 	

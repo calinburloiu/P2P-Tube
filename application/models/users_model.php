@@ -58,7 +58,22 @@ class Users_model extends CI_Model {
 		// authenticating here for the first time so it does not have an entry
 		// in `users` table.
 		if ($query->num_rows() !== 1)
-			return $this->ldap_login($username, $password);
+		{
+			$ldap_userdata = $this->ldap_login($username, $password);
+			$userdata = $this->convert_ldap_userdata($ldap_userdata);
+			$this->register($userdata);
+			
+			$user = $this->login($username, $password);
+			$user['import'] = TRUE;
+			return $user;
+			
+			/* foreach ($ldap_userdata as $k => $v)
+			{
+				echo "<h1>$k</h1>";
+				print_r($v);
+			}
+			die(); */
+		}
 		
 		$user = $query->row_array();
 		
@@ -69,6 +84,25 @@ class Users_model extends CI_Model {
 		
 		// If we are here internal authentication has successful.
 		return $user;
+	}
+	
+	/**
+	 * Converts an array returned by LDAP login to an array which contains
+	 * user data ready to be used in `users` DB.
+	 * 
+	 * @param array $ldap_userdata
+	 * @return array
+	 */
+	public function convert_ldap_userdata($ldap_userdata)
+	{
+		$userdata['username'] = $ldap_userdata['uid'][0];
+		$userdata['email'] = $ldap_userdata['mail'][0];
+		$userdata['first_name'] = $ldap_userdata['givenname'][0];
+		$userdata['last_name'] = $ldap_userdata['sn'][0];
+		
+		$userdata['auth_src'] = 'ldap';
+		
+		return $userdata;
 	}
 	
 	/**
@@ -132,7 +166,7 @@ class Users_model extends CI_Model {
 	public function ldap_dn_belongs_ou($dn, $ou)
 	{
 		if (!is_array($ou))
-		$ou = array ($ou);
+			$ou = array ($ou);
 		
 		$founded = FALSE;
 		$words = explode(',', $dn);
@@ -142,9 +176,98 @@ class Users_model extends CI_Model {
 			$value = $parts[1];
 		
 			if (strtolower($key) == "ou" && in_array($value, $ou) )
-			$founded = TRUE;
+				$founded = TRUE;
 		}
+		
 		return $founded;
+	}
+	
+	/**
+	 * Adds a new user to DB.
+	 * 
+	 * @param array $data	corresponds to DB columns
+	 */
+	public function register($data)
+	{
+		$this->load->helper('array');
+		
+		// TODO verify mandatory data existance
+		
+		// Process data.
+		if (isset($data['password']))
+			$data['password'] = sha1($data['password']);
+		// TODO picture data: save, convert, make it thumbnail
+		
+		$cols = '';
+		$vals = '';
+		foreach ($data as $col=> $val)
+		{
+			$cols .= "$col, ";
+			if (is_int($val))
+				$vals .= "$val, ";
+			else
+				$vals .= "'$val', ";
+		}
+		$cols = substr($cols, 0, -2);
+		$vals = substr($vals, 0, -2);
+		
+		$query = $this->db->query("INSERT INTO `users`
+			($cols)
+			VALUES ($vals)");
+		
+		// TODO exception on failure
+		return $query;
+	}
+	
+	/**
+	 * Returns data from `users` table for user with $user_id.
+	 * 
+	 * @param int $user_id
+	 */
+	public function get_userdata($user_id)
+	{
+		$query = $this->db->query("SELECT * from `users`
+			WHERE id = $user_id");
+		
+		if ($query->num_rows() === 0)
+			return FALSE;
+		
+		return $query->row_array();
+	}
+	
+	/**
+	 * Modifies data from `users` table for user with $user_id.
+	 * 
+	 * @param int $user_id
+	 * @param array $data	key-value pairs with columns and new values to be
+	 * modified
+	 */
+	public function set_userdata($user_id, $data)
+	{
+		// TODO verify mandatory data existance
+		
+		// Process data.
+		if (isset($data['password']))
+			$data['password'] = sha1($data['password']);
+		// TODO picture data: save, convert, make it thumbnail
+		
+		$set = '';
+		foreach ($data as $col => $val)
+		{
+			if (is_int($val))
+				$set .= "$col = $val, ";
+			else
+				$set .= "$col = '$val', ";
+		}
+		$set = substr($set, 0, -2);
+		
+		$query_str = "UPDATE `users`
+			SET $set WHERE id = $user_id";
+		//echo "<p>$query_str</p>";
+		$query = $this->db->query($query_str);
+		
+		// TODO exception
+		return $query;
 	}
 }
 
