@@ -26,7 +26,6 @@ define('DIR_WRITE_MODE', 0777);
 | These modes are used when working with fopen()/popen()
 |
 */
-
 define('FOPEN_READ',							'rb');
 define('FOPEN_READ_WRITE',						'r+b');
 define('FOPEN_WRITE_CREATE_DESTRUCTIVE',		'wb'); // truncates existing file data, use with care
@@ -36,6 +35,16 @@ define('FOPEN_READ_WRITE_CREATE',				'a+b');
 define('FOPEN_WRITE_CREATE_STRICT',				'xb');
 define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
+/*
+|--------------------------------------------------------------------------
+| User Roles
+|--------------------------------------------------------------------------
+|
+| Define bits significance in user roles bit mask.
+|
+*/
+define('USER_ROLE_STANDARD',			0);
+define('USER_ROLE_ADMIN',				1);
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

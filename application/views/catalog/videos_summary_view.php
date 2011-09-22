@@ -1,9 +1,9 @@
 <div class="videos-summary">
-	<h1 class="category-title">
-		<a href="<?php echo site_url("catalog/category/$category_name") ?>">
-			<?php echo $category_title ?>
-		</a>
+  <?php if (isset($title) && $title): ?>
+	<h1>
+		<?php echo $title ?>
 	</h1>
+  <?php endif ?>
 	
 	<?php
 	if ( isset($ordering))
@@ -22,6 +22,9 @@
 
 	<?php echo $pagination ?>
 
+  <?php if (count($videos) === 0): ?>
+	<p><?php echo $this->lang->line('user_no_videos_uploaded') ?></p>
+  <?php else: ?>
 	<?php foreach($videos as $video):
 		$thumb_src = $video['thumbs'][ $video['default_thumb'] ];
 		?>
@@ -44,10 +47,11 @@
 			?>
 		</div>
 		<div class="video-username">
-			<?php echo $this->lang->line('ui_from') . ' TODO' //TODO ?>
+			<?php echo $this->lang->line('ui_from') ?> <a href="<?php echo site_url("user/profile/{$video['username']}") ?>"><?php echo $video['username'] ?></a>
 		</div>
 	</div>
 	<?php endforeach ?>
+  <?php endif ?>
 
 	<?php echo $pagination ?>
 	
@@ -55,6 +59,7 @@
 
 </div>
 
+<?php // TODO change ordering via AJAX ?>
 <script type="text/javascript">
 	$(function() {
 		$('#ordering').change(function(e) {

@@ -22,11 +22,6 @@
 	margin-left: 8px;
 }
 
-.category-title
-{
-	/* border-bottom: 1px solid rgb(108,162,222); */
-}
-
 .video-icon
 {
 	position: relative;
@@ -34,7 +29,7 @@
 	float: left;
 	width: 146px;
 	height: 170px;
-	margin-right: 4px;
+	padding-right: 4px;
 }
 
 .video-icon .video-thumb
@@ -76,6 +71,7 @@
 {
 	margin-top: 2px;
 	font-size: 1em;
+	text-align: left;
 	line-height: 100%;
 }
 .video-icon .video-views

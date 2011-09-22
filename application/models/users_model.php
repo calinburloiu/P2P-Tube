@@ -50,37 +50,38 @@ class Users_model extends CI_Model {
 		$enc_password = sha1($password);
 		
 		// TODO select only required fields.
-		$query = $this->db->query("SELECT * FROM `users` 
+		$query = $this->db->query("SELECT u.*, a.activation_code
+			FROM `users` u LEFT JOIN `users_unactivated` a ON (u.id = a.user_id)
 			WHERE $cond_user
 				AND (auth_src = 'ldap' OR password = '$enc_password')");
 		
 		// It is possible that the user has a LDAP account but he's
 		// authenticating here for the first time so it does not have an entry
 		// in `users` table.
-		if ($query->num_rows() !== 1)
+		if ($query->num_rows() === 0)
 		{
 			$ldap_userdata = $this->ldap_login($username, $password);
+			if ($ldap_userdata === FALSE)
+				return FALSE;
 			$userdata = $this->convert_ldap_userdata($ldap_userdata);
 			$this->register($userdata);
 			
 			$user = $this->login($username, $password);
 			$user['import'] = TRUE;
 			return $user;
-			
-			/* foreach ($ldap_userdata as $k => $v)
-			{
-				echo "<h1>$k</h1>";
-				print_r($v);
-			}
-			die(); */
 		}
 		
 		$user = $query->row_array();
 		
 		// Authenticate with LDAP.
-		if ($user['auth_src'] == 'ldap')
-			return ($this->ldap_login($username, $password) !== FALSE 
-				? $user : FALSE);
+		if ($user['auth_src'] == 'ldap'
+				&& ! $this->ldap_login($username, $password))
+			return FALSE; 
+		
+		// Update last login time.
+		$this->db->query("UPDATE `users`
+			SET last_login = UTC_TIMESTAMP()
+			WHERE username = '$username'");
 		
 		// If we are here internal authentication has successful.
 		return $user;
@@ -184,6 +185,8 @@ class Users_model extends CI_Model {
 	
 	/**
 	 * Adds a new user to DB.
+	 * Do not add join_date and last_login column, they will be automatically
+	 * added.
 	 * 
 	 * @param array $data	corresponds to DB columns
 	 */
@@ -212,22 +215,78 @@ class Users_model extends CI_Model {
 		$vals = substr($vals, 0, -2);
 		
 		$query = $this->db->query("INSERT INTO `users`
-			($cols)
-			VALUES ($vals)");
+			($cols, registration_date, last_login)
+			VALUES ($vals, utc_timestamp(), utc_timestamp())");
+		
+		if ($query === FALSE)
+			return FALSE;
+		
+		// If the registered with internal authentication it needs to activate
+		// the account.
+		$activation_code = Users_model::gen_activation_code();
+		$user_id = $this->get_user_id($data['username']);
+		$query = $this->db->query("INSERT INTO `users_unactivated`
+			(user_id, activation_code)
+			VALUES ($user_id, '$activation_code')");
 		
 		// TODO exception on failure
 		return $query;
 	}
 	
+	public function get_user_id($username)
+	{
+		$query = $this->db->query("SELECT id FROM `users`
+			WHERE username = '$username'");
+		
+		if ($query->num_rows() === 0)
+			return FALSE;
+		
+		return $query->row()->id;
+	}
+	
+	// TODO cleanup account activation
+	public function cleanup_account_activation()
+	{
+		
+	}
+	
 	/**
-	 * Returns data from `users` table for user with $user_id.
+	 * Activated an account for an user having $user_id with $activation_code.
 	 * 
 	 * @param int $user_id
+	 * @param string $activation_code	hexa 16 characters string
+	 * @return returns TRUE if activation was successful and FALSE otherwise
 	 */
-	public function get_userdata($user_id)
+	public function activate_account($user_id, $activation_code)
 	{
+		$query = $this->db->query("SELECT * FROM `users_unactivated`
+			WHERE user_id = $user_id
+				AND activation_code = '$activation_code'");
+		
+		if ($query->num_rows() === 0)
+			return FALSE;
+		
+		$this->db->query("DELETE FROM `users_unactivated`
+			WHERE user_id = $user_id");
+		
+		return TRUE;
+	}
+	
+	/**
+	 * Returns data from `users` table. If $user is int it is used as an
+	 * id, if it is string it is used as an username.
+	 * 
+	 * @param mixed $user
+	 */
+	public function get_userdata($user)
+	{
+		if (is_int($user))
+			$cond = "id = $user";
+		else
+			$cond = "username = '$user'";
+		
 		$query = $this->db->query("SELECT * from `users`
-			WHERE id = $user_id");
+			WHERE $cond");
 		
 		if ($query->num_rows() === 0)
 			return FALSE;
@@ -268,6 +327,37 @@ class Users_model extends CI_Model {
 		
 		// TODO exception
 		return $query;
+	}
+	
+	public static function gen_activation_code($str = '')
+	{
+		$ci =& get_instance();
+		
+		$activation_code = substr(
+			sha1(''. $str. $ci->config->item('encryption_key')
+				. mt_rand()),
+			0,
+			16);
+		
+		return $activation_code;
+	}
+	
+	public static function roles_to_string($roles)
+	{
+		$ci =& get_instance();
+		$ci->lang->load('user');
+		
+		if ($roles == USER_ROLE_STANDARD)
+			return $ci->lang->line('user_role_standard');
+		else
+		{
+			$str_roles = '';
+			
+			if ($roles & USER_ROLE_ADMIN)
+				$str_roles .= $ci->lang->line('user_role_admin') . '; ';
+		}
+		
+		return $str_roles;
 	}
 }
 

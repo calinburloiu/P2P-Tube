@@ -43,7 +43,7 @@ endif;
 	  <?php else: ?>
 		<th><?php echo $this->lang->line('user_username'). ': ' ?></th>
 		<td>
-			&nbsp;<strong><?php echo $userdata['username'] ?></strong>
+			&nbsp;<em><?php echo $userdata['username'] ?></em>
 		</td>`
 	  <?php endif ?>
 	</tr>

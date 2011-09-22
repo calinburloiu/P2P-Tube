@@ -1,5 +1,7 @@
 <?php
 
+$lang['user_appelation'] = 'User';
+
 $lang['user_username'] = 'User Name';
 $lang['user_username_or_email'] = 'User Name or E-mail';
 $lang['user_password'] = 'Password';
@@ -16,12 +18,20 @@ $lang['user_country'] = 'Country';
 $lang['user_locality'] = 'City / Town';
 $lang['user_ui_lang'] = 'Site Interface Language';
 $lang['user_time_zone'] = 'Time Zone';
-$lang['user_role'] = 'Roles';
+$lang['user_roles'] = 'Roles';
 $lang['user_auth_src'] = 'Authentication Source';
 $lang['user_video_prefs'] = 'Video Preferences';
+$lang['user_registration_date'] = 'Registration Date';
+$lang['user_last_login'] = 'Last Login Time';
+
 $lang['user_note_required_fields'] = '* Required fields!';
 $lang['user_submit_register'] = 'Register';
 $lang['user_submit_save'] = 'Save';
+
+$lang['user_no_videos_uploaded'] = 'The user uploaded no videos.';
+
+$lang['user_role_standard'] = 'Standard User';
+$lang['user_role_admin'] = 'Administrator';
 
 /* End of file user_lang.php */
 /* Location: ./application/language/english/user_lang.php */

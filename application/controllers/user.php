@@ -9,6 +9,7 @@
 class User extends CI_Controller {
 
 	private $import = FALSE;
+	private $activated_account = TRUE;
 
 	public function __construct()
 	{
@@ -62,7 +63,9 @@ class User extends CI_Controller {
 		}
 		else
 		{
-			if (! $this->import)
+			if (! $this->activated_account)
+				header('Location: '. site_url('catalog/test'));
+			else if (! $this->import)
 			{
 				// Redirect to last page before login. 
 				header('Location: '. site_url(urldecode_segments($redirect)));
@@ -88,6 +91,8 @@ class User extends CI_Controller {
 	{
 		$this->session->unset_userdata('user_id');
 		$this->session->unset_userdata('username');
+		$this->session->unset_userdata('auth_src');
+		$this->session->unset_userdata('time_zone');
 		
 		header('Location: '. site_url(urldecode_segments($redirect)));
 	}
@@ -106,11 +111,13 @@ class User extends CI_Controller {
 			// Edit account data if logged in, otherwise register.
 			if ($user_id = $this->session->userdata('user_id'))
 			{
-				$userdata = $this->users_model->get_userdata($user_id);
+				$userdata = $this->users_model->get_userdata(intval($user_id));
+				$selected_menu = 'account';
 			}
 			else
 			{
 				$userdata = FALSE;
+				$selected_menu = 'register';
 			}
 			
 			$params = array('title' =>
@@ -125,7 +132,8 @@ class User extends CI_Controller {
 			// ** LOADING VIEWS
 			// **
 			$this->load->view('html_begin', $this->html_head_params);
-			$this->load->view('header', array('selected_menu' => 'register'));
+			$this->load->view('header', 
+				array('selected_menu' => $selected_menu));
 			
 			$main_params['content'] = $this->load->view('user/register_view', 
 				array('userdata'=> $userdata, 'redirect'=> $redirect),
@@ -147,6 +155,9 @@ class User extends CI_Controller {
 			$data['locality'] = $this->input->post('locality');
 			$data['ui_lang'] = $this->input->post('ui-lang');
 			$data['time_zone'] = $this->input->post('time-zone');
+			
+			// Update session user data.
+			$this->_update_session_userdata($data);
 			
 			// Edit account data
 			if ($user_id)
@@ -174,6 +185,94 @@ class User extends CI_Controller {
 	public function account($redirect = '')
 	{
 		$this->register($redirect);
+	}
+	
+	public function profile($username, $videos_offset = 0)
+	{
+		// TODO handle user not found
+		
+		$this->load->config('localization');
+		$this->load->helper('date');
+		$this->lang->load('date');
+		
+		// **
+		// ** LOADING MODEL
+		// **
+		// Logged in user time zone
+		$time_zone = $this->session->userdata('time_zone');
+		if (! $time_zone)
+			$time_zone = 'UTC';
+		
+		// User data
+		$userdata = $this->users_model->get_userdata($username);
+		$userdata['roles'] = Users_model::roles_to_string($userdata['roles']);
+		$country_list = $this->config->item('country_list');
+		$userdata['country_name'] = $country_list[ $userdata['country'] ];
+		$userdata['last_login'] = date('Y-m-d H:i:s',  
+			gmt_to_local(
+				strtotime($userdata['last_login']), 
+				$time_zone, 
+				TRUE)) . ($time_zone == 'UTC' ? ' (UTC)' : '');
+		$userdata['time_zone'] = $this->lang->line($userdata['time_zone']);
+		
+		// User's videos
+		$this->load->model('videos_model');
+		$vs_data['videos'] = $this->videos_model->get_videos_summary(
+			NULL, $username, intval($videos_offset),
+			$this->config->item('videos_per_page'));
+		
+		// Pagination
+		$this->load->library('pagination');
+		$pg_config['base_url'] = site_url("user/profile/$username/");
+		$pg_config['uri_segment'] = 4;
+		$pg_config['total_rows'] = $this->videos_model->get_videos_count(
+			NULL, $username);
+		$pg_config['per_page'] = $this->config->item('videos_per_page');
+		$this->pagination->initialize($pg_config);
+		$vs_data['pagination'] = $this->pagination->create_links();
+		$vs_data['title'] = NULL;
+		$vs_data['category_name'] = ''; // TODO videos_summary with AJAX
+		
+		$params = array(
+			'title'=> $this->lang->line('user_appelation').' '.$username
+				.' &ndash; '
+				. $this->config->item('site_name'),
+			'css'=> array('catalog.css')
+			//'metas' => array('description'=>'')
+		);
+		$this->load->library('html_head_params', $params);
+		
+		// Current user profile tab
+		$tab = (! $videos_offset ? 0 : 1);
+		
+		// **
+		// ** LOADING VIEWS
+		// **
+		$this->load->view('html_begin', $this->html_head_params);
+		$this->load->view('header', array());
+		
+		$vs = $this->load->view('catalog/videos_summary_view', $vs_data, TRUE);
+		
+		$main_params['content'] = $this->load->view('user/profile_view',
+			array('userdata'=> $userdata, 'videos_summary'=> $vs, 'tab'=>$tab),
+			TRUE);
+		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+		$this->load->view('main', $main_params);
+		
+		$this->load->view('footer');
+		$this->load->view('html_end');
+	}
+	
+	public function activate($user_id, $activation_code)
+	{
+		$user_id = intval($user_id);
+		echo ''. $this->users_model->activate_account($user_id, $activation_code);
+	}
+	
+	public function _update_session_userdata($data)
+	{
+		foreach ($data as $key=> $val)
+			$this->session->set_userdata($key, $val);
 	}
 	
 	public function _valid_username($username)
@@ -242,13 +341,21 @@ class User extends CI_Controller {
 		if ($user === FALSE)
 			return FALSE;
 		
+		// User has not activated the account.
+		if ($user['activation_code'] !== NULL)
+		{
+			$this->activated_account = FALSE;
+			return TRUE;
+		}
+		
 		// Authentication successful: set session with user data.
 		$this->session->set_userdata(array(
 			'user_id'=> $user['id'],
 			'username'=> $user['username'],
-			'auth_src'=> $user['auth_src']
+			'auth_src'=> $user['auth_src'],
+			'time_zone'=> $user['time_zone']
 		));
-		$this->import = $user['import'];
+		$this->import = (isset($user['import']) ? $user['import'] : FALSE);
 		return TRUE;
 	}
 }

@@ -26,20 +26,21 @@ class Catalog extends CI_Controller {
 		{
 			// Videos
 			$vs_data['videos'] = $this->videos_model->get_videos_summary(
-				$id, 0, $this->config->item('videos_per_row'));
+				$id, NULL, 0, $this->config->item('videos_per_row'));
 			
 			// Category
 			$vs_data['category_name'] = $name;
-			$vs_data['category_title'] = $name ?
-				$this->lang->line("ui_categ_$name") : $name;
 			$vs_data['category_id'] = $id;
+			$videos_summary['category_name'] = $name;
+			$videos_summary['category_title'] = $name ?
+				$this->lang->line("ui_categ_$name") : $name;
 			
 			// Pagination (not required)
 			$vs_data['pagination'] = '';
 			
-			$data['videos_summaries'][] = 
-				$this->load->view('catalog/videos_summary_view', 
-				$vs_data, TRUE);
+			$videos_summary['content'] = $this->load->view(
+				'catalog/videos_summary_view', $vs_data, TRUE);
+			$data['videos_summaries'][] = $videos_summary;
 		}
 		
 		$params = array(	'title' => $this->config->item('site_name'),
@@ -69,7 +70,8 @@ class Catalog extends CI_Controller {
 	
 	public function test($page = 0)
 	{
-		echo $this->uri->segment(1);
+		$this->load->model('users_model');
+		echo Users_model::gen_activation_code('calin.burloiu');
 	}
 	
 	public function category($category_name, $ordering = 'hottest', $offset = 0)
@@ -78,12 +80,12 @@ class Catalog extends CI_Controller {
 		// ** LOADING MODEL
 		// **
 		// Video Category
-		$vs_data = $this->_get_category_data($category_name);
+		$category_data = Catalog::_get_category_data($category_name);
 		
 		// Retrieve videos summary.
 		$this->load->model('videos_model');
 		$vs_data['videos'] = $this->videos_model->get_videos_summary(
-			$vs_data['category_id'], intval($offset),
+			$category_data['category_id'], NULL, intval($offset),
 			$this->config->item('videos_per_page'), $ordering);
 		
 		$vs_data['ordering'] = $ordering;
@@ -93,22 +95,19 @@ class Catalog extends CI_Controller {
 		$pg_config['base_url'] = site_url("catalog/category/$category_name/$ordering/");
 		$pg_config['uri_segment'] = 5;
 		$pg_config['total_rows'] = $this->videos_model->get_videos_count(
-			$vs_data['category_id']);
+			$category_data['category_id']);
 		$pg_config['per_page'] = $this->config->item('videos_per_page');
 		$this->pagination->initialize($pg_config);
 		$vs_data['pagination'] = $this->pagination->create_links();
-		
-		// Video Summary
-// 		$data['video_summary'] = $this->load->view('catalog/videos_summary_view',
-// 			$vs_data, TRUE);
+		$vs_data['category_name'] = $category_data['category_name'];
+		$vs_data['title'] = $category_data['category_title'];
 		
 		$params = array(	'title' =>
-								$vs_data['category_title'].' &ndash; '
+								$category_data['category_title'].' &ndash; '
 									. $this->config->item('site_name'),
 							'css' => array(
 								'catalog.css'
-							),
-							//'js' => array(),
+							)
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
 		$this->load->library('html_head_params', $params);
@@ -121,7 +120,6 @@ class Catalog extends CI_Controller {
 			'search_category_name'=> $vs_data['category_name']
 		));
 		
-// 		$main_params['content'] = $this->load->view('catalog/category_view', $data, TRUE);
 		$main_params['content'] = 
 			$this->load->view('catalog/videos_summary_view', $vs_data, TRUE);
 		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
@@ -161,7 +159,7 @@ class Catalog extends CI_Controller {
 		$results_data['search_query'] = $search_query;
 
 		// Category
-		$results_data = $this->_get_category_data($category_name);
+		$results_data = Catalog::_get_category_data($category_name);
 		if ($results_data === NULL)
 			$results_data = array('category_id'=>NULL);
 		
@@ -255,17 +253,19 @@ class Catalog extends CI_Controller {
 		$this->load->view('html_end');
 	}
 	
-	public function _get_category_data($category_name)
+	public static function _get_category_data($category_name)
 	{
+		$ci =& get_instance();
+		
 		if ($category_name === NULL)
 			return NULL;
 		
-		$categories = $this->config->item('categories');
+		$categories = $ci->config->item('categories');
 		$category_id = array_search($category_name, $categories);
 		$results_data['category_name'] = $category_name;
 		$results_data['category_id'] = $category_id;
 		$results_data['category_title'] = $category_name ?
-			$this->lang->line("ui_categ_$category_name") : $category_name;
+			$ci->lang->line("ui_categ_$category_name") : $category_name;
 		
 		return $results_data;
 	} 

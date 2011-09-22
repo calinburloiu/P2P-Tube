@@ -1,1 +1,0 @@
-<?php echo $video_summary ?>

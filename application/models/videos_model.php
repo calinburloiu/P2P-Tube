@@ -21,10 +21,13 @@ class Videos_model extends CI_Model {
 	}
 	
 	/**
-	 * Retrieves information about a set of videos which are going to be
-	 * displayed in the catalog.
+	 * Retrieves a set of videos information which can be used for displaying
+	 * that videos as a list with few details.
 	 *
-	 * @param		int $category_id	DB category ID
+	 * @param		int $category_id	DB category ID; pass NULL for all
+	 * categories
+	 * @param		mixed $user			an user_id (as int) or an username 
+	 * (as string); pass NULL for all users
 	 * @param		int $offset
 	 * @param		int $count
 	 * @param		string $ordering	control videos ording by these
@@ -45,7 +48,8 @@ class Videos_model extends CI_Model {
 	 *   <li>thumbs => thumbnail images' URLs</li>
 	 * </ul>
 	 */
-	public function get_videos_summary($category_id, $offset, $count, $ordering = 'hottest')
+	public function get_videos_summary($category_id, $user, $offset, $count,
+		$ordering = 'hottest')
 	{
 		$this->load->helper('text');
 		
@@ -66,19 +70,39 @@ class Videos_model extends CI_Model {
 			$order_statement = "";
 		}
 		
+		// Category filtering
+		if ($category_id === NULL)
+			$cond_category = "1";
+		else
+		{
+			$category_id = intval($category_id);
+			$cond_category = "category_id = $category_id";
+		}
+		
+		// User filtering
+		if ($user === NULL)
+			$cond_user = "1";
+		else
+		{
+			if (is_int($user))
+				$cond_user = "v.user_id = $user";
+			else if (is_string($user))
+				$cond_user = "u.username = '$user'";
+		}
+		
 		$query = $this->db->query(
-			"SELECT id, name, title, duration, user_id, views, thumbs_count,
-				default_thumb, (views + likes - dislikes) AS score
-			FROM `videos`
-			WHERE category_id = ?
+			"SELECT v.id, name, title, duration, user_id, u.username, views,
+				thumbs_count, default_thumb,
+				(views + likes - dislikes) AS score
+			FROM `videos` v, `users` u
+			WHERE v.user_id = u.id AND $cond_category AND $cond_user
 			$order_statement
-			LIMIT ?, ?", 
-			array(intval($category_id), $offset, $count)); 
+			LIMIT $offset, $count"); 
 		
 		if ($query->num_rows() > 0)
 			$videos = $query->result_array();
 		else
-			return NULL;
+			return array();
 		
 		foreach ($videos as & $video)
 		{
@@ -93,21 +117,41 @@ class Videos_model extends CI_Model {
 			// Ellipsized title
 			//$video['shorted_title'] = ellipsize($video['title'], 45, 0.75);
 			$video['shorted_title'] = character_limiter($video['title'], 50);
-			
-			// TODO: user information
-			$video['user_name'] = 'TODO';
 		}
 		
 		return $videos;
 	}
 	
-	public function get_videos_count($category_id)
+	/**
+	 * Returns the number of videos from database from a specific category or
+	 * user.
+	 * NULL parameters count videos from all categories and / or all users.
+	 * 
+	 * @param int $category_id
+	 * @param mixed $user	an user_id (as int) or an username (as string)
+	 * @return int	number of videos or NULL if an error occured
+	 */
+	public function get_videos_count($category_id = NULL, $user = NULL)
 	{
+		if ($category_id === NULL)
+			$cond_category = "1";
+		else
+			$cond_category = "category_id = $category_id";
+		
+		if ($user === NULL)
+			$cond_user = "1";
+		else
+		{
+			if (is_int($user))
+				$cond_user = "v.user_id = $user";
+			else if(is_string($user))
+				$cond_user = "u.username = '$user'";
+		}
+		
 		$query = $this->db->query(
-			'SELECT COUNT(*) count
-			FROM `videos`
-			WHERE category_id = ?',
-			$category_id);
+			"SELECT COUNT(*) count
+			FROM `videos` v, `users` u
+			WHERE v.user_id = u.id AND $cond_category AND $cond_user");
 		
 		if ($query->num_rows() > 0)
 			return $query->row()->count;
