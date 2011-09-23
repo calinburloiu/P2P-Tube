@@ -72,6 +72,20 @@ $config = array(
 			'label'=>'lang:user_locality',
 			'rules'=>'trim|ucwords|xss_clean|prep_for_form'
 		)
+	),
+	'activate'=> array(
+		array(
+			'field'=>'activation-code',
+			'label'=>'lang:user_activation_code',
+			'rules'=>'trim|required|strtolower|callback__valid_activation_code|callback__do_activate'
+		)
+	),
+	'resend_activation'=> array(
+		array(
+			'field'=>'email',
+			'label'=>'lang:user_email',
+			'rules'=>'trim|required|xss_clean|valid_email|callback__do_resend_activation'
+		)
 	)
 );
 

@@ -2,6 +2,7 @@
 
 $lang['user_appelation'] = 'User';
 
+// Login / Register/ Account / Profile
 $lang['user_username'] = 'User Name';
 $lang['user_username_or_email'] = 'User Name or E-mail';
 $lang['user_password'] = 'Password';
@@ -27,6 +28,17 @@ $lang['user_last_login'] = 'Last Login Time';
 $lang['user_note_required_fields'] = '* Required fields!';
 $lang['user_submit_register'] = 'Register';
 $lang['user_submit_save'] = 'Save';
+
+// Account Activation
+$lang['user_title_activation'] = 'Account Activation';
+$lang['user_legend_activation'] = 'Activate your account';
+$lang['user_instruction_activation'] = 'Shortly after the registration you made you will receive an <em>activation e-mail</em> on your e-mail address you provided. In order to confirm that you are the owner of that e-mail address, follow the link there or enter the <em>activation code</em> also provided in that e-mail in the field below.';
+$lang['user_activation_code'] = 'Activation Code';
+$lang['user_submit_activate'] = 'Activate Account';
+$lang['user_legend_resend_activation'] = 'Resend the activation code';
+$lang['user_instruction_resend_activation'] = 'The <em>activation e-mail</em> can take up to a few minutes until it arrives in your inbox, so please be patient. If you entered a wrong e-mail address, you can change it by entering another one in the field below. Pressing <em>Resend</em> will cause us to retransmit you the <em>activation e-mail</em> on the address entered in this field.';
+$lang['user_submit_resend_activation'] = 'Resend Activation E-mail';
+$lang['user_msg_activated_account'] = 'Your account is active so you can <a href="%s">login</a>. You successfully validated your e-mail address through the <em>activation e-mail</em>.';
 
 $lang['user_no_videos_uploaded'] = 'The user uploaded no videos.';
 

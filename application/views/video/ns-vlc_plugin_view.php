@@ -1,3 +1,5 @@
+<!-- OBSOLETE -->
+
 <div id="vlc_container">No VLC</div>
 <table id="nsTable">
 	<tr><td id="nsPlaybackCell"><input type=button value="Play" onClick="play();" />

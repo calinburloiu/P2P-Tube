@@ -37,6 +37,16 @@ table.form td
 	vertical-align: top;
 }
 
+fieldset
+{
+	margin-bottom: 1em;
+}
+
+label.strong
+{
+	font-weight: bold;
+}
+
 .error
 {
 	color: red;

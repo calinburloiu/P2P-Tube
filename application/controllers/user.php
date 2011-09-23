@@ -10,6 +10,7 @@ class User extends CI_Controller {
 
 	private $import = FALSE;
 	private $activated_account = TRUE;
+	private $user_id = NULL;
 
 	public function __construct()
 	{
@@ -64,7 +65,8 @@ class User extends CI_Controller {
 		else
 		{
 			if (! $this->activated_account)
-				header('Location: '. site_url('catalog/test'));
+				header('Location: '
+					. site_url("user/activate/{$this->user_id}"));
 			else if (! $this->import)
 			{
 				// Redirect to last page before login. 
@@ -167,6 +169,9 @@ class User extends CI_Controller {
 					$data['password'] = $this->input->post('new-password');
 				
 				$this->users_model->set_userdata($user_id, $data);
+				
+				// Redirect to last page before login.
+				header('Location: '. site_url(urldecode_segments($redirect)));
 			}
 			// Registration
 			else
@@ -175,10 +180,13 @@ class User extends CI_Controller {
 				$data['password'] = $this->input->post('password');
 				
 				$this->users_model->register($data);
+				$user_id = $this->users_model->get_userdata($data['username'],
+						"id");
+				$user_id = $user_id['id'];
+				
+				// Redirect account activation page.
+				header('Location: '. site_url("user/activate/$user_id"));
 			}
-			
-			// Redirect to last page before login.
-			header('Location: '. site_url(urldecode_segments($redirect)));
 		}
 	}
 	
@@ -263,10 +271,81 @@ class User extends CI_Controller {
 		$this->load->view('html_end');
 	}
 	
-	public function activate($user_id, $activation_code)
+	public function activate($user_id, $method='', $activation_code='')
 	{
 		$user_id = intval($user_id);
-		echo ''. $this->users_model->activate_account($user_id, $activation_code);
+		$userdata = $this->users_model->get_userdata($user_id,
+				'email, a.activation_code');
+		$email = $userdata['email'];
+		//print_r($userdata['activation_code']);
+		$activated_account = ($userdata['activation_code'] == NULL);
+		
+		$this->load->library('form_validation');
+			
+		$this->form_validation->set_error_delimiters('<span class="error">',
+					'</span>');
+		
+		$res_form_validation = FALSE;
+		if ($method == 'code')
+		{
+			$res_form_validation = $this->form_validation->run('activate');
+		}
+		else if ($method == 'resend')
+		{
+			$res_form_validation = 
+					$this->form_validation->run('resend_activation');
+		}
+		
+		if ($res_form_validation === FALSE)
+		{
+			$params = array(
+				'title'=> $this->lang->line('user_title_activation')
+					.' &ndash; '
+					. $this->config->item('site_name'),
+				//'metas' => array('description'=>'')
+			);
+			$this->load->library('html_head_params', $params);
+		
+			// **
+			// ** LOADING VIEWS
+			// **
+			$this->load->view('html_begin', $this->html_head_params);
+			$this->load->view('header', array());
+
+			if (! $activated_account)
+			{
+				$main_params['content'] = 
+					$this->load->view('user/activate_view',
+					array('user_id'=> $user_id, 'email'=> $userdata['email']),
+					TRUE);
+			}
+			else
+			{
+				$main_params['content'] =
+					$this->load->view('user/activated_account_view',
+					NULL, TRUE);
+			}
+			
+			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+			$this->load->view('main', $main_params);
+		
+			$this->load->view('footer');
+			$this->load->view('html_end');
+		}
+		else
+		{
+			if ($method == 'code')
+			{
+				// Redirect to a message which tells the user that the
+				// activation was successful.
+				header('Location: '. site_url("user/activate/$user_id"));
+			}
+			else if ($method == 'resend')
+			{
+				// Redirect to home page
+				header('Location: '. site_url());
+			}
+		}
 	}
 	
 	public function _update_session_userdata($data)
@@ -330,6 +409,11 @@ class User extends CI_Controller {
 		
 		return TRUE;
 	}
+	
+	public function _valid_activation_code($activation_code)
+	{
+		return (preg_match('/^[a-fA-F0-9]{16}$/', $activation_code) == 1);
+	}
 
 	public function _do_login($username, $field_password)
 	{
@@ -345,6 +429,7 @@ class User extends CI_Controller {
 		if ($user['activation_code'] !== NULL)
 		{
 			$this->activated_account = FALSE;
+			$this->user_id = $user['id'];
 			return TRUE;
 		}
 		
@@ -357,6 +442,22 @@ class User extends CI_Controller {
 		));
 		$this->import = (isset($user['import']) ? $user['import'] : FALSE);
 		return TRUE;
+	}
+	
+	public function _do_activate($activation_code)
+	{
+		$user_id = $this->input->post('user-id');
+		if ($user_id === FALSE)
+			return FALSE;
+		$user_id = intval($user_id);
+		
+		return $this->users_model->activate_account($user_id,
+				$activation_code);
+	}
+	
+	public function _do_resend_activation($email)
+	{
+		return FALSE;
 	}
 }
 

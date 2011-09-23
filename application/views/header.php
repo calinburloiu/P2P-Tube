@@ -64,7 +64,7 @@
 	</li> 
 	
 	<?php else: ?>
-	<li class="menu-right"><a href="<?php echo site_url('user/register/'. urlencode_segments(uri_string(), 'user/register')) ?>"
+	<li class="menu-right"><a href="<?php echo site_url('user/register') ?>"
 		<?php echo ($selected_menu == 'register' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_register') ?></a>
 	</li>
 		

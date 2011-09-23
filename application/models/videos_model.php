@@ -44,7 +44,7 @@ class Videos_model extends CI_Model {
 	 *   <li>id, name, title, duration, thumbs_count, default_thumb, views => from DB</li>
 	 *   <li>shorted_title => ellipsized title</li>
 	 *   <li>video_url => P2P-Tube video URl</li>
-	 *   <li>TODO: user_id, user_name</li>
+	 *   <li>user_id, user_name</li>
 	 *   <li>thumbs => thumbnail images' URLs</li>
 	 * </ul>
 	 */
@@ -179,7 +179,7 @@ class Videos_model extends CI_Model {
 	 * video asset having keys: "src", "res", "par" and "ext". Value of key
 	 * "src" is the video torrent formated as
 	 * {name}_{format}.{video_ext}.{default_torrent_ext}</li>
-	 *   <li>user_name => TODO: user name from `users` table</li>
+	 *   <li>username => user name from `users` table</li>
 	 *   <li>category_title => a human-friendly category name</li>
 	 *   <li>tags => associative list of "tag => score"</li>
 	 *   <li>date => date and time when the video was created</li>
@@ -190,9 +190,9 @@ class Videos_model extends CI_Model {
 	{
 		$this->load->helper('video');
 		
-		$query = $this->db->query('SELECT * 
-								FROM `videos` 
-								WHERE id = ?', $id);
+		$query = $this->db->query("SELECT v.*, u.username 
+								FROM `videos` v, `users` u
+								WHERE v.user_id = u.id AND v.id = $id");
 		$video = array();
 		
 		if ($query->num_rows() > 0)
@@ -238,9 +238,6 @@ class Videos_model extends CI_Model {
 		
 		// Thumbnails
 		$video['thumbs'] = $this->get_thumbs($video['name'], $video['thumbs_count']);
-		
-		// TODO: user information
-		$video['user_name'] = 'TODO';
 		
 		return $video;
 	}

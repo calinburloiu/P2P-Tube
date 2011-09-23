@@ -277,15 +277,22 @@ class Users_model extends CI_Model {
 	 * id, if it is string it is used as an username.
 	 * 
 	 * @param mixed $user
+	 * @param string $table_cols	(optional) string with comma separated
+	 * `users` table column names. Use a.activation_code to check user's
+	 * account activation_code. If this value is NULL than the account is
+	 * active.
+	 * @return array	associative array with userdata from DB
 	 */
-	public function get_userdata($user)
+	public function get_userdata($user, $table_cols = '*')
 	{
 		if (is_int($user))
 			$cond = "id = $user";
 		else
 			$cond = "username = '$user'";
 		
-		$query = $this->db->query("SELECT * from `users`
+		$query = $this->db->query("SELECT $table_cols
+			FROM `users` u LEFT JOIN `users_unactivated` a
+				ON (u.id = a.user_id)
 			WHERE $cond");
 		
 		if ($query->num_rows() === 0)
