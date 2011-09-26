@@ -17,6 +17,12 @@ $lang['_valid_activation_code']		= 'Invalid activation code. You must provide 16
 $lang['_do_activate']				= 'Wrong activation code.';
 $lang['_do_resend_activation']		= 'An error occurred while resending your activation e-mail. This is not a permanent error. Please try again later.';
 
+// Password Recovery
+$lang['_username_exists']			= 'There is no account registered with this username.';
+$lang['_internal_account']			= 'You cannot change the password for this account because authentication is provided by a third-party.';
+$lang['_do_recover_password']		= 'Username and e-mail address are not associated with the same account.';
+
+
 
 /* End of file form_validation_lang.php */
 /* Location: ./system/language/english/form_validation_lang.php */

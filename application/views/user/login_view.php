@@ -26,5 +26,11 @@
 			<input type="submit" value="<?php echo $this->lang->line('ui_nav_menu_log_in') ?>" />
 		</td>
 	</tr>
+	<tr>
+		<td></td>
+		<td>
+			<p><a href="<?php echo site_url('user/recover_password') ?>"><?php echo $this->lang->line('user_link_password_recovery') ?></a></p>
+		</td>
+	</tr>
 </table>
 </form>

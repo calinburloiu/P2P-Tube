@@ -23,6 +23,11 @@ class User extends CI_Controller {
 	public function index()
 	{
 	}
+	
+	public function test($user_id = 1)
+	{
+		echo sha1('hQwCUEPQZcN8c4Es');
+	}
 
 	/**
 	* Login a user and then redirect it to the last page which must be encoded
@@ -38,7 +43,7 @@ class User extends CI_Controller {
 		$this->form_validation->set_error_delimiters('<span class="error">',
 			'</span>');
 
-		if ($this->form_validation->run('signin') === FALSE)
+		if ($this->form_validation->run('login') === FALSE)
 		{
 			$params = array(	'title' =>
 									$this->lang->line('ui_nav_menu_login')
@@ -273,28 +278,59 @@ class User extends CI_Controller {
 	
 	public function activate($user_id, $method='', $activation_code='')
 	{
-		$user_id = intval($user_id);
+		$user_id = intval($user_id);		
+		$res_form_validation = FALSE;
+		
+		if ($method == 'code')
+		{
+			if (! $activation_code)
+				$res_form_validation = $this->form_validation->run('activate');
+			// Activation code is provided in URL.
+			else
+			{
+				if ($this->_valid_activation_code($activation_code)
+						&& $this->users_model->activate_account($user_id,
+							$activation_code))
+				{
+					$this->session->set_flashdata('msg', sprintf(
+						$this->lang->line('user_msg_activated_account'), 
+						site_url('user/login')));
+					header('Location: '. site_url('message/info'));
+					return;
+				}
+				else
+				{
+					$this->session->set_flashdata('msg',
+						$this->lang->line('user_msg_wrong_activation_code'));
+					header('Location: '. site_url('message/error'));
+					return;
+				}
+			}
+		}
+		else if ($method == 'resend')
+		{
+			$res_form_validation =
+				$this->form_validation->run('resend_activation');
+		}
+		
 		$userdata = $this->users_model->get_userdata($user_id,
 				'email, a.activation_code');
 		$email = $userdata['email'];
-		//print_r($userdata['activation_code']);
 		$activated_account = ($userdata['activation_code'] == NULL);
+		
+		if ($activated_account)
+		{
+			$this->session->set_flashdata('msg', sprintf(
+						$this->lang->line('user_msg_activated_account'), 
+						site_url('user/login')));
+			header('Location: '. site_url('message/info'));
+			return;
+		}
 		
 		$this->load->library('form_validation');
 			
 		$this->form_validation->set_error_delimiters('<span class="error">',
 					'</span>');
-		
-		$res_form_validation = FALSE;
-		if ($method == 'code')
-		{
-			$res_form_validation = $this->form_validation->run('activate');
-		}
-		else if ($method == 'resend')
-		{
-			$res_form_validation = 
-					$this->form_validation->run('resend_activation');
-		}
 		
 		if ($res_form_validation === FALSE)
 		{
@@ -312,19 +348,12 @@ class User extends CI_Controller {
 			$this->load->view('html_begin', $this->html_head_params);
 			$this->load->view('header', array());
 
-			if (! $activated_account)
-			{
-				$main_params['content'] = 
-					$this->load->view('user/activate_view',
-					array('user_id'=> $user_id, 'email'=> $userdata['email']),
-					TRUE);
-			}
-			else
-			{
-				$main_params['content'] =
-					$this->load->view('user/activated_account_view',
-					NULL, TRUE);
-			}
+			// Show form
+			$main_params['content'] = 
+				$this->load->view('user/activate_view',
+				array(	'user_id'=> $user_id,
+						'email'=> $userdata['email']),
+				TRUE);
 			
 			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
 			$this->load->view('main', $main_params);
@@ -338,13 +367,68 @@ class User extends CI_Controller {
 			{
 				// Redirect to a message which tells the user that the
 				// activation was successful.
-				header('Location: '. site_url("user/activate/$user_id"));
+				$this->session->set_flashdata('msg', sprintf(
+						$this->lang->line('user_msg_activated_account'), 
+						site_url('user/login')));
+				header('Location: '. site_url('message/info'));
+				return;
 			}
 			else if ($method == 'resend')
 			{
-				// Redirect to home page
-				header('Location: '. site_url());
+				// Redirect to resent message
+				$this->session->set_flashdata('msg', sprintf(
+						$this->lang->line('user_msg_activation_resent'),
+						$this->input->post('email')));
+				header('Location: '. site_url('message/info'));
+				return;
 			}
+		}
+	}
+	
+	public function recover_password()
+	{
+		$this->load->library('form_validation');
+			
+		$this->form_validation->set_error_delimiters('<span class="error">',
+			'</span>');
+
+		if ($this->form_validation->run('recover_password') === FALSE)
+		{
+			$params = array(	'title' =>
+									$this->lang->line(
+										'user_title_password_recovery')
+										.' &ndash; '
+										. $this->config->item('site_name'),
+								//'metas' => array('description'=>'')
+			);
+			$this->load->library('html_head_params', $params);
+				
+			// **
+			// ** LOADING VIEWS
+			// **
+			$this->load->view('html_begin', $this->html_head_params);
+			$this->load->view('header', array('selected_menu' => 
+					'recover_password'));
+
+			$main_params['content'] = $this->load->view(
+				'user/recover_password_view', array(),
+				TRUE);
+			
+			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+			$this->load->view('main', $main_params);
+				
+			$this->load->view('footer');
+			$this->load->view('html_end');
+		}
+		else
+		{
+			// Redirect to resent message
+			$this->session->set_flashdata('msg', sprintf(
+					$this->lang->line('user_msg_password_recovery_email_sent'),
+					$this->input->post('username'),
+					$this->input->post('email')));
+			header('Location: '. site_url('message/info'));
+			return;
 		}
 	}
 	
@@ -457,7 +541,46 @@ class User extends CI_Controller {
 	
 	public function _do_resend_activation($email)
 	{
-		return FALSE;
+		$user_id = $this->input->post('user-id');
+		if ($user_id === FALSE)
+			return FALSE;
+		$user_id = intval($user_id);
+		
+		$this->users_model->set_userdata($user_id,
+			array('email'=> $email));
+		
+		return $this->users_model->send_activation_email($user_id, $email);
+	}
+	
+	public function _username_exists($username)
+	{
+		$userdata = $this->users_model->get_userdata($username);
+		
+		if (! $userdata)
+			return FALSE;
+		
+		return TRUE;
+	}
+	
+	public function _internal_account($username)
+	{
+		$userdata = $this->users_model->get_userdata($username, 'auth_src');
+		if (! $userdata)
+			return FALSE;
+
+		if ($userdata['auth_src'] != 'internal')
+			return FALSE;
+		
+		return TRUE;
+	}
+	
+	public function _do_recover_password($username)
+	{
+		$email = $this->input->post('email');
+		if (! $email)
+			return FALSE;
+		
+		return $this->users_model->recover_password($username, $email);
 	}
 }
 

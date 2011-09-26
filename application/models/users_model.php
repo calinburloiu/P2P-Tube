@@ -221,13 +221,15 @@ class Users_model extends CI_Model {
 		if ($query === FALSE)
 			return FALSE;
 		
-		// If the registered with internal authentication it needs to activate
+		// If registered with internal authentication it needs to activate
 		// the account.
-		$activation_code = Users_model::gen_activation_code();
+		$activation_code = Users_model::gen_activation_code($data['username']);
 		$user_id = $this->get_user_id($data['username']);
 		$query = $this->db->query("INSERT INTO `users_unactivated`
 			(user_id, activation_code)
 			VALUES ($user_id, '$activation_code')");
+		$this->send_activation_email($user_id, $data['email'],
+			$activation_code, $data['username']);
 		
 		// TODO exception on failure
 		return $query;
@@ -272,6 +274,64 @@ class Users_model extends CI_Model {
 		return TRUE;
 	}
 	
+	public function send_activation_email($user_id, $email = NULL,
+			$activation_code = NULL, $username = NULL)
+	{
+		if (!$activation_code || !$email || !$username)
+		{
+			if (!$email)
+				$cols = 'email, ';
+			else
+				$cols = '';
+			
+			$userdata = $this->get_userdata($user_id,
+					$cols. "a.activation_code, username");
+			$activation_code =& $userdata['activation_code'];
+			
+			if (!$email)
+				$email =& $userdata['email'];
+			$username =& $userdata['username'];
+		}
+		
+		if ($activation_code === NULL)
+			return TRUE;
+		
+		$subject = '['. $this->config->item('site_name')
+				. '] Account Activation';
+		$activation_url =
+				site_url("user/activate/$user_id/code/$activation_code"); 
+		$msg = sprintf($this->lang->line('user_activation_email_content'),
+			$username, $this->config->item('site_name'), site_url(),
+			$activation_url, $activation_code);
+		$headers = "From: ". $this->config->item('noreply_email');
+		
+		return mail($email, $subject, $msg, $headers);
+	}
+	
+	public function recover_password($username, $email)
+	{
+		$userdata = $this->get_userdata($username, 'email, username, id');
+		
+		if (strcmp($userdata['email'], $email) !== 0)
+			return FALSE;
+		
+		$recovered_password = Users_model::gen_password();
+		
+		$this->set_userdata(intval($userdata['id']), array('password'=> 
+				$recovered_password));
+		
+		$subject = '['. $this->config->item('site_name')
+		. '] Password Recovery';
+		$msg = sprintf($this->lang->line('user_password_recovery_email_content'),
+			$username, $this->config->item('site_name'), site_url(),
+			$recovered_password);
+		$headers = "From: ". $this->config->item('noreply_email');
+		
+		mail($email, $subject, $msg, $headers);
+		
+		return TRUE;
+	}
+	
 	/**
 	 * Returns data from `users` table. If $user is int it is used as an
 	 * id, if it is string it is used as an username.
@@ -307,6 +367,7 @@ class Users_model extends CI_Model {
 	 * @param int $user_id
 	 * @param array $data	key-value pairs with columns and new values to be
 	 * modified
+	 * @return boolean	returns TRUE on success and FALSE otherwise
 	 */
 	public function set_userdata($user_id, $data)
 	{
@@ -348,6 +409,26 @@ class Users_model extends CI_Model {
 		
 		return $activation_code;
 	}
+	
+	public static function gen_password()
+	{
+		$ci =& get_instance();
+		$length = 16;
+		$chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,.?!_-';
+		$len_chars = strlen($chars);
+		$enc_key = $ci->config->item('encryption_key');
+		$len_enc_key = strlen($enc_key);
+		$password = '';
+		
+		for ($p = 0; $p < $length; $p++) 
+		{
+			$i = (mt_rand(1, 100) * ord($enc_key[ mt_rand(0, $len_enc_key-1) ]))
+				% $len_chars;
+			$password .= $chars[$i];
+		}
+		
+		return $password;
+	} 
 	
 	public static function roles_to_string($roles)
 	{

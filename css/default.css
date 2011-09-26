@@ -20,6 +20,11 @@ a:hover, a:active
 	text-decoration: underline;
 }
 
+.ui-state-highlight a 
+{
+    color: rgb(0,90,192) !important;
+}
+
 h1
 {
 	margin-top: 8px;

@@ -1,7 +1,7 @@
 <?php
 
 $config = array(
-	'signin'=> array(
+	'login'=> array(
 		array(
 			'field'=>'username',
 			'label'=>'lang:user_username_or_email',
@@ -85,6 +85,20 @@ $config = array(
 			'field'=>'email',
 			'label'=>'lang:user_email',
 			'rules'=>'trim|required|xss_clean|valid_email|callback__do_resend_activation'
+		)
+	),
+	'recover_password'=> array(
+		array(
+			'field'=>'username',
+			'label'=>'lang:user_username',
+			'rules'=>'trim|required|min_length[5]|max_length[32]'
+				. '|strtolower|callback__valid_username|callback__username_exists|callback__internal_account'
+				. '|callback__do_recover_password'
+		),
+		array(
+			'field'=>'email',
+			'label'=>'lang:user_email',
+			'rules'=>'trim|required|xss_clean|valid_email'
 		)
 	)
 );

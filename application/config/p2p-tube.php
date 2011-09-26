@@ -135,3 +135,14 @@ $config['available_languages_list'] = array(
 	'en'=>'english',
 	'ro'=>'romanian'
 );
+
+/*
+|--------------------------------------------------------------------------
+| No-Reply E-mail address
+|--------------------------------------------------------------------------
+|
+| The e-mail address from which the users receive e-mail notifications
+| like account activation e-mail or password recovery.
+|
+*/
+$config['noreply_email'] = 'no-reply@p2p-next.cs.pub.ro';

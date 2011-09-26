@@ -41,7 +41,7 @@ endif;
 			<input type="text" name="username" size="16" value="<?php echo _set_value($userdata, 'username') ?>" />
 		</td>
 	  <?php else: ?>
-		<th><?php echo $this->lang->line('user_username'). ': ' ?></th>
+		<th><?php echo $this->lang->line('user_username'). ' : ' ?></th>
 		<td>
 			&nbsp;<em><?php echo $userdata['username'] ?></em>
 		</td>`
@@ -139,6 +139,14 @@ endif;
 		<th><?php echo $this->lang->line('user_locality'). ' : ' ?></th>
 		<td>
 			<input type="text" name="locality" size="16" value="<?php echo _set_value($userdata, 'locality') ?>" />
+		</td>
+	</tr>
+	<tr><td></td><td><?php echo form_error('locality') ?></td></tr>
+	
+	<tr>
+		<th><?php echo $this->lang->line('user_picture'). ' : ' ?></th>
+		<td>
+			<input type="file" name="picture" size="16" />
 		</td>
 	</tr>
 	<tr><td></td><td><?php echo form_error('locality') ?></td></tr>
