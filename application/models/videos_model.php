@@ -243,18 +243,61 @@ class Videos_model extends CI_Model {
 	}
 	
 	/**
-	 * Increment a video parameter from DB: `views`, `likes` or `dislikes`.
+	 * Increments views count for a video.
 	 * 
 	 * @param int $id	DB video id
-	 * @param string $param	DB parameter column name.
 	 * @return void
 	 */
-	public function inc_video_var($id, $var)
+	public function inc_views($id)
 	{
-		// TODO error report if query returns FALSE
-		$this->db->query('UPDATE `videos` '
-						. 'SET `'. $var. '`=`'. $var. '`+1 '
+		return $this->db->query('UPDATE `videos` '
+						. 'SET `views`=`views`+1 '
 						. 'WHERE id='. $id); 
+	}
+	
+	public function vote($video_id, $user_id, $like = TRUE)
+	{
+		if ($like)
+		{
+			$col = 'likes';
+			$action = 'like';
+		}
+		else
+		{
+			$col = 'dislikes';
+			$action = 'dislike';
+		}
+		
+		$query = $this->db->query("SELECT * FROM `users_actions`
+			WHERE user_id = $user_id
+				AND target_id = $video_id
+				AND target_type = 'video'
+				AND action = '$action'
+				AND date = CURDATE()");
+		// User already voted today
+		if ($query->num_rows() > 0)
+			return -1;
+		
+		$this->db->query("UPDATE `videos`
+			SET $col = $col + 1
+			WHERE id = $video_id");
+		
+		// Mark this action so that the user cannot repeat it today.
+		$this->db->query("INSERT INTO `users_actions`
+				(user_id, action, target_type, target_id, date)
+			VALUES ( $user_id, '$action', 'video', $video_id, CURDATE() )");
+		
+		$query = $this->db->query("SELECT $col FROM `videos`
+			WHERE id = $video_id");
+		
+		if ($query->num_rows() === 1)
+		{
+			$row = $query->row_array();
+			return $row[ $col ];
+		}
+		
+		// Error
+		return FALSE;
 	}
 	
 	public function get_thumbs($name, $count)

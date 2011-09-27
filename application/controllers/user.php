@@ -26,7 +26,7 @@ class User extends CI_Controller {
 	
 	public function test($user_id = 1)
 	{
-		echo sha1('hQwCUEPQZcN8c4Es');
+
 	}
 
 	/**
@@ -112,8 +112,32 @@ class User extends CI_Controller {
 			
 		$this->form_validation->set_error_delimiters('<span class="error">',
 					'</span>');
+		$error_upload = '';
+
+		if ($this->form_validation->run('register'))
+		{
+			$b_validation = TRUE;
+			
+			if ($_FILES['picture']['tmp_name'])
+			{
+				// Upload library
+				$config_upload['upload_path'] = './data/user_pictures';
+				$config_upload['file_name'] = 
+					str_replace('.', '-', $this->input->post('username')) .'-';
+				$config_upload['allowed_types'] = 'gif|jpg|png';
+				$config_upload['max_size'] = '10240';
+				$this->load->library('upload', $config_upload);
+				
+				$b_validation = $this->upload->do_upload('picture');
+				$error_upload = 
+					$this->upload->display_errors('<span class="error">',
+							'</span>');
+			}
+		}
+		else
+			$b_validation = FALSE;
 		
-		if ($this->form_validation->run('register') === FALSE)
+		if (! $b_validation)
 		{
 			// Edit account data if logged in, otherwise register.
 			if ($user_id = $this->session->userdata('user_id'))
@@ -143,7 +167,8 @@ class User extends CI_Controller {
 				array('selected_menu' => $selected_menu));
 			
 			$main_params['content'] = $this->load->view('user/register_view', 
-				array('userdata'=> $userdata, 'redirect'=> $redirect),
+				array('userdata'=> $userdata, 'redirect'=> $redirect,
+					'error_upload'=> $error_upload),
 				TRUE);
 			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
 			$this->load->view('main', $main_params);
@@ -162,6 +187,26 @@ class User extends CI_Controller {
 			$data['locality'] = $this->input->post('locality');
 			$data['ui_lang'] = $this->input->post('ui-lang');
 			$data['time_zone'] = $this->input->post('time-zone');
+			
+			// Handle picture if one was uploaded.
+			if ($_FILES['picture']['tmp_name'])
+			{
+				$upload_data = $this->upload->data();
+				$this->load->library('image');
+				$this->image->load($upload_data['full_path']);
+				// Resize original to a maximum size.
+				if ($this->image->get_width() * $this->image->get_height()
+						> 640*480)
+				{
+					$this->image->save_thumbnail(
+						$upload_data['full_path'],
+						640, 480, IMAGETYPE_AUTO);
+				}
+				// Create thumbnail.
+				$data['picture'] = $upload_data['file_name']. '-thumb.jpg';
+				$this->image->save_thumbnail($upload_data['file_path']
+						. $upload_data['file_name']. '-thumb.jpg', 120, 90);
+			}
 			
 			// Update session user data.
 			$this->_update_session_userdata($data);

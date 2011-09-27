@@ -2,8 +2,12 @@
 	if (! isset($tab))
 		$tab = 0;
 ?>
-<h1><?php echo $this->lang->line('user_appelation')
-	. ' <em>'. $userdata['username']. '</em>' ?></h1>
+
+<h1>
+	<?php echo $this->lang->line('user_appelation')
+	. ' <em>'. $userdata['username']. '</em>' ?>
+</h1>
+
 <div id="profile-tabs">
 	<ul>
 		<li><a href="#tab-profile">Profile</a></li>
@@ -11,6 +15,15 @@
 	</ul>
 	<div id="tab-profile">
 		<table class="form">
+			<tr>
+				<td>
+				  <?php if ($userdata['picture']): ?>
+					<img src="<?php echo site_url("data/user_pictures/{$userdata['picture']}") ?>" style="float: left" />
+				  <?php endif ?>
+				</td>
+				<td></td>
+			</tr>
+			
 			<tr>
 				<th><?php echo $this->lang->line('user_username'). ': ' ?></th>
 				<td><?php echo $userdata['username'] ?></td>

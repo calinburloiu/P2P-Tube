@@ -8,6 +8,8 @@
  * @copyright	2006 Simon Jarvis, 2011 Călin-Andrei Burloiu
  */
 
+define('IMAGETYPE_AUTO', 0);
+
 class Image {
 	 
 	var $image;
@@ -25,6 +27,16 @@ class Image {
 		}
 	}
 	function save($filename, $image_type=IMAGETYPE_JPEG, $compression=60, $permissions=null) {
+		if( $image_type == IMAGETYPE_AUTO) {
+			if (preg_match('/\.jpg$/', $filename) 
+					|| preg_match('/\.jpeg$/', $filename))
+				$image_type = IMAGETYPE_JPEG;
+			elseif (preg_match('/\.gif$/', $filename))
+				$image_type = IMAGETYPE_GIF;
+			elseif (preg_match('/\.png$/', $filename))
+				$image_type = IMAGETYPE_PNG;
+		}
+		
 		if( $image_type == IMAGETYPE_JPEG ) {
 			imagejpeg($this->image,$filename,$compression);
 		} elseif( $image_type == IMAGETYPE_GIF ) {
@@ -32,6 +44,7 @@ class Image {
 		} elseif( $image_type == IMAGETYPE_PNG ) {
 			imagepng($this->image,$filename);
 		}
+		
 		if( $permissions != null) {
 			chmod($filename,$permissions);
 		}
@@ -45,42 +58,43 @@ class Image {
 			imagepng($this->image);
 		}
 	}
-	function saveThumbnail($filename, $width, $height)
+	function save_thumbnail($filename, $width, $height,
+			$image_type=IMAGETYPE_JPEG)
 	{
-		$ratio = $this->getWidth() / $this->getHeight();
+		$ratio = $this->get_width() / $this->get_height();
 		$thumbRatio = $width / $height;
 
 		if($ratio < $thumbRatio)
-		$this->resizeToHeight($height);
+			$this->resize_to_height($height);
 		else
-		$this->resizeToWidth($width);
+			$this->resize_to_width($width);
 
-		$this->save($filename);
+		$this->save($filename, $image_type);
 	}
-	function getWidth() {
+	function get_width() {
 		return imagesx($this->image);
 	}
-	function getHeight() {
+	function get_height() {
 		return imagesy($this->image);
 	}
-	function resizeToHeight($height) {
-		$ratio = $height / $this->getHeight();
-		$width = $this->getWidth() * $ratio;
+	function resize_to_height($height) {
+		$ratio = $height / $this->get_height();
+		$width = $this->get_width() * $ratio;
 		$this->resize($width,$height);
 	}
-	function resizeToWidth($width) {
-		$ratio = $width / $this->getWidth();
-		$height = $this->getheight() * $ratio;
+	function resize_to_width($width) {
+		$ratio = $width / $this->get_width();
+		$height = $this->get_height() * $ratio;
 		$this->resize($width,$height);
 	}
 	function scale($scale) {
-		$width = $this->getWidth() * $scale/100;
-		$height = $this->getheight() * $scale/100;
+		$width = $this->get_width() * $scale/100;
+		$height = $this->get_height() * $scale/100;
 		$this->resize($width,$height);
 	}
 	function resize($width,$height) {
 		$new_image = imagecreatetruecolor($width, $height);
-		imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
+		imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $this->get_width(), $this->get_height());
 		$this->image = $new_image;
 	}
 }

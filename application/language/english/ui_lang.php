@@ -59,5 +59,8 @@ $lang['ui_license'] = 'license';
 $lang['ui_uploaded_by'] = 'Uploaded by';
 $lang['ui_on_date'] = 'on';
 
+$lang['ui_msg_login_restriction'] = 'You must log in to perform this action.';
+$lang['ui_msg_repeated_action_restriction'] = 'You can only perform this action once a day.';
+
 /* End of file ui_lang.php */
 /* Location: ./application/language/english/ui_lang.php */

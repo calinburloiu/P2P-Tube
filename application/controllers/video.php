@@ -13,7 +13,7 @@ class Video extends CI_Controller {
 	{
 		parent::__construct();
 		
-		//$this->lang->load('video');
+		$this->lang->load('video');
 	}
 	
 	public function index()
@@ -36,12 +36,15 @@ class Video extends CI_Controller {
 		// **
 		// Retrieve video information.
 		$this->load->model('videos_model');
-		$this->videos_model->inc_video_var($id, 'views');
+		$this->videos_model->inc_views($id);
 		$data['video'] = $this->videos_model->get_video($id, $name);
 		$categories = $this->config->item('categories');
 		$data['video']['category_name'] = 
 			$categories[ $data['video']['category_id'] ];
 		$data['plugin_type'] = ($plugin === NULL ? 'auto' : $plugin);
+		$data['user_id'] = $this->session->userdata('user_id');
+		if ($data['user_id'] === FALSE)
+			$data['user_id'] = '';
 		
 		// Display page.
 		$params = array(	'title' => $data['video']['title'] . ' &ndash; '
@@ -78,6 +81,27 @@ class Video extends CI_Controller {
 		
 		$this->load->view('footer');
 		$this->load->view('html_end');
+	}
+	
+	/**
+	 * Increments likes count for video with the specified id and returns to 
+	 * the client as plain text the number if likes. 
+	 * 
+	 * @param string $action	'like' or 'dislike'
+	 * @param string $video_id
+	 * @param string $user_id
+	 */
+	public function ajax_vote($action, $video_id, $user_id = NULL)
+	{
+		$video_id = intval($video_id);
+		$user_id = intval($user_id);
+		$this->load->model('videos_model');
+		
+		$res = $this->videos_model->vote($video_id, $user_id, 
+			(strcmp($action, 'like') == 0 ? TRUE : FALSE));
+		
+		if ($res !== -1)
+			echo $res;
 	}
 	
 	/**

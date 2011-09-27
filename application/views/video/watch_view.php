@@ -51,19 +51,15 @@
 			?>
 		</div>
 		
-		<div><span id="video-likes">
-			<?php echo $video['likes'] . ' '
-				. ($video['likes'] == 1 ? 
-					$this->lang->line('ui_like') : 
-					$this->lang->line('ui_likes') );
-			?></span>,
-		<span id="video-dislikes">
-			<?php echo $video['dislikes'] . ' '
-				. ($video['dislikes'] == 1 ? 
-					$this->lang->line('ui_dislike') : 
-					$this->lang->line('ui_dislikes') );
-			?>
-		</span></div>
+		<div><!--<a id="link-like" href="#"><?php echo $this->lang->line('video_like') ?></a>
+			<a id="link-dislike" href="#"><?php echo $this->lang->line('video_dislike') ?></a>-->
+			<a class="link-vote" data-action="like" href="#"><?php echo $this->lang->line('video_like') ?></a>
+			<a class="link-vote" data-action="dislike" href="#"><?php echo $this->lang->line('video_dislike') ?></a>
+			<span id="video-likes"><?php echo $video['likes'] ?></span> <?php
+				echo $this->lang->line('ui_likes') ?>,
+			<span id="video-dislikes"><?php echo $video['dislikes'] ?></span> <?php
+				echo $this->lang->line('ui_dislikes'); ?>
+		</div>
 	</div>
 	
 	<div id="video-description"><?php echo $video['description'] ?></div>
@@ -136,5 +132,86 @@
 						.css('width', $('#video-widget').css('width'));
 				}
 			});
+		
+		$('.link-vote')
+			.click(function() {
+				var user_id = "<?php echo $user_id ?>";
+				var action, idOutput;
+				if ($(this).data('action') == 'like')
+				{
+					var action = 'like';
+					var idOutput = '#video-likes';
+				}
+				else
+				{
+					var action = 'dislike';
+					var idOutput = '#video-dislikes';
+				}
+				//alert(action + " " + user_id);
+				
+				if (user_id.length != 0)
+				{
+					$.ajax({
+						type: "GET",
+						url: "<?php echo site_url("video/ajax_vote") ?>/"
+							+ action
+							+ "<?php echo "/{$video['id']}/$user_id" ?>",
+						data: {t: ""+Math.random()},
+						dataType: "text",
+						success: function(text) {
+							if (text)
+								$(idOutput).html(text);
+							else
+								alert('<?php echo $this->lang->line('ui_msg_repeated_action_restriction') ?>');
+						}
+					});
+				}
+				else
+					alert('<?php echo $this->lang->line('ui_msg_login_restriction') ?>');
+			})
+			.button();
+		
+		$('#link-like')
+			.click(function() {
+				user_id = "<?php echo $user_id ?>";
+				
+				if (user_id)
+				{
+					$.ajax({
+						type: "GET",
+						url: "<?php echo site_url("video/ajax_vote/like/{$video['id']}/$user_id") ?>",
+						dataType: "text",
+						success: function(text) {
+							if (text)
+								$('#video-likes').html(text);
+							else
+								alert('<?php echo $this->lang->line('ui_msg_repeated_action_restriction') ?>');
+						}
+					});
+				}
+				else
+					alert('<?php echo $this->lang->line('ui_msg_login_restriction') ?>');
+			})
+			.button();
+		$('#link-dislike')
+			.click(function() {
+				user_id = "<?php echo $user_id ?>";
+				
+				if (user_id)
+				{
+					$.ajax({
+						type: "GET",
+						url: "<?php echo site_url("video/ajax_vote/dislike/{$video['id']}/$user_id") ?>",
+						data: {t: ""+Math.random()},
+						dataType: "text",
+						success: function(text) {
+							$('#video-dislikes').html(text);
+						}
+					});
+				}
+				else
+					alert('<?php echo $this->lang->line('ui_msg_login_restriction') ?>');
+			})
+			.button();
 	});
 </script>

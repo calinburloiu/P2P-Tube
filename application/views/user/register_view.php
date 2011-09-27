@@ -10,20 +10,16 @@ function _set_value($userdata, $field, $default = '')
 		? $userdata[ str_replace('-','_',$field) ]
 		: $post_value);
 }
-?>
-<?php 
-if (!$userdata):
-	echo form_open("user/register/$redirect");
-else:
-	echo form_open("user/account/$redirect");
-endif;
+
+if (!$userdata)
+	echo form_open_multipart("user/register/$redirect");
+else
+	echo form_open_multipart("user/account/$redirect");
 ?>
 
 <?php if ($userdata): ?>
 <input type="hidden" name="user-id" value="<?php echo $userdata['id'] ?>" />
 <input type="hidden" name="username" value="<?php echo $userdata['username'] ?>" />
-<!--<input type="hidden" name="password" value="12345" />
-<input type="hidden" name="password-confirmation" value="12345" />-->
 <?php endif ?>
 
 <table class="form">
@@ -143,13 +139,29 @@ endif;
 	</tr>
 	<tr><td></td><td><?php echo form_error('locality') ?></td></tr>
 	
+  <?php if ($userdata && $userdata['picture']): ?>
 	<tr>
 		<th><?php echo $this->lang->line('user_picture'). ' : ' ?></th>
+		<td>
+			<img src="<?php echo site_url("data/user_pictures/{$userdata['picture']}") ?>" alt="<?php echo $userdata['username'] ?>" />
+		</td>
+	</tr>
+	<tr><td></td><td></td></tr>
+  <?php endif ?>
+	
+	<tr>
+		<th>
+		  <?php if (! $userdata || ($userdata && ! $userdata['picture'])): ?>
+			<?php echo $this->lang->line('user_picture'). ' : ' ?>
+		  <?php else: ?>
+			<?php echo $this->lang->line('user_change_picture'). ' : ' ?>
+		  <?php endif ?>
+		</th>
 		<td>
 			<input type="file" name="picture" size="16" />
 		</td>
 	</tr>
-	<tr><td></td><td><?php echo form_error('locality') ?></td></tr>
+	<tr><td></td><td><?php echo $error_upload ?></td></tr>
 	
 	<tr><td></td><td>&nbsp;</td></tr>
 	

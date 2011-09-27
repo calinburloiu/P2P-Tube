@@ -205,7 +205,7 @@ label.strong
 	text-align: left;
 	padding: 0px 0px 0px 8px;
 	margin: 8px 0px 8px 0px;
-	background: url(/img/header.png) top repeat-x;
+	background: url(/img/header.png) center repeat-x;
 	outline: 1px outset rgb(108,162,222);
 	clear: both;
 }
