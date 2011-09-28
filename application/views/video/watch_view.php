@@ -37,7 +37,7 @@
 	<div id="video-info" style="clear: both">
 	<div id="video-upload-info">
 		<?php echo $this->lang->line('ui_uploaded_by') ?>
-			<span id="video-date"><a href="<?php echo site_url("user/profile/{$video['username']}") ?>"><?php echo $video['username'] ?></a></span>
+			<span id="video-user"><a href="<?php echo site_url("user/profile/{$video['username']}") ?>"><?php echo $video['username'] ?></a></span>
 			<?php echo $this->lang->line('ui_on_date') ?>
 			<span id="video-date"><?php echo $video['date'] ?></span>
 	</div>

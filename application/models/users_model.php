@@ -205,10 +205,17 @@ class Users_model extends CI_Model {
 		$vals = '';
 		foreach ($data as $col=> $val)
 		{
+			if ($val === NULL)
+			{
+				$cols .= "$col, ";
+				$vals .= "NULL, ";
+				continue;
+			}
+				
 			$cols .= "$col, ";
 			if (is_int($val))
 				$vals .= "$val, ";
-			else
+			else if (is_string($val))
 				$vals .= "'$val', ";
 		}
 		$cols = substr($cols, 0, -2);
@@ -217,7 +224,6 @@ class Users_model extends CI_Model {
 		$query = $this->db->query("INSERT INTO `users`
 			($cols, registration_date, last_login)
 			VALUES ($vals, utc_timestamp(), utc_timestamp())");
-		
 		if ($query === FALSE)
 			return FALSE;
 		
@@ -358,7 +364,18 @@ class Users_model extends CI_Model {
 		if ($query->num_rows() === 0)
 			return FALSE;
 		
-		return $query->row_array();
+		$userdata = $query->row_array();
+		
+		// Post process userdata.
+		if (isset($userdata['picture']))
+		{
+			$userdata['picture_thumb'] = site_url(
+				"data/user_pictures/{$userdata['picture']}-thumb.jpg");
+			$userdata['picture'] = site_url(
+				"data/user_pictures/{$userdata['picture']}");
+		} 
+		
+		return $userdata;
 	}
 	
 	/**
@@ -383,8 +400,10 @@ class Users_model extends CI_Model {
 		{
 			if (is_int($val))
 				$set .= "$col = $val, ";
-			else
+			else if (is_string($val))
 				$set .= "$col = '$val', ";
+			else if (is_null($var))
+				$set .= "$col = NULL, ";
 		}
 		$set = substr($set, 0, -2);
 		

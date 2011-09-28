@@ -124,6 +124,16 @@ $config['search_results_per_page'] = 20;
 
 /*
 |--------------------------------------------------------------------------
+| Video Comments per Page
+|--------------------------------------------------------------------------
+|
+| The number of video comments shown per page (as in video/watch).
+|
+*/
+$config['video_comments_per_page'] = 20;
+
+/*
+|--------------------------------------------------------------------------
 | A list with all available languages in which the site is translated
 |--------------------------------------------------------------------------
 |

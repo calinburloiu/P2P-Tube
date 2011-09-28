@@ -129,7 +129,7 @@ class Videos_model extends CI_Model {
 	 * 
 	 * @param int $category_id
 	 * @param mixed $user	an user_id (as int) or an username (as string)
-	 * @return int	number of videos or NULL if an error occured
+	 * @return int	number of videos or FALSE if an error occured
 	 */
 	public function get_videos_count($category_id = NULL, $user = NULL)
 	{
@@ -157,7 +157,7 @@ class Videos_model extends CI_Model {
 			return $query->row()->count;
 		
 		// Error
-		return NULL;
+		return FALSE;
 	}
 	
 	/**
@@ -240,6 +240,79 @@ class Videos_model extends CI_Model {
 		$video['thumbs'] = $this->get_thumbs($video['name'], $video['thumbs_count']);
 		
 		return $video;
+	}
+	
+	/**
+	 * Retrieves comments for a video.
+	 * 
+	 * @param int $video_id
+	 * @param int $offset
+	 * @param int $count
+	 * @param string $ordering	control comments ording by these possibilities:
+	 * <ul>
+	 *   <li><strong>'hottest':</strong> newest most appreciated first. An
+	 *   appreciated comment is one which has a bigger
+	 *   score = likes - dislikes.</li>
+	 *   <li><strong>'newest':</strong> newest first.</li>
+	 * </ul>
+	 * @return array	an array with comments
+	 */
+	public function get_video_comments($video_id, $offset, $count,
+			$ordering = 'newest')
+	{
+		// Ordering
+		switch ($ordering)
+		{
+		case 'newest':
+			$order_statement = "ORDER BY time DESC";
+			break;
+		case 'hottest':
+			$order_statement = "ORDER BY time DESC, score DESC";
+			break;
+				
+		default:
+			$order_statement = "";
+		}
+		
+		$query = $this->db->query(
+			"SELECT c.*, u.username, (c.likes + c.dislikes) AS score
+				FROM `videos_comments` c, `users` u
+				WHERE c.user_id = u.id AND video_id = $video_id
+				$order_statement");
+		
+		if ($query->num_rows() == 0)
+			return array();
+		
+		$comments = $query->result_array();
+		
+		return $comments;
+	}
+	
+	public function get_video_comments_count($video_id)
+	{
+		$query = $this->db->query(
+					"SELECT COUNT(*) count
+						FROM `videos_comments`
+						WHERE video_id = $video_id");
+				
+		if ($query->num_rows() == 0)
+			return FALSE;
+		
+		return $query->row()->count;
+	}
+	
+	/**
+	 * Insert in DB a comment for a video.
+	 * 
+	 * @param int $video_id
+	 * @param int $user_id
+	 * @param string $content
+	 */
+	public function comment_video($video_id, $user_id, $content)
+	{
+		return $query = $this->db->query(
+			"INSERT INTO `videos_comments` (video_id, user_id, content, time)
+			VALUES ($video_id, $user_id, '$content', UTC_TIMESTAMP())");
 	}
 	
 	/**

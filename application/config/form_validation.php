@@ -65,7 +65,7 @@ $config = array(
 		array(
 			'field'=>'birth-date',
 			'label'=>'lang:user_birth_date',
-			'rules'=>'trim|callback__valid_date'
+			'rules'=>'trim|callback__valid_date|callback__postprocess_birth_date'
 		),
 		array(
 			'field'=>'locality',
@@ -99,6 +99,13 @@ $config = array(
 			'field'=>'email',
 			'label'=>'lang:user_email',
 			'rules'=>'trim|required|xss_clean|valid_email'
+		)
+	),
+	'comment_video'=> array(
+		array(
+			'field'=>'comment',
+			'label'=>'lang:video_comment',
+			'rules'=>'trim|required|xss_clean|callback__is_user_loggedin|callback__do_comment'
 		)
 	)
 );

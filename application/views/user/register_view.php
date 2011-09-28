@@ -143,7 +143,7 @@ else
 	<tr>
 		<th><?php echo $this->lang->line('user_picture'). ' : ' ?></th>
 		<td>
-			<img src="<?php echo site_url("data/user_pictures/{$userdata['picture']}") ?>" alt="<?php echo $userdata['username'] ?>" />
+			<a href="<?php echo $userdata['picture'] ?>"><img src="<?php echo $userdata['picture_thumb'] ?>" alt="<?php echo $userdata['username'] ?>" /></a>
 		</td>
 	</tr>
 	<tr><td></td><td></td></tr>

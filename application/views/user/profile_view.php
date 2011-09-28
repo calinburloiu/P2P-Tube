@@ -18,7 +18,7 @@
 			<tr>
 				<td>
 				  <?php if ($userdata['picture']): ?>
-					<img src="<?php echo site_url("data/user_pictures/{$userdata['picture']}") ?>" style="float: left" />
+					<a href="<?php echo $userdata['picture'] ?>"><img src="<?php echo $userdata['picture_thumb'] ?>" style="float: left" /></a>
 				  <?php endif ?>
 				</td>
 				<td></td>

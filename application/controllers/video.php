@@ -21,6 +21,33 @@ class Video extends CI_Controller {
 		
 	}
 	
+	public function test($video_id)
+	{
+		// Display page.
+		$params = array(	'title' => $this->config->item('site_name'),
+									'css' => array(
+										'video.css'
+		),
+									'js' => array(
+		),
+		//'metas' => array('description'=>'','keywords'=>'')
+		);
+		$this->load->library('html_head_params', $params);
+		
+		// **
+		// ** LOADING VIEWS
+		// **
+		$this->load->view('html_begin', $this->html_head_params);
+		$this->load->view('header');
+		
+		//$main_params['content'] = $this->load->view('video/watch_view', $data, TRUE);
+		$this->load->view('echo', array('output'=> 
+			$this->_ajax_comment(TRUE, $video_id)));
+		
+		$this->load->view('footer');
+		$this->load->view('html_end');
+	}
+	
 	/**
 	 * The page used for watching a video
 	 *
@@ -104,8 +131,72 @@ class Video extends CI_Controller {
 			echo $res;
 	}
 	
+	public function ajax_comment($video_id,
+			$ordering = 'newest', $offset = '0')
+	{
+		$this->_ajax_comment(FALSE, $video_id, $ordering, $offset);
+	}
+	
+	public function _ajax_comment($return_output, $video_id,
+			$ordering = 'newest', $offset = '0')
+	{
+		$video_id = intval($video_id);
+		
+		$this->load->library('form_validation');
+		$this->form_validation->set_error_delimiters('<span class="error">',
+					'</span>');
+		$this->form_validation->run('comment_video');
+		
+		// **
+		// ** MODEL **
+		// **		
+		$this->load->model('videos_model');
+		$data['comments'] = $this->videos_model->get_video_comments($video_id,
+			$offset, $this->config->item('video_comments_per_page'), $ordering);
+		$data['comments_count'] =
+			$this->videos_model->get_video_comments_count($video_id);
+		$data['video_id'] = $video_id;
+		
+		// Pagination
+		$this->load->library('pagination');
+		$pg_config['base_url'] = site_url("video/ajax_comment/$video_id/$ordering/");
+		$pg_config['uri_segment'] = 5;
+		$pg_config['total_rows'] = $data['comments_count'];
+		$pg_config['per_page'] = $this->config->item('video_comments_per_page');
+		$this->pagination->initialize($pg_config);
+		$data['comments_pagination'] = $this->pagination->create_links();
+		
+		// **
+		// ** VIEWS **
+		// **
+		$output = $this->load->view('video/comments_view',
+			$data, $return_output);
+		
+		if ($return_output)
+			return $output;
+	}
+	
+	public function _is_user_loggedin($param)
+	{
+		if (! $this->session->userdata('user_id'))
+			return FALSE;
+		
+		return TRUE;
+	}
+	
+	public function _do_comment($comment)
+	{
+		// Note: Videos_model must be already loaded.
+		$this->load->model('videos_model');
+		
+		$video_id = intval($this->input->post('video-id'));
+		$user_id = intval($this->session->userdata('user_id'));
+		
+		$this->videos_model->comment_video($video_id, $user_id, $comment);
+	}
+	
 	/**
-	 * AJAX page which retrieves a video plugin.
+	 * OBSOLETE: AJAX page which retrieves a video plugin.
 	 *
 	 * The view associated with this controller should be parameter type
 	 * concatenated with '_plugin_view' and must be located in
@@ -121,7 +212,7 @@ class Video extends CI_Controller {
 	}
 	
 	/**
-	 * Video plugin controller
+	 * OBSOLETE: Video plugin controller
 	 *
 	 * See plugin function for details. If the second parameter is TRUE
 	 * the output is return instead of being displayed (used in preloading).

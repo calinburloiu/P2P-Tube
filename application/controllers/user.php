@@ -39,7 +39,6 @@ class User extends CI_Controller {
 	public function login($redirect = '')
 	{
 		$this->load->library('form_validation');
-			
 		$this->form_validation->set_error_delimiters('<span class="error">',
 			'</span>');
 
@@ -203,7 +202,7 @@ class User extends CI_Controller {
 						640, 480, IMAGETYPE_AUTO);
 				}
 				// Create thumbnail.
-				$data['picture'] = $upload_data['file_name']. '-thumb.jpg';
+				$data['picture'] = $upload_data['file_name'];
 				$this->image->save_thumbnail($upload_data['file_path']
 						. $upload_data['file_name']. '-thumb.jpg', 120, 90);
 			}
@@ -504,6 +503,15 @@ class User extends CI_Controller {
 			return TRUE;
 		
 		return (preg_match('/[\d]{4}-[\d]{2}-[\d]{2}/', $date) === 1);
+	}
+	
+	public function _postprocess_birth_date($date)
+	{
+		// If the user entered no birth date NULL needs to be inserted into DB.
+		if (! $date)
+			return NULL;
+		
+		return $date;
 	}
 	
 	public function _valid_old_password($old_password, $field_username)
