@@ -225,6 +225,7 @@ class Videos_model extends CI_Model {
 		foreach ($video['assets'] as & $asset)
 		{
 			$def = substr($asset['res'], strpos($asset['res'], 'x') + 1) . 'p';
+			$asset['def'] = $def;
  			$asset['src'] = site_url('data/torrents/'. $video['name'] . '_'
  				. $def . '.'. $asset['ext']
  				. '.'. $this->config->item('default_torrent_ext'));
@@ -260,6 +261,9 @@ class Videos_model extends CI_Model {
 	public function get_video_comments($video_id, $offset, $count,
 			$ordering = 'newest')
 	{
+		$this->load->helper('date');
+		$cond_hottest = '';
+		
 		// Ordering
 		switch ($ordering)
 		{
@@ -267,7 +271,8 @@ class Videos_model extends CI_Model {
 			$order_statement = "ORDER BY time DESC";
 			break;
 		case 'hottest':
-			$order_statement = "ORDER BY time DESC, score DESC";
+			$order_statement = "ORDER BY score DESC, time DESC";
+			$cond_hottest = "AND c.likes + c.dislikes > 0";
 			break;
 				
 		default:
@@ -275,15 +280,22 @@ class Videos_model extends CI_Model {
 		}
 		
 		$query = $this->db->query(
-			"SELECT c.*, u.username, (c.likes + c.dislikes) AS score
+			"SELECT c.*, u.username, u.time_zone, (c.likes + c.dislikes) AS score
 				FROM `videos_comments` c, `users` u
-				WHERE c.user_id = u.id AND video_id = $video_id
-				$order_statement");
+				WHERE c.user_id = u.id AND video_id = $video_id $cond_hottest
+				$order_statement
+				LIMIT $offset, $count");
 		
 		if ($query->num_rows() == 0)
 			return array();
 		
 		$comments = $query->result_array();
+		
+		foreach ($comments as & $comment)
+		{
+			$comment['local_time'] = human_gmt_to_human_local($comment['time'],
+				$comment['time_zone']);
+		}
 		
 		return $comments;
 	}
@@ -310,6 +322,11 @@ class Videos_model extends CI_Model {
 	 */
 	public function comment_video($video_id, $user_id, $content)
 	{
+		// Prepping content.
+		$content = substr($content, 0, 512);
+		$content = htmlspecialchars($content);
+		$content = nl2br($content);
+		
 		return $query = $this->db->query(
 			"INSERT INTO `videos_comments` (video_id, user_id, content, time)
 			VALUES ($video_id, $user_id, '$content', UTC_TIMESTAMP())");
@@ -369,6 +386,51 @@ class Videos_model extends CI_Model {
 			return $row[ $col ];
 		}
 		
+		// Error
+		return FALSE;
+	}
+	
+	public function vote_comment($comment_id, $user_id, $like = TRUE)
+	{
+		if ($like)
+		{
+			$col = 'likes';
+			$action = 'like';
+		}
+		else
+		{
+			$col = 'dislikes';
+			$action = 'dislike';
+		}
+	
+		$query = $this->db->query("SELECT * FROM `users_actions`
+				WHERE user_id = $user_id
+					AND target_id = $comment_id
+					AND target_type = 'vcomment'
+					AND action = '$action'
+					AND date = CURDATE()");
+		// User already voted today
+		if ($query->num_rows() > 0)
+			return -1;
+	
+		$this->db->query("UPDATE `videos_comments`
+				SET $col = $col + 1
+				WHERE id = $comment_id");
+	
+		// Mark this action so that the user cannot repeat it today.
+		$this->db->query("INSERT INTO `users_actions`
+					(user_id, action, target_type, target_id, date)
+				VALUES ( $user_id, '$action', 'vcomment', $comment_id, CURDATE() )");
+	
+		$query = $this->db->query("SELECT $col FROM `videos_comments`
+				WHERE id = $comment_id");
+	
+		if ($query->num_rows() === 1)
+		{
+			$row = $query->row_array();
+			return $row[ $col ];
+		}
+	
 		// Error
 		return FALSE;
 	}

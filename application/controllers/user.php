@@ -257,19 +257,14 @@ class User extends CI_Controller {
 		// **
 		// Logged in user time zone
 		$time_zone = $this->session->userdata('time_zone');
-		if (! $time_zone)
-			$time_zone = 'UTC';
 		
 		// User data
 		$userdata = $this->users_model->get_userdata($username);
 		$userdata['roles'] = Users_model::roles_to_string($userdata['roles']);
 		$country_list = $this->config->item('country_list');
 		$userdata['country_name'] = $country_list[ $userdata['country'] ];
-		$userdata['last_login'] = date('Y-m-d H:i:s',  
-			gmt_to_local(
-				strtotime($userdata['last_login']), 
-				$time_zone, 
-				TRUE)) . ($time_zone == 'UTC' ? ' (UTC)' : '');
+		$userdata['last_login'] = human_gmt_to_human_local(
+			$userdata['last_login'], $time_zone); 
 		$userdata['time_zone'] = $this->lang->line($userdata['time_zone']);
 		
 		// User's videos

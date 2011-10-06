@@ -55,12 +55,15 @@ $lang['ui_from'] = 'from';
 $lang['ui_by'] = 'by';
 $lang['ui_category'] = 'category';
 $lang['ui_tags'] = 'tags';
+$lang['ui_download_torrents'] = 'Download Torrents';
 $lang['ui_license'] = 'license';
 $lang['ui_uploaded_by'] = 'Uploaded by';
 $lang['ui_on_date'] = 'on';
 
 $lang['ui_msg_login_restriction'] = 'You must log in to perform this action.';
 $lang['ui_msg_repeated_action_restriction'] = 'You can only perform this action once a day.';
+
+$lang['ui_chars_left'] = 'characters left';
 
 /* End of file ui_lang.php */
 /* Location: ./application/language/english/ui_lang.php */

@@ -22,7 +22,8 @@ $lang['_username_exists']			= 'There is no account registered with this username
 $lang['_internal_account']			= 'You cannot change the password for this account because authentication is provided by a third-party.';
 $lang['_do_recover_password']		= 'Username and e-mail address are not associated with the same account.';
 
-
+// Comment Video
+$lang['_is_user_loggedin'] 		= 'In order to comment a video you must be logged in.';
 
 /* End of file form_validation_lang.php */
 /* Location: ./system/language/english/form_validation_lang.php */

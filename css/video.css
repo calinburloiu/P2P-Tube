@@ -1,12 +1,14 @@
-#watch-main
-{
-	width: 1056px;
-	margin: 0 auto;
-}
-
 .ui-tabs-panel
 {
 	padding: 0 !important;
+}
+
+#video-footer
+{
+	float: left;
+	width: 752px;
+	margin: 8px;
+	/* outline: 2px outset gray; */
 }
 
 dt
@@ -31,4 +33,18 @@ dd
 .video-tag
 {
 	margin-right: 1.6em;
+}
+
+.comment-info
+{
+	margin-bottom: 0.33em;
+}
+.comment-content
+{
+	margin-bottom: 0.33em;
+}
+.comment-popularity
+{
+	font-size: 0.8em;
+	margin-bottom: 2em;
 }

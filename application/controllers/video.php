@@ -29,6 +29,7 @@ class Video extends CI_Controller {
 										'video.css'
 		),
 									'js' => array(
+										'jquery.ui.ajax_links_maker.js'
 		),
 		//'metas' => array('description'=>'','keywords'=>'')
 		);
@@ -40,9 +41,12 @@ class Video extends CI_Controller {
 		$this->load->view('html_begin', $this->html_head_params);
 		$this->load->view('header');
 		
-		//$main_params['content'] = $this->load->view('video/watch_view', $data, TRUE);
-		$this->load->view('echo', array('output'=> 
-			$this->_ajax_comment(TRUE, $video_id)));
+		$main_params['content'] =
+			$this->load->view('echo', array('output'=> 
+				$this->_ajax_comment(TRUE, $video_id)),
+			TRUE);
+		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+		$this->load->view('main', $main_params);
 		
 		$this->load->view('footer');
 		$this->load->view('html_end');
@@ -81,7 +85,8 @@ class Video extends CI_Controller {
 								'video.css'
 							),
 							'js' => array(
-								'jquery.ui.nsvideo.js'
+								'jquery.ui.nsvideo.js',
+								'jquery.ui.ajax_links_maker.js'
 							),
 							//'metas' => array('description'=>'','keywords'=>'')
 							);
@@ -96,6 +101,9 @@ class Video extends CI_Controller {
 		// TODO remove old AJAX plugin content
 // 		$data['plugin_content'] = $this->_plugin('ns-html5', 
 // 			$data['video']['url'][0], TRUE);
+
+		// Comments
+		$data['comments'] = $this->_ajax_comment(TRUE, $id);
 		
 		// **
 		// ** LOADING VIEWS
@@ -111,20 +119,39 @@ class Video extends CI_Controller {
 	}
 	
 	/**
-	 * Increments likes count for video with the specified id and returns to 
-	 * the client as plain text the number if likes. 
-	 * 
-	 * @param string $action	'like' or 'dislike'
-	 * @param string $video_id
-	 * @param string $user_id
-	 */
-	public function ajax_vote($action, $video_id, $user_id = NULL)
+	* Increments (dis)likes count for video with the specified id and returns to
+	* the client as plain text the number if likes.
+	*
+	* @param string $action	'like' or 'dislike'
+	* @param string $video_id
+	* @param string $user_id
+	*/
+	public function ajax_vote($action, $video_id)
 	{
 		$video_id = intval($video_id);
-		$user_id = intval($user_id);
+		$user_id = $this->session->userdata('user_id');
+		$this->load->model('videos_model');
+	
+		$res = $this->videos_model->vote($video_id, $user_id,
+			(strcmp($action, 'like') == 0 ? TRUE : FALSE));
+	
+		if ($res !== -1)
+			echo $res;
+	}
+	/**
+	 * Increments (dis)likes count for a comment with a specified id and returns
+	 * to the client as plain text the number if likes. 
+	 * 
+	 * @param string $action	'like' or 'dislike'
+	 * @param string $comment_id
+	 */
+	public function ajax_vote_comment($action, $comment_id)
+	{
+		$comment_id = intval($comment_id);
+		$user_id = $this->session->userdata('user_id');
 		$this->load->model('videos_model');
 		
-		$res = $this->videos_model->vote($video_id, $user_id, 
+		$res = $this->videos_model->vote_comment($comment_id, $user_id,
 			(strcmp($action, 'like') == 0 ? TRUE : FALSE));
 		
 		if ($res !== -1)
@@ -145,7 +172,15 @@ class Video extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<span class="error">',
 					'</span>');
-		$this->form_validation->run('comment_video');
+		
+		if ($this->form_validation->run('comment_video'))
+		{
+			$this->load->model('videos_model');
+			$user_id = intval($this->session->userdata('user_id'));
+			$comment = $this->input->post('comment');
+			
+			$this->videos_model->comment_video($video_id, $user_id, $comment);
+		}
 		
 		// **
 		// ** MODEL **
@@ -155,7 +190,10 @@ class Video extends CI_Controller {
 			$offset, $this->config->item('video_comments_per_page'), $ordering);
 		$data['comments_count'] =
 			$this->videos_model->get_video_comments_count($video_id);
+		$data['hottest_comments'] = $this->videos_model->get_video_comments(
+			$video_id, 0, 2, 'hottest');
 		$data['video_id'] = $video_id;
+		$data['user_id'] = $this->session->userdata('user_id');
 		
 		// Pagination
 		$this->load->library('pagination');

@@ -105,7 +105,7 @@ $config = array(
 		array(
 			'field'=>'comment',
 			'label'=>'lang:video_comment',
-			'rules'=>'trim|required|xss_clean|callback__is_user_loggedin|callback__do_comment'
+			'rules'=>'trim|required|xss_clean|callback__is_user_loggedin'
 		)
 	)
 );
