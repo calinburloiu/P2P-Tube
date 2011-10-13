@@ -19,7 +19,7 @@ class Message extends CI_Controller {
 		$this->msg = $this->session->flashdata('msg');
 	}
 	
-	public function _remap($method, $params = array())
+	public function _remap($method, $par = array())
 	{	
 		if (! $this->msg)
 			header('Location: '. site_url());

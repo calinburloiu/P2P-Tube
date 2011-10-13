@@ -120,7 +120,7 @@ class Auth_OpenID {
      */
     static function isFailure($thing)
     {
-        return is_a($thing, 'Auth_OpenID_FailureResponse');
+		return is_a($thing, 'Auth_OpenID_FailureResponse');
     }
 
     /**
@@ -351,6 +351,8 @@ class Auth_OpenID {
         }
 
         return $url . $sep . Auth_OpenID::httpBuildQuery($args);
+		// Added by Calin-Andrei Burloiu.
+//        return $url .'/'. $sep . Auth_OpenID::httpBuildQuery($args);
     }
 
     /**

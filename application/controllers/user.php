@@ -41,8 +41,20 @@ class User extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->form_validation->set_error_delimiters('<span class="error">',
 			'</span>');
+		
+		// Normal or OpenID login?
+		if ($this->input->post('openid') !== FALSE)
+			$b_openid = TRUE;
+		else
+			$b_openid = FALSE;
+		// Validate the correct form.
+		$res_form_validation = FALSE;
+		if (!$b_openid)
+			$res_form_validation = $this->form_validation->run('login');
+		else
+			$res_form_validation = $this->form_validation->run('login_openid');
 
-		if ($this->form_validation->run('login') === FALSE)
+		if ($res_form_validation === FALSE)
 		{
 			$params = array(	'title' =>
 									$this->lang->line('ui_nav_menu_login')
@@ -68,6 +80,30 @@ class User extends CI_Controller {
 		}
 		else
 		{
+			if ($b_openid)
+			{
+				$this->lang->load('openid');
+				$this->load->library('openid');
+				$this->config->load('openid');
+				$request_to = site_url('user/check_openid_login');
+				$req = $this->config->item('openid_required');
+				$opt = $this->config->item('openid_optional');
+				$policy = site_url('user/openid_policy');
+				$pape_policy_uris = $this->config->item('openid_papa_policies');
+				
+				$this->openid->set_request_to($request_to);
+				$this->openid->set_trust_root(base_url());
+				$this->openid->set_args(null);
+				$this->openid->set_sreg(true, $req, $opt, $policy);
+				if (!empty($pape_policy_uris))
+					$this->openid->set_pape(true, $pape_policy_uris);
+				
+				// Redirection to OP site will follow.
+				$this->openid->authenticate($this->input->post('openid'));
+				return;
+			}
+			
+			// Without OpenID
 			if (! $this->activated_account)
 				header('Location: '
 					. site_url("user/activate/{$this->user_id}"));
@@ -84,6 +120,55 @@ class User extends CI_Controller {
 				header('Location: '. site_url('user/account'));
 			}
 		}
+	}
+	
+	public function check_openid_login()
+	{
+		$this->lang->load('openid');
+		$this->load->library('openid');
+		$this->config->load('openid');
+		$request_to = site_url('user/check_openid_login');
+
+		$this->openid->set_request_to($request_to);
+		$response = $this->openid->get_response();
+
+		switch ($response->status)
+		{
+		case Auth_OpenID_CANCEL:
+			$this->load->helper('message');
+			show_info_msg_page($this, $this->lang->line('openid_cancel'));
+			break;
+		case Auth_OpenID_FAILURE:
+			$this->load->helper('message');
+			show_error_msg_page($this,
+					$this->_format_message('openid_failure',
+							$response->message));
+			break;
+		case Auth_OpenID_SUCCESS:
+			$openid = $response->getDisplayIdentifier();
+			$esc_identity = htmlspecialchars($openid, ENT_QUOTES);
+
+			$sreg_resp = Auth_OpenID_SRegResponse::fromSuccessResponse($response);
+			$sreg = $sreg_resp->contents();
+			
+			// Get registration informations
+		    $ax = new Auth_OpenID_AX_FetchResponse();
+			$obj = $ax->fromSuccessResponse($response);
+
+			//echo 'nickname('. $sreg_resp->get('nickname'). ')';
+			echo var_dump($obj->data);
+//			foreach ($sreg as $key => $value)
+//			{
+//				$data['success'] .= $this->_set_message('openid_content', array($key, $value), array('%s', '%t'));
+//			}
+
+			break;
+		}
+	}
+	
+	public function openid_policy()
+	{
+		$this->load->view('openid_policy_view');
 	}
 	
 	/**
@@ -331,17 +416,18 @@ class User extends CI_Controller {
 						&& $this->users_model->activate_account($user_id,
 							$activation_code))
 				{
-					$this->session->set_flashdata('msg', sprintf(
+					$this->load->helper('message');
+					show_info_msg_page($this, sprintf(
 						$this->lang->line('user_msg_activated_account'), 
 						site_url('user/login')));
-					header('Location: '. site_url('message/info'));
 					return;
 				}
 				else
 				{
-					$this->session->set_flashdata('msg',
-						$this->lang->line('user_msg_wrong_activation_code'));
-					header('Location: '. site_url('message/error'));
+					$this->load->helper('message');
+					show_error_msg_page($this, 
+							$this->lang->line(
+									'user_msg_wrong_activation_code'));
 					return;
 				}
 			}
@@ -359,10 +445,10 @@ class User extends CI_Controller {
 		
 		if ($activated_account)
 		{
-			$this->session->set_flashdata('msg', sprintf(
-						$this->lang->line('user_msg_activated_account'), 
-						site_url('user/login')));
-			header('Location: '. site_url('message/info'));
+			$this->load->helper('message');
+			show_info_msg_page($this, sprintf(
+				$this->lang->line('user_msg_activated_account'), 
+				site_url('user/login')));
 			return;
 		}
 		
@@ -404,21 +490,21 @@ class User extends CI_Controller {
 		{
 			if ($method == 'code')
 			{
-				// Redirect to a message which tells the user that the
+				// A message which tells the user that the
 				// activation was successful.
-				$this->session->set_flashdata('msg', sprintf(
-						$this->lang->line('user_msg_activated_account'), 
-						site_url('user/login')));
-				header('Location: '. site_url('message/info'));
+				$this->load->helper('message');
+				show_info_msg_page($this, sprintf(
+					$this->lang->line('user_msg_activated_account'), 
+					site_url('user/login')));
 				return;
 			}
 			else if ($method == 'resend')
 			{
 				// Redirect to resent message
-				$this->session->set_flashdata('msg', sprintf(
+				$this->load->helper('message');
+				show_info_msg_page($this, sprintf(
 						$this->lang->line('user_msg_activation_resent'),
 						$this->input->post('email')));
-				header('Location: '. site_url('message/info'));
 				return;
 			}
 		}
@@ -461,14 +547,19 @@ class User extends CI_Controller {
 		}
 		else
 		{
-			// Redirect to resent message
-			$this->session->set_flashdata('msg', sprintf(
+			// Resent message
+			$this->load->helper('message');
+			show_info_msg_page($this, sprintf(
 					$this->lang->line('user_msg_password_recovery_email_sent'),
 					$this->input->post('username'),
 					$this->input->post('email')));
-			header('Location: '. site_url('message/info'));
 			return;
 		}
+	}
+	
+	public function _format_message($msg, $val = '', $sub = '%s')
+	{
+		return str_replace($sub, $val, $this->lang->line($msg));
 	}
 	
 	public function _update_session_userdata($data)

@@ -1,5 +1,5 @@
 <html>
-  <head><title>PHP OpenID Authentication Example</title></head>
+  <head><title>PHP OpenID Authentication Example</title>
   <style type="text/css">
       * {
         font-family: verdana,sans-serif;
@@ -34,6 +34,7 @@
         padding-bottom: 0em;
       }
   </style>
+  </head>
   <body>
     <h1>PHP OpenID Authentication Example</h1>
     <p>

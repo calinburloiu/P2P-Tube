@@ -3,8 +3,11 @@
 $lang['user_appelation'] = 'User';
 
 // Login / Register/ Account / Profile
+$lang['user_legend_login_normal'] = 'Log in with a %s Account';
+$lang['user_legend_login_openid'] = 'Log in with a Third-party Account';
 $lang['user_username'] = 'User Name';
 $lang['user_username_or_email'] = 'User Name or E-mail';
+$lang['user_openid'] = 'OpenID';
 $lang['user_password'] = 'Password';
 $lang['user_password_confirmation'] = 'Password Confirmation';
 $lang['user_old_password'] = 'Old Password';

@@ -15,6 +15,13 @@ $config = array(
 			'rules'=>'required|min_length[5]|max_length[32]'
 		)
 	),
+	'login_openid'=> array(
+		array(
+			'field'=>'openid',
+			'label'=>'lang:user_openid',
+			'rules'=>'trim|required'
+		)
+	),
 	'register'=> array(
 		array(
 			'field'=>'username',

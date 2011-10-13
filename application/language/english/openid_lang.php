@@ -1,5 +1,6 @@
 <?php
 
+// TODO: Review
 $lang['openid_cancel'] = "Verification cancelled.";
 $lang['openid_failure'] = "OpenID authentication failed: %s";
 $lang['openid_success'] = 'You have successfully verified <a href="%s">%t</a> as your identity.';
