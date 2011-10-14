@@ -78,6 +78,10 @@ class Users_model extends CI_Model {
 				&& ! $this->ldap_login($username, $password))
 			return FALSE; 
 		
+		if (empty($user['email']) || empty($user['first_name'])
+				|| empty($user['last_name']))
+			$user['import'] = TRUE;
+		
 		// Update last login time.
 		$this->db->query("UPDATE `users`
 			SET last_login = UTC_TIMESTAMP()
@@ -201,6 +205,9 @@ class Users_model extends CI_Model {
 			$data['password'] = sha1($data['password']);
 		// TODO picture data: save, convert, make it thumbnail
 		
+		if (empty($data['birth_date']))
+			$data['birth_date'] = NULL;
+		
 		$cols = '';
 		$vals = '';
 		foreach ($data as $col=> $val)
@@ -229,13 +236,16 @@ class Users_model extends CI_Model {
 		
 		// If registered with internal authentication it needs to activate
 		// the account.
-		$activation_code = Users_model::gen_activation_code($data['username']);
-		$user_id = $this->get_user_id($data['username']);
-		$query = $this->db->query("INSERT INTO `users_unactivated`
-			(user_id, activation_code)
-			VALUES ($user_id, '$activation_code')");
-		$this->send_activation_email($user_id, $data['email'],
-			$activation_code, $data['username']);
+		if ($data['auth_src'] == 'internal')
+		{
+			$activation_code = Users_model::gen_activation_code($data['username']);
+			$user_id = $this->get_user_id($data['username']);
+			$query = $this->db->query("INSERT INTO `users_unactivated`
+				(user_id, activation_code)
+				VALUES ($user_id, '$activation_code')");
+			$this->send_activation_email($user_id, $data['email'],
+				$activation_code, $data['username']);
+		}
 		
 		// TODO exception on failure
 		return $query;
@@ -395,15 +405,22 @@ class Users_model extends CI_Model {
 			$data['password'] = sha1($data['password']);
 		// TODO picture data: save, convert, make it thumbnail
 		
+		if (empty($data['birth_date']))
+			$data['birth_date'] = NULL;
+		
 		$set = '';
 		foreach ($data as $col => $val)
 		{
+			if ($val === NULL)
+			{
+				$set .= "$col = NULL, ";
+				continue;
+			}
+			
 			if (is_int($val))
 				$set .= "$col = $val, ";
 			else if (is_string($val))
 				$set .= "$col = '$val', ";
-			else if (is_null($var))
-				$set .= "$col = NULL, ";
 		}
 		$set = substr($set, 0, -2);
 		

@@ -122,9 +122,12 @@ class Openid {
 		// Create attribute request object
 		// See http://code.google.com/apis/accounts/docs/OpenID.html#Parameters for parameters
 		// Usage: make($type_uri, $count=1, $required=false, $alias=null)
-		$attribute[] = Auth_OpenID_AX_AttrInfo::make('http://axschema.org/contact/email',2,1, 'email');
-		$attribute[] = Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/first',1,1, 'firstname');
-		$attribute[] = Auth_OpenID_AX_AttrInfo::make('http://axschema.org/namePerson/last',1,1, 'lastname');
+		$attribute[] = Auth_OpenID_AX_AttrInfo::make(
+				'http://axschema.org/contact/email', 1, TRUE);
+		$attribute[] = Auth_OpenID_AX_AttrInfo::make(
+				'http://axschema.org/namePerson/first', 1, TRUE);
+		$attribute[] = Auth_OpenID_AX_AttrInfo::make(
+				'http://axschema.org/namePerson/last', 1, TRUE);
 
 		// Create AX fetch request
 		$ax = new Auth_OpenID_AX_FetchRequest;

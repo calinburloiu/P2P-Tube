@@ -2,7 +2,7 @@
 
 $config['openid_storepath'] = './tmp';
 $config['openid_required'] = array('nickname');
-$config['openid_optional'] = array('fullname', 'email');
+$config['openid_optional'] = array('fullname', 'email', 'dob', 'country');
 $config['openid_pape_policies'] = array();
 
 // OBSOLETE

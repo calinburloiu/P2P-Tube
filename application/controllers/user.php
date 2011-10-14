@@ -157,6 +157,8 @@ class User extends CI_Controller {
 
 			//echo 'nickname('. $sreg_resp->get('nickname'). ')';
 			echo var_dump($obj->data);
+			echo '<br />';
+			echo var_dump($sreg);
 //			foreach ($sreg as $key => $value)
 //			{
 //				$data['success'] .= $this->_set_message('openid_content', array($key, $value), array('%s', '%t'));
