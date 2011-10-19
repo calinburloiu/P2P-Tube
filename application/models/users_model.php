@@ -26,16 +26,8 @@ class Users_model extends CI_Model {
 	 * 
 	 * @param string $username
 	 * @param string $password
-	 * @return mixed can return FALSE if authentication failed, a DB row as an
-	 * associative array if authentication was succesful or an associative
-	 * array with LDAP user information if authentication with LDAP was
-	 * successful but the user logged in for the first time and it does not
-	 * have an entry in `users` table yet. The key 'auth_src' distinguishes
-	 * which associative array was returned:
-	 * <ul>
-	 *   <li>'internal' or 'ldap': a DB row</li>
-	 *   <li>'ldap_first_time': LDAP user information</li>
-	 * </ul>
+	 * @return mixed can return FALSE if authentication failed, a `users`DB row
+	 * as an associative array if authentication was successful
 	 */
 	public function login($username, $password)
 	{
@@ -49,7 +41,6 @@ class Users_model extends CI_Model {
 		
 		$enc_password = sha1($password);
 		
-		// TODO select only required fields.
 		$query = $this->db->query("SELECT u.*, a.activation_code
 			FROM `users` u LEFT JOIN `users_unactivated` a ON (u.id = a.user_id)
 			WHERE $cond_user
@@ -78,8 +69,9 @@ class Users_model extends CI_Model {
 				&& ! $this->ldap_login($username, $password))
 			return FALSE; 
 		
-		if (empty($user['email']) || empty($user['first_name'])
-				|| empty($user['last_name']))
+		if (empty($user['username']) || empty($user['email'])
+				|| empty($user['first_name']) || empty($user['last_name'])
+				|| empty($user['country']))
 			$user['import'] = TRUE;
 		
 		// Update last login time.
@@ -89,6 +81,205 @@ class Users_model extends CI_Model {
 		
 		// If we are here internal authentication has successful.
 		return $user;
+	}
+	
+	/**
+	 * Begin the OpenID login by redirecting user to the OP to authenticate.
+	 * 
+	 * @param string $openid 
+	 */
+	public function openid_begin_login($openid)
+	{
+		$this->lang->load('openid');
+		$this->load->library('openid');
+
+		$request_to = site_url('user/check_openid_login');
+
+		$req = array('nickname');
+		$opt = array('fullname', 'email', 'dob', 'country');
+		$policy = site_url('user/openid_policy');
+
+		$ax_attributes[] = Auth_OpenID_AX_AttrInfo::make(
+				'http://axschema.org/contact/email', 1, TRUE);
+		$ax_attributes[] = Auth_OpenID_AX_AttrInfo::make(
+				'http://axschema.org/namePerson/first', 1, TRUE);
+		$ax_attributes[] = Auth_OpenID_AX_AttrInfo::make(
+				'http://axschema.org/namePerson/last', 1, TRUE);
+		$ax_attributes[] = Auth_OpenID_AX_AttrInfo::make(
+				'http://axschema.org/contact/country', 1, TRUE);
+
+		$this->openid->set_request_to($request_to);
+		$this->openid->set_trust_root(base_url());
+		$this->openid->set_sreg(TRUE, $req, $opt, $policy);
+		$this->openid->set_ax(TRUE, $ax_attributes);
+
+		// Redirection to OP site will follow.
+		$this->openid->authenticate($openid);
+	}
+	
+	/**
+	 * Finalize the OpenID login. Register user if is here for the first time.
+	 * 
+	 * @return mixed returns a `users` DB row as an associative array if
+	 * authentication was successful or Auth_OpenID_CANCEL/_FAILURE if it was
+	 * unsuccessful.
+	 */
+	public function openid_complete_login()
+	{
+		$this->lang->load('openid');
+		$this->load->library('openid');
+		
+		$request_to = site_url('user/check_openid_login');
+		$this->openid->set_request_to($request_to);
+
+		$response = $this->openid->get_response();
+		
+		if ($response->status === Auth_OpenID_CANCEL
+				|| $response->status === Auth_OpenID_FAILURE)
+			return $response->status;
+
+		// Auth_OpenID_SUCCESS
+		$openid = $response->getDisplayIdentifier();
+		//$esc_openid = htmlspecialchars($openid, ENT_QUOTES);
+
+		// Get user_id to see if it's the first time the user logs in with
+		// OpenID.
+		$query = $this->db->query("SELECT * from `users_openid`
+			WHERE openid_url = '$openid'");
+		$import = FALSE;
+		
+		// First time with OpenID => register user
+		if ($query->num_rows() === 0)
+		{
+			$user_id = $this->openid_register($response);
+			$import = TRUE;
+		}
+		// Not first time with OpenID.
+		else
+			$user_id = $query->row()->user_id;
+		
+		// Login
+		$query = $this->db->query("SELECT * FROM `users`
+			WHERE id = $user_id");
+		$userdata = $query->row_array();
+		$userdata['import'] = $import;
+		
+		if (empty($userdata['username']) || empty($userdata['email'])
+				|| empty($userdata['first_name'])
+				|| empty($userdata['last_name'])
+				|| empty($userdata['country']))
+			$userdata['import'] = TRUE;
+		
+		// Update last login time.
+		$this->db->query("UPDATE `users`
+			SET last_login = UTC_TIMESTAMP()
+			WHERE id = $user_id");
+
+		return $userdata;		
+	}
+	
+	/**
+	 * Register an user that logged in with OpenID for the first time.
+	 * 
+	 * @param object $op_response object returned by Janrain 
+	 * Consumer::complete method.
+	 * @return mixed the user_id inserted or FALSE on error
+	 */
+	public function openid_register($op_response)
+	{
+		$sreg_resp = Auth_OpenID_SRegResponse::fromSuccessResponse($op_response);
+		$ax_resp = Auth_OpenID_AX_FetchResponse::fromSuccessResponse($op_response);
+
+		// E-mail
+		$email = $ax_resp->get('http://axschema.org/contact/email');
+		if (empty($email) || is_a($email, 'Auth_OpenID_AX_Error'))
+			$data['email'] = $sreg_resp->get('email', '');
+		else
+			$data['email'] = $email[0];
+		
+		// First Name
+		$first_name = $ax_resp->get('http://axschema.org/namePerson/first');
+		if (empty($first_name) || is_a($first_name, 'Auth_OpenID_AX_Error'))
+			$data['first_name'] = '';
+		else
+			$data['first_name'] = $first_name[0];
+		
+		// Sur Name
+		$last_name = $ax_resp->get('http://axschema.org/namePerson/last');
+		if (empty($last_name) || is_a($last_name, 'Auth_OpenID_AX_Error'))
+			$data['last_name'] = '';
+		else
+			$data['last_name'] = $last_name[0];
+		
+		// First Name and Last Name
+		if (empty($data['first_name']) || empty($data['last_name']))
+		{
+			$fullname = $sreg_resp->get('fullname');
+			
+			if ($fullname)
+			{
+				if (empty($data['first_name']))
+					$data['first_name'] = substr(
+							$fullname, 0, strrpos($fullname, ' '));
+				if (empty($data['last_name']))
+					$data['last_name'] = substr(
+							$fullname, strrpos($fullname, ' ') + 1);
+			}
+		}
+		
+		// Username
+		$data['username'] = $sreg_resp->get('nickname');
+		if (!$data['username'])
+		{
+			if (!empty($data['email']))
+			{
+				$data['email'] = strtolower($data['email']);
+				$data['username'] = substr($data['email'],
+						0, strpos($data['email'], '@'));
+				$data['username'] = preg_replace(array('/[^a-z0-9\._]*/'),
+						array(''), $data['username']);
+			}
+			else if(!empty($data['first_name']) || !empty($data['last_name']))
+			{
+				$data['username'] = $data['first_name'] . '_'
+						. $data['last_name'];
+				$data['username'] = substr($data['username'], 0, 32);
+			}
+			else
+				$data['username'] = $this->gen_username();
+		}
+		if ($this->get_userdata($data['username']))
+		{
+			$chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+			$len_chars = strlen($chars);
+			$data['username'] .= '_';
+			do
+			{
+				$data['username'] .= $chars[ mt_rand(0, $len_chars - 1) ];
+			} while($this->get_userdata($data['username']));
+		}
+		
+		// Country
+		$country = $ax_resp->get('http://axschema.org/contact/country');
+		if (empty($country) || is_a($country, 'Auth_OpenID_AX_Error'))
+			$data['country'] = $sreg_resp->get('country', '');
+		else
+			$data['country'] = $country[0];
+		
+		// Birth Date
+		$data['birth_date'] = $sreg_resp->get('dob', NULL);
+		
+		// OpenID
+		$data['auth_src'] = 'openid';
+		
+//		print_r($data);
+		
+		if (!$this->register($data, $op_response->getDisplayIdentifier()))
+			return FALSE;
+		
+		$query = $this->db->query("SELECT id from `users`
+			WHERE username = '{$data['username']}'");
+		return $query->row()->id;
 	}
 	
 	/**
@@ -191,10 +382,12 @@ class Users_model extends CI_Model {
 	 * Adds a new user to DB.
 	 * Do not add join_date and last_login column, they will be automatically
 	 * added.
+	 * Provide an 'openid' with the OpenID as value in order to register users
+	 * logging in this way.
 	 * 
 	 * @param array $data	corresponds to DB columns
 	 */
-	public function register($data)
+	public function register($data, $openid = NULL)
 	{
 		$this->load->helper('array');
 		
@@ -203,7 +396,6 @@ class Users_model extends CI_Model {
 		// Process data.
 		if (isset($data['password']))
 			$data['password'] = sha1($data['password']);
-		// TODO picture data: save, convert, make it thumbnail
 		
 		if (empty($data['birth_date']))
 			$data['birth_date'] = NULL;
@@ -233,6 +425,24 @@ class Users_model extends CI_Model {
 			VALUES ($vals, utc_timestamp(), utc_timestamp())");
 		if ($query === FALSE)
 			return FALSE;
+		
+		// If registered with OpenID insert a row in `users_openid`.
+		if ($openid)
+		{
+			// Find user_id.
+			$query = $this->db->query("SELECT id from `users`
+				WHERE username = '{$data['username']}'");
+			if ($query->num_rows() === 0)
+				return FALSE;
+			$user_id = $query->row()->id;
+			
+			// Insert row in `users_openid`.
+			$query = $this->db->query("INSERT INTO `users_openid`
+				(openid_url, user_id)
+				VALUES ('$openid', $user_id)");
+			if (!$query)
+				return FALSE;
+		}
 		
 		// If registered with internal authentication it needs to activate
 		// the account.
@@ -464,7 +674,20 @@ class Users_model extends CI_Model {
 		}
 		
 		return $password;
-	} 
+	}
+	
+	public static function gen_username()
+	{
+		$chars = 'abcdefghijklmnopqrstuvwxyz0123456789._';
+		$len_chars = strlen($chars);
+		$len = 8;
+		$username = '';
+		
+		for ($i = 0; $i < $len; $i++)
+			$username .= $chars[ mt_rand(0, $len_chars - 1) ];
+		
+		return $username;
+	}
 	
 	public static function roles_to_string($roles)
 	{

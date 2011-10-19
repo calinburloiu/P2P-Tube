@@ -26,7 +26,7 @@ class User extends CI_Controller {
 	
 	public function test($user_id = 1)
 	{
-
+		echo ($this->users_model->get_userdata('calin.burloiu') ? 'd' : 'n');
 	}
 
 	/**
@@ -82,24 +82,8 @@ class User extends CI_Controller {
 		{
 			if ($b_openid)
 			{
-				$this->lang->load('openid');
-				$this->load->library('openid');
-				$this->config->load('openid');
-				$request_to = site_url('user/check_openid_login');
-				$req = $this->config->item('openid_required');
-				$opt = $this->config->item('openid_optional');
-				$policy = site_url('user/openid_policy');
-				$pape_policy_uris = $this->config->item('openid_papa_policies');
-				
-				$this->openid->set_request_to($request_to);
-				$this->openid->set_trust_root(base_url());
-				$this->openid->set_args(null);
-				$this->openid->set_sreg(true, $req, $opt, $policy);
-				if (!empty($pape_policy_uris))
-					$this->openid->set_pape(true, $pape_policy_uris);
-				
-				// Redirection to OP site will follow.
-				$this->openid->authenticate($this->input->post('openid'));
+				$this->users_model->openid_begin_login(
+						$this->input->post('openid'));
 				return;
 			}
 			
@@ -124,48 +108,34 @@ class User extends CI_Controller {
 	
 	public function check_openid_login()
 	{
-		$this->lang->load('openid');
-		$this->load->library('openid');
-		$this->config->load('openid');
-		$request_to = site_url('user/check_openid_login');
-
-		$this->openid->set_request_to($request_to);
-		$response = $this->openid->get_response();
-
-		switch ($response->status)
+		$user = $this->users_model->openid_complete_login();
+		
+		// Authentication failed.
+		if ($user == Auth_OpenID_CANCEL)
 		{
-		case Auth_OpenID_CANCEL:
 			$this->load->helper('message');
-			show_info_msg_page($this, $this->lang->line('openid_cancel'));
-			break;
-		case Auth_OpenID_FAILURE:
+			show_error_msg_page($this, $this->lang->line('openid_cancel'));
+			return;
+		}		
+		else if ($user == Auth_OpenID_FAILURE)
+		{
 			$this->load->helper('message');
-			show_error_msg_page($this,
-					$this->_format_message('openid_failure',
-							$response->message));
-			break;
-		case Auth_OpenID_SUCCESS:
-			$openid = $response->getDisplayIdentifier();
-			$esc_identity = htmlspecialchars($openid, ENT_QUOTES);
-
-			$sreg_resp = Auth_OpenID_SRegResponse::fromSuccessResponse($response);
-			$sreg = $sreg_resp->contents();
-			
-			// Get registration informations
-		    $ax = new Auth_OpenID_AX_FetchResponse();
-			$obj = $ax->fromSuccessResponse($response);
-
-			//echo 'nickname('. $sreg_resp->get('nickname'). ')';
-			echo var_dump($obj->data);
-			echo '<br />';
-			echo var_dump($sreg);
-//			foreach ($sreg as $key => $value)
-//			{
-//				$data['success'] .= $this->_set_message('openid_content', array($key, $value), array('%s', '%t'));
-//			}
-
-			break;
+			show_error_msg_page($this, $this->lang->line('openid_failure'));
+			return;
 		}
+
+		// Authentication successful: set session with user data.
+		$this->session->set_userdata(array(
+			'user_id'=> $user['id'],
+			'username'=> $user['username'],
+			'auth_src'=> $user['auth_src'],
+			'time_zone'=> $user['time_zone']
+		));
+		
+		if ($user['import'])
+			header('Location: '. site_url('user/account'));
+		else
+			header('Location: '. site_url());
 	}
 	
 	public function openid_policy()

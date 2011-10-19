@@ -71,13 +71,13 @@ class Catalog extends CI_Controller {
 
 	public function test()
 	{
-		$q = $this->input->get('q');
-		$q = ($q ? $q : 'nimic');
-		
-		$w = $this->input->get('w');
-		$w = ($w ? $w : 'nimic');
-		
-		echo "$q / $w";
+		$data['email'] = 'CA-LăIN$*(_3@GMAIL.COM';
+		$data['email'] = strtolower($data['email']);
+		$data['username'] = substr($data['email'],
+				0, strpos($data['email'], '@'));
+		$data['username'] = preg_replace(array('/[^a-z0-9\._]*/'),
+				array(''), $data['username']);
+		echo $data['username'];
 	}
 
 	public function category($category_name, $ordering = 'hottest', $offset = 0)

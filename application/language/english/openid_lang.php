@@ -14,6 +14,7 @@ $lang['openid_auth_age'] = "<p>The authentication age returned by the server is:
 
 $lang['openid_auth_error'] = 'Authentication error; not a valid OpenID.';
 $lang['openid_sreg_failed'] = 'SREG failed.';
+$lang['openid_sreg_failed'] = 'AX failed.';
 $lang['openid_pape_failed'] = 'PAPE failed.';
 $lang['openid_redirect_failed'] = 'Could not redirect to server: %s';
 $lang['openid_storepath_failed'] = 'Could not create the FileStore directory %s. Please check the effective permissions.';

@@ -14,10 +14,13 @@ if (!defined('BASEPATH'))
 class Openid {
 
 	var $storePath = 'tmp';
+	
 	var $sreg_enable = FALSE;
 	var $sreg_required = NULL;
 	var $sreg_optional = NULL;
 	var $sreg_policy = NULL;
+	var $ax_enable  = FALSE;
+	var $ax_attributes = NULL;
 	var $pape_enable = FALSE;
 	var $pape_policy_uris = NULL;
 	var $ext_args = NULL;
@@ -53,6 +56,12 @@ class Openid {
 		$this->sreg_required = $required;
 		$this->sreg_optional = $optional;
 		$this->sreg_policy = $policy;
+	}
+	
+	function set_ax($enable, $ax_attributes = NULL)
+	{
+		$this->ax_enable = $enable;
+		$this->ax_attributes = $ax_attributes;
 	}
 
 	function set_pape($enable, $policy_uris = NULL)
@@ -115,32 +124,21 @@ class Openid {
 			}
 		}
 		
-		
-		
-		// *** TODO ***
-		
-		// Create attribute request object
-		// See http://code.google.com/apis/accounts/docs/OpenID.html#Parameters for parameters
-		// Usage: make($type_uri, $count=1, $required=false, $alias=null)
-		$attribute[] = Auth_OpenID_AX_AttrInfo::make(
-				'http://axschema.org/contact/email', 1, TRUE);
-		$attribute[] = Auth_OpenID_AX_AttrInfo::make(
-				'http://axschema.org/namePerson/first', 1, TRUE);
-		$attribute[] = Auth_OpenID_AX_AttrInfo::make(
-				'http://axschema.org/namePerson/last', 1, TRUE);
-
-		// Create AX fetch request
-		$ax = new Auth_OpenID_AX_FetchRequest;
-
-		// Add attributes to AX fetch request
-		foreach($attribute as $attr){
-			$ax->add($attr);
+		if ($this->ax_enable)
+		{
+			$ax_request = new Auth_OpenID_AX_FetchRequest();
+			
+			if ($ax_request)
+			{
+				foreach ($this->ax_attributes as $attr)
+					$ax_request->add($attr);
+				$authRequest->addExtension($ax_request);
+			}
+			else
+			{
+				$this->_set_message(TRUE, 'openid_ax_failed');
+			}
 		}
-
-		// Add AX fetch request to authentication request
-		$authRequest->addExtension($ax);
-		
-		
 		
 		if ($this->pape_enable)
 		{
