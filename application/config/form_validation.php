@@ -27,7 +27,7 @@ $config = array(
 			'field'=>'username',
 			'label'=>'lang:user_username',
 			'rules'=>'trim|callback__required_by_register|min_length[5]|max_length[32]'
-				. '|strtolower|xss_clean|callback__valid_username'
+				. '|strtolower|xss_clean|callback__is_username_unique|callback__valid_username'
 		),
 		array(
 			'field'=>'password',

@@ -43,6 +43,13 @@
 <fieldset>
 	<legend><?php echo $this->lang->line('user_legend_login_openid') ?></legend>
 	
+	<!--<p></p>-->
+	<p>
+		<a class="login-openid" data-op="google" href="#">Google</a>
+		<a class="login-openid" data-op="yahoo" href="#">Yahoo!</a>
+		<a class="login-openid" data-op="myopenid" href="#">myOpenID</a>
+	</p>
+	
 	<table class="form">
 		<tr>
 			<th><?php echo $this->lang->line('user_openid'). ': ' ?></th>
@@ -64,3 +71,37 @@
 	</table>
 </fieldset>
 </form>
+
+<script type="text/javascript">
+	$(function() {
+		$('.login-openid')
+			.click(function() {
+				var openId;
+				
+				console.log($(this).data('op'));
+				
+				switch ($(this).data('op'))
+				{
+				case 'google':
+					openId = 'https://www.google.com/accounts/o8/id';
+					break;
+				case 'yahoo':
+					openId = 'https://me.yahoo.com/';
+					break;
+				case 'myopenid':
+					openId = 'https://myopenid.com/';
+					break;
+				}
+				
+				$.post('<?php echo site_url('user/login') ?>',
+						{'openid': openId},
+						function(text) {
+							document.open();
+							document.write(text);
+							document.close();
+						});
+			})
+			.button();
+		
+	});
+</script>

@@ -196,9 +196,13 @@ class User extends CI_Controller {
 		if (! $b_validation)
 		{
 			// Edit account data if logged in, otherwise register.
-			if ($user_id = $this->session->userdata('user_id'))
+			$user_id = $this->session->userdata('user_id');
+			if ($user_id)
 			{
 				$userdata = $this->users_model->get_userdata(intval($user_id));
+				if (substr($userdata['username'], 0, 8) == 'autogen_')
+					$userdata['autogen_username'] = //'xxx';
+						substr($userdata['username'], 8);
 				$selected_menu = 'account';
 			}
 			else
@@ -235,6 +239,8 @@ class User extends CI_Controller {
 		else
 		{
 			$user_id = $this->input->post('user-id');
+			if ($this->input->post('username'))
+				$data['username'] = $this->input->post('username');
 			$data['email'] = $this->input->post('email');
 			$data['first_name'] = $this->input->post('first-name');
 			$data['last_name'] = $this->input->post('last-name');
@@ -538,6 +544,14 @@ class User extends CI_Controller {
 	{
 		foreach ($data as $key=> $val)
 			$this->session->set_userdata($key, $val);
+	}
+	
+	public function _is_username_unique($username)
+	{
+		if ($this->users_model->get_userdata($username))
+			return FALSE;
+		
+		return TRUE;
 	}
 	
 	public function _valid_username($username)

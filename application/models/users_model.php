@@ -243,11 +243,11 @@ class Users_model extends CI_Model {
 			{
 				$data['username'] = $data['first_name'] . '_'
 						. $data['last_name'];
-				$data['username'] = substr($data['username'], 0, 32);
 			}
 			else
 				$data['username'] = $this->gen_username();
 		}
+		$data['username'] = substr($data['username'], 0, 24);
 		if ($this->get_userdata($data['username']))
 		{
 			$chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -258,6 +258,7 @@ class Users_model extends CI_Model {
 				$data['username'] .= $chars[ mt_rand(0, $len_chars - 1) ];
 			} while($this->get_userdata($data['username']));
 		}
+		$data['username'] = 'autogen_' . $data['username'];
 		
 		// Country
 		$country = $ax_resp->get('http://axschema.org/contact/country');

@@ -31,16 +31,20 @@ else
 	<tr><td></td><td>&nbsp;</td></tr>
 
 	<tr>
-	  <?php if (! $userdata): ?>
+	  <?php if (! $userdata || ! empty($userdata['autogen_username'])): ?>
 		<th><?php echo $this->lang->line('user_username'). ' <span class="required">*</span> : ' ?></th>
 		<td>
+		  <?php if (empty($userdata['autogen_username'])): ?>
 			<input type="text" name="username" size="16" value="<?php echo _set_value($userdata, 'username') ?>" />
+		  <?php else: ?>
+			<input type="text" name="username" size="16" value="<?php echo $userdata['autogen_username'] ?>" />
+		  <?php endif ?>
 		</td>
 	  <?php else: ?>
 		<th><?php echo $this->lang->line('user_username'). ' : ' ?></th>
 		<td>
 			&nbsp;<em><?php echo $userdata['username'] ?></em>
-		</td>`
+		</td>
 	  <?php endif ?>
 	</tr>
 	<tr><td></td><td><?php echo form_error('username') ?></td></tr>
