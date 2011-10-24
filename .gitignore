@@ -31,3 +31,4 @@ config.mk
 application/logs/*.php
 data/thumbs/*
 data/torrents/*
+data/user_pictures/*
