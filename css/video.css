@@ -20,12 +20,18 @@ dd
 	margin-left: 1em;
 }
 
+#a-show-info-details
+{
+/*	display: block;
+	text-align: center;*/
+}
+
 #video-upload-info, #video-popularity
 {
 	font-size: 0.8em;
 	line-height: 150%;
 }
-#video-description
+.video-description
 {
 	margin-top: 1em;
 	margin-bottom: 0.5em;

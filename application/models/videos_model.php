@@ -189,6 +189,7 @@ class Videos_model extends CI_Model {
 	public function get_video($id, $name = NULL)
 	{
 		$this->load->helper('video');
+		$this->load->helper('text');
 		
 		$query = $this->db->query("SELECT v.*, u.username 
 								FROM `videos` v, `users` u
@@ -239,6 +240,10 @@ class Videos_model extends CI_Model {
 		
 		// Thumbnails
 		$video['thumbs'] = $this->get_thumbs($video['name'], $video['thumbs_count']);
+		
+		// Shorted description
+		$video['shorted_description'] = character_limiter(
+				$video['description'], 128);
 		
 		return $video;
 	}

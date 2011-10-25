@@ -48,6 +48,7 @@ class Openid {
 		require_once "Auth/OpenID/SReg.php";
 		require_once "Auth/OpenID/AX.php";
 		require_once "Auth/OpenID/PAPE.php";
+		require_once "Auth/extensions.php";
 	}
 
 	function set_sreg($enable, $required = NULL, $optional = NULL, $policy = NULL)
@@ -225,7 +226,8 @@ class Openid {
 		}
 
 		$store = new Auth_OpenID_FileStore($this->storePath);
-		$consumer = new Auth_OpenID_Consumer($store);
+		$consumer = new Auth_OpenID_Consumer($store,
+				new Auth_Yadis_CISession());
 
 		return $consumer;
 	}

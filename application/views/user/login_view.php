@@ -76,11 +76,10 @@
 	$(function() {
 		$('.login-openid')
 			.click(function() {
+				var op = $(this).data('op');
 				var openId;
 				
-				console.log($(this).data('op'));
-				
-				switch ($(this).data('op'))
+				switch (op)
 				{
 				case 'google':
 					openId = 'https://www.google.com/accounts/o8/id';
@@ -101,7 +100,16 @@
 							document.close();
 						});
 			})
-			.button();
+			.each(function() {
+				var op = $(this).data('op');
+				
+				$(this)
+					.button({
+						icons: {
+							primary: 'ui-icon-' + op
+						}
+					});
+			});
 		
 	});
 </script>

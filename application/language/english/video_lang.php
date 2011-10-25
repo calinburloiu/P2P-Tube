@@ -3,6 +3,9 @@
 $lang['video_like'] = 'Like';
 $lang['video_dislike'] = 'Dislike';
 
+$lang['video_show_more'] = 'Show more';
+$lang['video_show_less'] = 'Show less';
+
 $lang['video_comment'] = 'Comment';
 $lang['video_title_comment'] = 'Comment';
 $lang['video_title_all_comments'] = 'All Comments';

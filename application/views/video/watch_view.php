@@ -63,35 +63,41 @@
 				</div>
 			</div>
 			
-			<div id="video-description"><?php echo $video['description'] ?></div>
+			<div id="video-shorted-description" class="video-description"><?php echo $video['shorted_description'] ?></div>
 			
-			<dl id="video-category">
-				<dt><?php echo ucwords($this->lang->line('ui_category'))
-					. ': ' ?></dt>
-				<dd><?php echo $video['category_title'] ?></dd>
-			</dl>
+			<div id="video-info-details">
+				<div id="video-description" class="video-description"><?php echo $video['description'] ?></div>
+
+				<dl id="video-category">
+					<dt><?php echo ucwords($this->lang->line('ui_category'))
+						. ': ' ?></dt>
+					<dd><?php echo $video['category_title'] ?></dd>
+				</dl>
+
+				<dl id="video-tags">
+					<dt><?php echo ucwords($this->lang->line('ui_tags')). ': ' ?></dt>
+					<dd><?php if (isset($video['tags'])): 
+					foreach ($video['tags'] as $tag => $score): ?>
+					<a href="<?php echo site_url('catalog/search/'. $tag) ?>" class="video-tag">
+						<?php echo "$tag " // TODO print score in future ?>
+					</a>
+					<?php endforeach; endif ?></dd>
+				</dl>
+
+				<dl id="video-torrents">
+					<dt><?php echo $this->lang->line('ui_download_torrents') ?>: </dt>
+				  <?php foreach ($video['assets'] as $asset): ?>
+					<dd><a href="<?php echo $asset['src'] ?>"><?php echo $asset['def'] ?></a></dd>
+				  <?php endforeach ?>
+				</dl>
+
+				<dl id="video-license">
+					<dt><?php echo ucwords($this->lang->line('ui_license')).': ' ?></dt>
+					<dd><?php echo $video['license'] ?></dd>
+				</dl>
+			</div>
 			
-			<dl id="video-tags">
-				<dt><?php echo ucwords($this->lang->line('ui_tags')). ': ' ?></dt>
-				<dd><?php if (isset($video['tags'])): 
-				foreach ($video['tags'] as $tag => $score): ?>
-				<a href="<?php echo site_url('catalog/search/'. $tag) ?>" class="video-tag">
-					<?php echo "$tag " // TODO print score in future ?>
-				</a>
-				<?php endforeach; endif ?></dd>
-			</dl>
-			
-			<dl id="video-torrents">
-				<dt><?php echo $this->lang->line('ui_download_torrents') ?>: </dt>
-			  <?php foreach ($video['assets'] as $asset): ?>
-				<dd><a href="<?php echo $asset['src'] ?>"><?php echo $asset['def'] ?></a></dd>
-			  <?php endforeach ?>
-			</dl>
-			
-			<dl id="video-license">
-				<dt><?php echo ucwords($this->lang->line('ui_license')).': ' ?></dt>
-				<dd><?php echo $video['license'] ?></dd>
-			</dl>
+			<a id="a-show-info-details" data-val="more" href="#"><?php echo $this->lang->line('video_show_more') ?></a>
 		</div>
 	
 		<div id="video-comments"><?php echo $comments ?></div>
@@ -225,5 +231,32 @@
 					alert('<?php echo $this->lang->line('ui_msg_login_restriction') ?>');
 			})
 			.button();
+			
+		$('#video-info-details').hide();
+		
+		$('#a-show-info-details')
+//			.button({
+//				icons: {
+//					primary: 'ui-icon-triangle-1-s'
+//				},
+//				text: false
+//			})
+			.click(function(event) {
+				event.preventDefault(true);
+				$('#video-shorted-description').toggle();
+				$('#video-info-details').fadeToggle();
+				
+				//console.log($(this).button('option', 'icons'));
+				if ($(this).data('val') == 'more')
+				{
+					$(this).data('val', 'less');
+					$(this).html('<?php echo $this->lang->line('video_show_less') ?>');
+				}
+				else
+				{
+					$(this).data('val', 'more');
+					$(this).html('<?php echo $this->lang->line('video_show_more') ?>');
+				}
+			});
 	});
 </script>

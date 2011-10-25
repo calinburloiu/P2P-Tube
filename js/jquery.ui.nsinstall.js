@@ -108,6 +108,7 @@ $.widget( "ui.nsinstall", {
 	
 	_createSwarmPlayerInstall: function() {
 		var widget = this;
+		var msg;
 		
 		if (widget.options.error == 'none')
 		{
@@ -133,7 +134,7 @@ $.widget( "ui.nsinstall", {
 					+ '</div>'
 				+ '</div>');
 			
-			var msg = 'SwarmPlayer ' + widget.options.msg[widget.options.error];
+			msg = 'SwarmPlayer ' + widget.options.msg[widget.options.error];
 			$('#install-swarmplayer-msg').html(msg);
 		}
 		else
@@ -149,7 +150,7 @@ $.widget( "ui.nsinstall", {
 					+ '</div>'
 				+ '</div>');
 			
-			var msg = 'SwarmPlayer ' + widget.options.msg[widget.options.error];
+			msg = 'SwarmPlayer ' + widget.options.msg[widget.options.error];
 			$('#install-swarmplayer-msg').html(msg);
 		}
 		

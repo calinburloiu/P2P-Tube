@@ -269,3 +269,16 @@ label.strong
 	word-spacing: 0.5em;
 	margin-bottom: 0.5em;
 }
+
+.ui-icon-google
+{
+	background-image: url("/img/icon-google.png") !important;
+}
+.ui-icon-yahoo
+{
+	background-image: url("/img/icon-yahoo.png") !important;
+}
+.ui-icon-myopenid
+{
+	background-image: url("/img/icon-myopenid.png") !important;
+}

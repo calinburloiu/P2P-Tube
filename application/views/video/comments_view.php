@@ -60,7 +60,7 @@
 
 	function updateCommentCharsLeft($textarea) 
 	{
-		$('#comment-chars-left').html('' + (512 - $textarea.val().length));
+		
 	}
 	
 	$(function() {
@@ -71,6 +71,7 @@
 					function(data) {
 						$('#video-comments').html(data);
 					});
+				$('#comment').val('');
 			});
 		
 		$('.pagination')
@@ -126,14 +127,14 @@
 			});
 		
 		$('#comment')
-			.keydown(function(event) {
-				updateCommentCharsLeft($(this));
+			.bind('keyup paste drop change', function(event) {
+				$textarea = $(this);
 				
-				if ($(this).val().length == 513)
-					$(this).val($(this).val().substring(0, 512));
-			})
-			.change(function() {
-				updateCommentCharsLeft($(this));
+				if ($textarea.val().length >= 513)
+					$textarea.val($textarea.val().substring(0, 512));
+
+				$('#comment-chars-left').html('' + (512 - $textarea.val().length));
+				console.log(event.type);
 			});
 	});
 </script>
