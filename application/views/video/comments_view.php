@@ -1,7 +1,11 @@
 <h4><?php echo $this->lang->line('video_title_comment') ?>: </h4>
 
 <?php echo form_open("video/comment/$video_id") ?>
-	<textarea name="comment" id="comment" rows="4" cols="56"><?php echo set_value('comment', '') ?></textarea>
+	<textarea name="comment" id="comment" rows="4" cols="56"><?php 
+		if (validation_errors()):
+			echo set_value('comment', '');
+		endif;
+	?></textarea>
 	
 	<div><input type="button" id="button-post" value="<?php echo $this->lang->line('video_submit_post_comment') ?>" />
 		<span id="comment-chars-left">512</span> <?php echo $this->lang->line('ui_chars_left') ?>
@@ -57,12 +61,6 @@
 <?php endif ?>
 
 <script type="text/javascript">
-
-	function updateCommentCharsLeft($textarea) 
-	{
-		
-	}
-	
 	$(function() {
 		$('#button-post')
 			.click(function() {
@@ -71,7 +69,6 @@
 					function(data) {
 						$('#video-comments').html(data);
 					});
-				$('#comment').val('');
 			});
 		
 		$('.pagination')
@@ -134,7 +131,6 @@
 					$textarea.val($textarea.val().substring(0, 512));
 
 				$('#comment-chars-left').html('' + (512 - $textarea.val().length));
-				console.log(event.type);
 			});
 	});
 </script>
