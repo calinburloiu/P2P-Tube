@@ -520,8 +520,8 @@ class Videos_model extends CI_Model {
 		else
 		{
 			// TODO select data, description if details are needed
-			$selected_columns = "id, name, title, duration, user_id, views,
-					thumbs_count, default_thumb,
+			$selected_columns = "v.id, name, title, duration, user_id, views,
+					thumbs_count, default_thumb, u.username,
 					(views + likes - dislikes) AS score, 
 					$relevance";
 			$order = "ORDER BY relevance DESC, score DESC";
@@ -534,8 +534,8 @@ class Videos_model extends CI_Model {
 			$category_cond = "";
 
 		$str_query = "SELECT $selected_columns
-			FROM `videos`
-			WHERE  $category_cond ( $search_cond )
+			FROM `videos` v, `users` u
+			WHERE  v.user_id = u.id AND $category_cond ( $search_cond )
 			$order
 			$limit";
 // 		echo "<p>$str_query</p>";

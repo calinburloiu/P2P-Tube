@@ -97,8 +97,8 @@ $.widget( "ui.nsvideo", {
 				.appendTo(widget.$controls);
 			$formats = $('.ui-nsvideo-formats', $formats[0]);
 			$.each(widget.options.src, function(index, value) {
-				id = widget.element.attr('id') + '-format-' + index;
-				definition = value.res.substring(value.res.indexOf('x')+1)+'p';
+				var id = widget.element.attr('id') + '-format-' + index;
+				var definition = value.res.substring(value.res.indexOf('x')+1)+'p';
 				$('<input type="radio" id="' + id + '" name="format" />')
 					.appendTo($formats)
 					.attr('checked', (index == widget.options.srcIndex))
@@ -187,7 +187,7 @@ $.widget( "ui.nsvideo", {
 	},
 	
 	video: function() {
-		widget = this;
+		var widget = this;
 		
 		// Select video source.
 		// If src option is string, that's the source.
@@ -288,7 +288,7 @@ $.widget( "ui.nsvideo", {
 					},
 					seeking: function() {
 						widget.html5.refreshState();
-					},
+					}
 				});
 		}
 		// VLC

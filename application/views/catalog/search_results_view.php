@@ -28,7 +28,7 @@
 			?>
 		</div>
 		<div class="video-username">
-			<?php echo $this->lang->line('ui_from') . ' TODO' //TODO ?>
+			<?php echo $this->lang->line('ui_from') ?> <a href="<?php echo site_url("user/profile/{$video['username']}") ?>"><?php echo $video['username'] ?></a>
 		</div>
 	</div>
 	<?php endforeach ?>
