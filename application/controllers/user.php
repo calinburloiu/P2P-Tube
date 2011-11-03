@@ -26,7 +26,24 @@ class User extends CI_Controller {
 	
 	public function test($user_id = 1)
 	{
-		echo ($this->users_model->get_userdata('calin.burloiu') ? 'd' : 'n');
+//		echo ($this->users_model->get_userdata('calin.burloiu') ? 'd' : 'n');
+	}
+	
+	// DEBUG
+	public function show_session()
+	{
+		if (ENVIRONMENT == 'production')
+			die();
+			
+		var_dump($this->session->all_userdata());
+	}
+	// DEBUG
+	public function destroy_session()
+	{
+		if (ENVIRONMENT == 'production')
+			die();
+			
+		$this->session->sess_destroy();
 	}
 
 	/**
@@ -165,6 +182,8 @@ class User extends CI_Controller {
 		$this->load->library('form_validation');
 		$this->load->helper('localization');
 		$this->load->helper('date');
+		
+		$user_id = $this->session->userdata('user_id');
 			
 		$this->form_validation->set_error_delimiters('<span class="error">',
 					'</span>');
@@ -192,16 +211,15 @@ class User extends CI_Controller {
 		}
 		else
 			$b_validation = FALSE;
-		
+
 		if (! $b_validation)
 		{
 			// Edit account data if logged in, otherwise register.
-			$user_id = $this->session->userdata('user_id');
 			if ($user_id)
 			{
 				$userdata = $this->users_model->get_userdata(intval($user_id));
 				if (substr($userdata['username'], 0, 8) == 'autogen_')
-					$userdata['autogen_username'] = //'xxx';
+					$userdata['autogen_username'] =
 						substr($userdata['username'], 8);
 				$selected_menu = 'account';
 			}
@@ -238,12 +256,14 @@ class User extends CI_Controller {
 		}
 		else
 		{
-			$user_id = $this->input->post('user-id');
+			// TODO: Security problem!
+			//$user_id = $this->input->post('user-id');
 			if ($this->input->post('username'))
 				$data['username'] = $this->input->post('username');
 			$data['email'] = $this->input->post('email');
 			$data['first_name'] = $this->input->post('first-name');
 			$data['last_name'] = $this->input->post('last-name');
+			$data['sex'] = intval($this->input->post('sex'));
 			$data['birth_date'] = $this->input->post('birth-date');
 			$data['country'] = $this->input->post('country');
 			$data['locality'] = $this->input->post('locality');
@@ -270,6 +290,7 @@ class User extends CI_Controller {
 						. $upload_data['file_name']. '-thumb.jpg', 120, 90);
 			}
 			
+			// TODO: To much info as session data?
 			// Update session user data.
 			$this->_update_session_userdata($data);
 			
@@ -278,7 +299,7 @@ class User extends CI_Controller {
 			{
 				$password = $this->input->post('new-password');
 				if ($password)
-					$data['password'] = $this->input->post('new-password');
+					$data['password'] = $password;
 				
 				$this->users_model->set_userdata($user_id, $data);
 				
@@ -290,6 +311,7 @@ class User extends CI_Controller {
 			{
 				$data['username'] = $this->input->post('username');
 				$data['password'] = $this->input->post('password');
+				$data['auth_src'] = 'internal';
 				
 				$this->users_model->register($data);
 				$user_id = $this->users_model->get_userdata($data['username'],
@@ -543,7 +565,10 @@ class User extends CI_Controller {
 	public function _update_session_userdata($data)
 	{
 		foreach ($data as $key=> $val)
-			$this->session->set_userdata($key, $val);
+		{
+			if ($this->session->userdata($key))
+				$this->session->set_userdata($key, $val);
+		}
 	}
 	
 	public function _is_username_unique($username)
@@ -586,12 +611,12 @@ class User extends CI_Controller {
 		return $date;
 	}
 	
-	public function _valid_old_password($old_password, $field_username)
+	public function _valid_old_password($old_password)
 	{
 		if (! $old_password)
 			return TRUE;
 		
-		$username= $this->input->post($field_username);
+		$username= $this->session->userdata('username');
 		
 		if ($this->users_model->login($username, $old_password))
 			return TRUE;
@@ -611,7 +636,7 @@ class User extends CI_Controller {
 	
 	public function _required_by_register($param)
 	{
-		$user_id = $this->input->post('user-id');
+		$user_id = $this->session->userdata('user_id');
 		
 		if (! $user_id && ! $param)
 			return FALSE;

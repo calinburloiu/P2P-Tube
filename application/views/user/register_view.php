@@ -7,7 +7,7 @@ function _set_value($userdata, $field, $default = '')
 		return $post_value;
 
 	return ($post_value === $default 
-		? $userdata[ str_replace('-','_',$field) ]
+		? ''.$userdata[ str_replace('-','_',$field) ]
 		: $post_value);
 }
 
@@ -17,10 +17,10 @@ else
 	echo form_open_multipart("user/account/$redirect");
 ?>
 
-<?php if ($userdata): ?>
+<!--<?php if ($userdata): ?>
 <input type="hidden" name="user-id" value="<?php echo $userdata['id'] ?>" />
 <input type="hidden" name="username" value="<?php echo $userdata['username'] ?>" />
-<?php endif ?>
+<?php endif ?>-->
 
 <table class="form">
 	<tr>
@@ -44,6 +44,7 @@ else
 		<th><?php echo $this->lang->line('user_username'). ' : ' ?></th>
 		<td>
 			&nbsp;<em><?php echo $userdata['username'] ?></em>
+			<!--<input type="hidden" name="username" value="<?php echo $userdata['username'] ?>" />-->
 		</td>
 	  <?php endif ?>
 	</tr>
@@ -118,6 +119,19 @@ else
 		</td>
 	</tr>
 	<tr><td></td><td><?php echo form_error('last-name') ?></td></tr>
+	
+	<tr>
+		<th><?php echo $this->lang->line('user_sex'). ' <span class="required">*</span> : ' ?></th>
+		<td>
+			<?php echo form_dropdown('sex', 
+				array(
+					'0'=> $this->lang->line('user_sex_male'),
+					'1'=> $this->lang->line('user_sex_female')),
+				_set_value($userdata, 'sex', '0')
+			) ?>
+		</td>
+	</tr>
+	<tr><td></td><td><?php echo form_error('sex') ?></td></tr>
 	
 	<tr>
 		<th><?php echo $this->lang->line('user_birth_date'). ' : ' ?></th>

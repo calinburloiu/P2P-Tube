@@ -415,7 +415,7 @@ class Users_model extends CI_Model {
 	 * Adds a new user to DB.
 	 * Do not add join_date and last_login column, they will be automatically
 	 * added.
-	 * Provide an 'openid' with the OpenID as value in order to register users
+	 * Provide an $openid with the OpenID as value in order to register users
 	 * logging in this way.
 	 * 
 	 * @param array $data	corresponds to DB columns
@@ -505,10 +505,45 @@ class Users_model extends CI_Model {
 		return $query->row()->id;
 	}
 	
-	// TODO cleanup account activation
-	public function cleanup_account_activation()
+	/**
+	 * Removes users that didn't activated their account within $days_to_expire
+	 * days inclusively.
+	 * 
+	 * @param int $days_to_expire 
+	 */
+	public function cleanup_unactivated_users($days_to_expire)
 	{
+		// Get user_id-s with expired activation period.
+		$query = $this->db->query("SELECT u.id
+			FROM `users` u, `users_unactivated` a
+			WHERE u.id = a.user_id
+				AND DATEDIFF(CURRENT_DATE(), u.registration_date) > $days_to_expire");
 		
+		if ($query->num_rows() > 0)
+		{
+			$str_user_ids = '';
+			$results = $query->result();
+			foreach ($results as $result)
+				$str_user_ids .= "{$result->id}, ";
+			$str_user_ids = substr($str_user_ids, 0, -2);
+		}
+		else
+			return FALSE;
+		
+		// Delete from `users` table.
+		$ret = $this->db->query("DELETE FROM `users`
+			WHERE id IN ($str_user_ids)");
+		if (!$ret)
+			return FALSE;
+		
+		// Delete from `users_unactivated table.
+		$ret = $this->db->query("DELETE FROM `users_unactivated`
+			WHERE user_id IN ($str_user_ids)");
+		if (!$ret)
+			return FALSE;
+		
+		// Success
+		return TRUE;
 	}
 	
 	/**

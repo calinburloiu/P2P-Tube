@@ -42,7 +42,7 @@ $config = array(
 		array(
 			'field'=>'old-password',
 			'label'=>'lang:user_old_password',
-			'rules'=>'min_length[5]|max_length[32]|callback__valid_old_password[username]'
+			'rules'=>'min_length[5]|max_length[32]|callback__valid_old_password'
 		),
 		array(
 			'field'=>'new-password',
@@ -68,6 +68,11 @@ $config = array(
 			'field'=>'last-name',
 			'label'=>'lang:user_last_name',
 			'rules'=>'trim|required|ucwords|xss_clean|prep_for_form'
+		),
+		array(
+			'field'=>'sex',
+			'label'=>'lang:user_sex',
+			'rules'=>'required|xss_clean|prep_for_form'
 		),
 		array(
 			'field'=>'birth-date',
