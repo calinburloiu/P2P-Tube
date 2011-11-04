@@ -38,6 +38,7 @@
  * @property CI_Zip $zip
  * 
  * 
+ * @property Captcha $captcha
  * @property Html_head_params $html_head_params
  * @property Image $image
  * @property Openid $openid
@@ -89,6 +90,7 @@ class CI_Model
  * @property CI_Zip $zip
  * 
  * 
+ * @property Captcha $captcha
  * @property Html_head_params $html_head_params
  * @property Image $image
  * @property Openid $openid

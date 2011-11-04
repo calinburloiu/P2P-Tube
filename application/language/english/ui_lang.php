@@ -65,5 +65,9 @@ $lang['ui_msg_repeated_action_restriction'] = 'You can only perform this action 
 
 $lang['ui_chars_left'] = 'characters left';
 
+$lang['ui_captcha'] = 'CAPTCHA';
+$lang['ui_captcha_instructions'] = 'Please insert the text from the image below in order to demonstrate that you are a human:';
+$lang['ui_change_captcha'] = 'Change CAPTCHA image';
+
 /* End of file ui_lang.php */
 /* Location: ./application/language/english/ui_lang.php */

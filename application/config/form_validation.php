@@ -83,6 +83,11 @@ $config = array(
 			'field'=>'locality',
 			'label'=>'lang:user_locality',
 			'rules'=>'trim|ucwords|xss_clean|prep_for_form'
+		),
+		array(
+			'field'=>'captcha',
+			'label'=>'lang:captcha',
+			'rules'=>'callback__required_by_register|callback__check_captcha'
 		)
 	),
 	'activate'=> array(

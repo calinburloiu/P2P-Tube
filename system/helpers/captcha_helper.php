@@ -77,7 +77,7 @@ if ( ! function_exists('create_captcha'))
 		{
 			return FALSE;
 		}
-
+		
 		// -----------------------------------
 		// Remove old images
 		// -----------------------------------
@@ -235,7 +235,7 @@ if ( ! function_exists('create_captcha'))
 		$img = "<img src=\"$img_url$img_name\" width=\"$img_width\" height=\"$img_height\" style=\"border:0;\" alt=\" \" />";
 
 		ImageDestroy($im);
-
+		
 		return array('word' => $word, 'time' => $now, 'image' => $img);
 	}
 }

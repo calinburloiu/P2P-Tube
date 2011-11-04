@@ -26,7 +26,7 @@ class User extends CI_Controller {
 	
 	public function test($user_id = 1)
 	{
-//		echo ($this->users_model->get_userdata('calin.burloiu') ? 'd' : 'n');
+		echo extension_loaded('gd') ? 'gd' : 'nu';
 	}
 	
 	// DEBUG
@@ -44,6 +44,13 @@ class User extends CI_Controller {
 			die();
 			
 		$this->session->sess_destroy();
+	}
+	
+	public function ajax_get_captcha()
+	{
+		$this->load->library('captcha');
+		$captcha = $this->captcha->get_captcha();
+		echo $captcha['image'];
 	}
 
 	/**
@@ -215,6 +222,7 @@ class User extends CI_Controller {
 		if (! $b_validation)
 		{
 			// Edit account data if logged in, otherwise register.
+			// ** ACCOUNT
 			if ($user_id)
 			{
 				$userdata = $this->users_model->get_userdata(intval($user_id));
@@ -222,11 +230,18 @@ class User extends CI_Controller {
 					$userdata['autogen_username'] =
 						substr($userdata['username'], 8);
 				$selected_menu = 'account';
+				$captcha = FALSE;
 			}
+			// ** REGISTER
 			else
 			{
 				$userdata = FALSE;
 				$selected_menu = 'register';
+				
+				// CAPTCHA
+				$this->load->library('captcha');
+				$captcha = $this->captcha->get_captcha();
+				$captcha = $captcha['image'];
 			}
 			
 			$params = array('title' =>
@@ -246,7 +261,7 @@ class User extends CI_Controller {
 			
 			$main_params['content'] = $this->load->view('user/register_view', 
 				array('userdata'=> $userdata, 'redirect'=> $redirect,
-					'error_upload'=> $error_upload),
+					'error_upload'=> $error_upload, 'captcha'=> $captcha),
 				TRUE);
 			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
 			$this->load->view('main', $main_params);
@@ -710,6 +725,13 @@ class User extends CI_Controller {
 			return FALSE;
 		
 		return TRUE;
+	}
+	
+	public function _check_captcha($word)
+	{
+		$this->load->library('captcha');
+		
+		return $this->captcha->check_captcha($word);
 	}
 	
 	public function _internal_account($username)

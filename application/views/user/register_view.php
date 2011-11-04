@@ -17,11 +17,6 @@ else
 	echo form_open_multipart("user/account/$redirect");
 ?>
 
-<!--<?php if ($userdata): ?>
-<input type="hidden" name="user-id" value="<?php echo $userdata['id'] ?>" />
-<input type="hidden" name="username" value="<?php echo $userdata['username'] ?>" />
-<?php endif ?>-->
-
 <table class="form">
 	<tr>
 		<td></td>
@@ -44,7 +39,6 @@ else
 		<th><?php echo $this->lang->line('user_username'). ' : ' ?></th>
 		<td>
 			&nbsp;<em><?php echo $userdata['username'] ?></em>
-			<!--<input type="hidden" name="username" value="<?php echo $userdata['username'] ?>" />-->
 		</td>
 	  <?php endif ?>
 	</tr>
@@ -201,6 +195,23 @@ else
 	
 	<tr><td></td><td>&nbsp;</td></tr>
 	
+  <?php if (! $userdata): ?>
+	<tr>
+		<th><?php echo $this->lang->line('ui_captcha'). ' <span class="required">*</span> : ' ?></th>
+		<td>
+			<div><?php echo $this->lang->line('ui_captcha_instructions') ?></div>
+			<div><span id="container-captcha"><?php echo $captcha ?></span>
+				<input type="button" id="button-change-captcha"
+					   value="<?php echo $this->lang->line('ui_change_captcha') ?>" />
+			</div>
+			<p><input type="text" name="captcha" size="16" value="" /></p>
+		</td>
+	</tr>
+	<tr><td></td><td><?php echo form_error('captcha') ?></td></tr>
+	
+	<tr><td></td><td>&nbsp;</td></tr>
+  <?php endif ?>
+	
 	<tr>
 		<td></td>
 		<td>
@@ -225,5 +236,11 @@ else
 			buttonImage: "<?php echo site_url('img/calendar.gif') ?>",
 			buttonImageOnly: true
 		});
+		
+		$('#button-change-captcha')
+			.click(function() {
+				$('#container-captcha')
+					.load('<?php echo site_url('user/ajax_get_captcha') ?>');
+			});
 	});
 </script>

@@ -45,6 +45,14 @@
 				<th><?php echo $this->lang->line('user_last_name'). ': ' ?></th>
 				<td><?php echo $userdata['last_name'] ?></td>
 			</tr>
+			
+			<tr>
+				<th><?php echo $this->lang->line('user_sex'). ': ' ?></th>
+				<td><?php
+					echo ($userdata['sex']
+							? $this->lang->line('user_sex_female')
+							: $this->lang->line('user_sex_male') ) ?></td>
+			</tr>
 
 			<tr>
 				<th><?php echo $this->lang->line('user_birth_date'). ': ' ?></th>

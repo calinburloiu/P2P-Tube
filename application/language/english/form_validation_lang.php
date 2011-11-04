@@ -12,6 +12,7 @@ $lang['_valid_date']				= 'Invalid %s! Use the specified format or leave the fie
 $lang['_valid_old_password']		= 'Wrong %s.';
 $lang['_change_password_cond']		= 'If you want to change your password complete all three password related fields.';
 $lang['_required_by_register']		= 'The %s field is required.';
+$lang['_check_captcha']				= 'The text entered does not match the text from the previous image. Try again with this image.';
 
 // Account Activation
 $lang['_valid_activation_code']		= 'Invalid activation code. You must provide 16 hexa characters.';
