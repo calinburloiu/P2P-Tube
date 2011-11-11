@@ -4,7 +4,7 @@
  * Class Users_model models user information from DB
  * 
  * @category 	Model
- * @author 		calinburloiu
+ * @author 		Călin-Andrei Burloiu
  *
  */
 class Users_model extends CI_Model {

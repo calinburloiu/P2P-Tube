@@ -71,13 +71,9 @@ class Catalog extends CI_Controller {
 
 	public function test()
 	{
-		$data['email'] = 'CA-LăIN$*(_3@GMAIL.COM';
-		$data['email'] = strtolower($data['email']);
-		$data['username'] = substr($data['email'],
-				0, strpos($data['email'], '@'));
-		$data['username'] = preg_replace(array('/[^a-z0-9\._]*/'),
-				array(''), $data['username']);
-		echo $data['username'];
+		$this->load->helper('av_info');
+		
+		var_dump(get_video_dar('./data/media/test.ogv'));
 	}
 
 	public function category($category_name, $ordering = 'hottest', $offset = 0)
