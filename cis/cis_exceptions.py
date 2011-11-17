@@ -10,3 +10,6 @@ class NotImplementedException(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+class TranscodingException(Exception):
+    pass
