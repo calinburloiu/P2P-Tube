@@ -6,6 +6,8 @@ Base classes for the external programs API.
 
 import cis_exceptions
 import re
+import cis_util
+import random
 
 class BaseTranscoder:
     """
@@ -53,12 +55,7 @@ class BaseTranscoder:
             self.prog_bin = prog_bin
         
         if name is None:
-            if input_file.find('/') is not -1:
-                name = input_file[(input_file.rindex('/')+1):]
-            else:
-                name = input_file
-            if name.find('.') is not -1:
-                name = name[:name.rindex('.')]
+            name = cis_util.get_name(input_file)
 
         self.name = name
 
@@ -166,3 +163,83 @@ class BaseTranscoder:
             raise cis_exceptions.NotImplementedException("Video Codec " + name)
 
         return self.v_codecs[name]
+
+
+class BaseThumbExtractor:
+    """
+    Abstraction of the API class for the thumbnail extraction program. 
+
+    Thumbnail extracted are in JPEG format.
+    """
+
+    prog_bin = None
+    input_file = None
+    dest_path = ''
+    name = None
+    
+    def __init__(self, input_file, name=None, prog_bin=None):
+        self.input_file = input_file
+        if prog_bin is not None:
+            self.prog_bin = prog_bin
+        
+        if name is None:
+            name = cis_util.get_name(input_file)
+
+        self.name = name
+
+    def extract_thumb(self, seek_pos, resolution="120x90", index=0):
+        """
+        Extracts a thumbnail from the video from a specified position
+        expressed in seconds (int/float).
+
+        index: an index appended to the image name in order to avoid
+        overwriting.
+        """
+        pass
+
+    def extract_random_thumb(self, resolution="120x90", index=0):
+        """
+        Extracts a thumbnail from the video from a random position.
+        """
+        duration = self.get_video_duration()
+        seek_pos = random.random() * duration
+        self.extract_thumb(seek_pos, resolution, index)
+
+    def extract_summary_thumbs(self, count, resolution="120x90"):
+        """
+        Extracts a series of thumbnails from a video by taking several
+        snapshots.
+
+        The snapshots are taken from equally spaced positions such that
+        `count` thumbs are extracted.
+        """
+        duration = self.get_video_duration()
+        interval = duration / (count + 1)
+        
+        n_thumbs_extracted = 0
+        seek_pos = interval
+        for index in range (0, count):
+            thumb_extracted = True
+            try:
+                self.extract_thumb(seek_pos, resolution, index)
+            except cis_exceptions.ThumbExtractionException as e:
+                thumb_extracted = False
+
+            if thumb_extracted:
+                n_thumbs_extracted += 1
+
+            seek_pos += interval
+
+        return n_thumbs_extracted
+
+    def get_video_duration(self):
+        """
+        Returns the number of seconds of a video (int/float).
+        """
+        pass
+
+    def get_output_file_name(self, index):
+        """ Returns the name required as output file name based on index. """
+        output_file_name = self.dest_path + self.name \
+                + '_t' + ("%02d" % index) + '.jpg'
+        return output_file_name

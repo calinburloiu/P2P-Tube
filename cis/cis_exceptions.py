@@ -13,3 +13,6 @@ class NotImplementedException(Exception):
 
 class TranscodingException(Exception):
     pass
+
+class ThumbExtractionException(Exception):
+    pass

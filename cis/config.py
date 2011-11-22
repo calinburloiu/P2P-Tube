@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 # Make here all necessary imports required for API classes.
-from api import ffmpeg
+from api import avhandling
 
 # External programs API classes.
-TRANSCODER_CLASS = ffmpeg.FFmpegTranscoder
-THUMB_EXTRACTER_CLASS = None # TODO
+TRANSCODER_CLASS = avhandling.FFmpegTranscoder
+THUMB_EXTRACTOR_CLASS = avhandling.FFmpegThumbExtractor
 BT_CLIENT_CLASS = None # TODO
 FILE_TRANSFERER_CLASS = None # TODO
 
