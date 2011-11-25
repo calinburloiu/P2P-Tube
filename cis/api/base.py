@@ -4,7 +4,7 @@
 Base classes for the external programs API.
 """
 
-import cis_exceptions
+import api_exceptions
 import re
 import cis_util
 import random
@@ -131,7 +131,7 @@ class BaseTranscoder:
         """ Translates container API name into external program identifier."""
 
         if not self.containers.has_key(name) or self.containers[name] is None:
-            raise cis_exceptions.NotImplementedException("Container " + name)
+            raise api_exceptions.NotImplementedException("Container " + name)
 
         return self.containers[name]
 
@@ -152,7 +152,7 @@ class BaseTranscoder:
         """ Translates audio codec API name into external program identifier."""
 
         if not self.a_codecs.has_key(name) or self.a_codecs[name] is None:
-            raise cis_exceptions.NotImplementedException("Audio Codec " + name)
+            raise api_exceptions.NotImplementedException("Audio Codec " + name)
 
         return self.a_codecs[name]
 
@@ -160,7 +160,7 @@ class BaseTranscoder:
         """ Translates video codec API name into external program identifier."""
 
         if not self.v_codecs.has_key(name) or self.v_codecs[name] is None:
-            raise cis_exceptions.NotImplementedException("Video Codec " + name)
+            raise api_exceptions.NotImplementedException("Video Codec " + name)
 
         return self.v_codecs[name]
 
@@ -222,7 +222,7 @@ class BaseThumbExtractor:
             thumb_extracted = True
             try:
                 self.extract_thumb(seek_pos, resolution, index)
-            except cis_exceptions.ThumbExtractionException as e:
+            except api_exceptions.ThumbExtractionException as e:
                 thumb_extracted = False
 
             if thumb_extracted:
@@ -243,3 +243,47 @@ class BaseThumbExtractor:
         output_file_name = self.dest_path + self.name \
                 + '_t' + ("%02d" % index) + '.jpg'
         return output_file_name
+
+
+class BaseFileTransferer:
+    """
+    Ensures file transfer from the Web Server to the CIS (here).
+    
+    Several implementations can be done by extending this class for
+    file transfer protocol such as FTP, SCP, RSYNC, HTTP etc.
+    """
+    
+    local_path = ''
+    remote_path = ''
+    
+    def __init__(self, local_path='', remote_path=''):
+        """ Initialize by setting local and remote paths for file transfer. """
+        self.local_path = local_path
+        self.remote_path = remote_path
+
+    def __del__(self):
+        self.close()
+
+    def get(self, files):
+        """
+        Transfers files locally from the Web Server.
+
+        files: a list of file name strings
+        """
+        pass
+
+    def put(self, files):
+        """
+        Transfers files from the Web Server locally.
+
+        files: a list of file name strings
+        """
+        pass
+
+    def close(self):
+        """
+        This method should be called when the instance is no longer required.
+
+        Class's destructor calls this method.
+        """
+        pass
