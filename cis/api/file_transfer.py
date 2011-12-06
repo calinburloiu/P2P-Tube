@@ -70,4 +70,7 @@ class FTPFileTransferer(base.BaseFileTransferer):
 
     def close(self):
         if self.ftp is not None:
-            self.ftp.quit()
+            try:
+                self.ftp.quit()
+            except:
+                pass

@@ -232,17 +232,14 @@ class BaseThumbExtractor:
 
         return n_thumbs_extracted
 
-    def get_video_duration(self):
-        """
-        Returns the number of seconds of a video (int/float).
-        """
-        pass
-
     def get_output_file_name(self, index):
         """ Returns the name required as output file name based on index. """
         output_file_name = self.dest_path + self.name \
                 + '_t' + ("%02d" % index) + '.jpg'
         return output_file_name
+
+    def get_video_duration(self):
+        pass
 
 
 class BaseFileTransferer:
@@ -285,5 +282,14 @@ class BaseFileTransferer:
         This method should be called when the instance is no longer required.
 
         Class's destructor calls this method.
+        """
+        pass
+
+
+class BaseAVInfo:
+    @staticmethod
+    def get_video_duration(input_file):
+        """
+        Returns the number of seconds of a video (int/float).
         """
         pass

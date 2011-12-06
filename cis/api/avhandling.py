@@ -102,7 +102,6 @@ class FFmpegThumbExtractor(base.BaseThumbExtractor):
     """
 
     prog_bin = "ffmpeg"
-    info_prog_bin = "ffprobe"
 
     log_file = 'log/FFmpegThumbExtractor.log'
 
@@ -142,8 +141,17 @@ class FFmpegThumbExtractor(base.BaseThumbExtractor):
                     'FFmpeg created an empty file.')
 
     def get_video_duration(self):
-        args = self.info_prog_bin + ' -show_format "' \
-                + self.input_file + '"'
+        return FFmpegAVInfo.get_video_duration(self.input_file)
+
+
+class FFmpegAVInfo(base.BaseAVInfo):
+    
+    prog_bin = "ffprobe"
+
+    @staticmethod
+    def get_video_duration(input_file):
+        args = FFmpegAVInfo.prog_bin + ' -show_format "' \
+                + input_file + '"'
 
         # READ handler for process's output.
         p = subprocess.Popen(args, shell=True,
@@ -165,4 +173,3 @@ class FFmpegThumbExtractor(base.BaseThumbExtractor):
         if exit_code > 0:
             raise api_exceptions.ThumbExtractionException( \
                     'FFmpeg exited with code ' + str(exit_code) + '.')
-
