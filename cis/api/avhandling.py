@@ -11,6 +11,7 @@ import api_exceptions
 import subprocess
 import re
 import os
+import math
 
 class FFmpegTranscoder(base.BaseTranscoder):
     """
@@ -149,7 +150,7 @@ class FFmpegAVInfo(base.BaseAVInfo):
     prog_bin = "ffprobe"
 
     @staticmethod
-    def get_video_duration(input_file):
+    def get_video_duration(input_file, formated=False):
         args = FFmpegAVInfo.prog_bin + ' -show_format "' \
                 + input_file + '"'
 
@@ -167,9 +168,22 @@ class FFmpegAVInfo(base.BaseAVInfo):
             # Search for the line which contains duration information.
             m = re.match(r"duration=([\d\.]+)", line)
             if m is not None:
-                return float(m.group(1))
+                seconds = float(m.group(1))
+                if not formated:
+                    return seconds
+                else:
+                    seconds = math.floor(seconds)
+                    minutes = math.floor(seconds / 60)
+                    seconds = seconds % 60
+                    if minutes >= 60:
+                        hours = math.floor(minutes / 60)
+                        minutes = minutes % 60
+                        
+                        return "%02d:%02d:%02d" % (hours, minutes, seconds)
+                    else:
+                        return "%02d:%02d" % (minutes, seconds)
 
         exit_code = p.wait()
         if exit_code > 0:
-            raise api_exceptions.ThumbExtractionException( \
-                    'FFmpeg exited with code ' + str(exit_code) + '.')
+            raise api_exceptions.AVInfoException( \
+                    'ffprobe exited with code ' + str(exit_code) + '.')

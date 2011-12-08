@@ -17,5 +17,8 @@ class TranscodingException(Exception):
 class ThumbExtractionException(Exception):
     pass
 
+class AVInfoException(Exception):
+    pass
+
 class FileTransferException(Exception):
     pass

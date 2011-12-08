@@ -2,26 +2,31 @@
 
 import sys
 import config
+import os
 
-#
-# !! Imports required for create_torrent
-#
 from BaseLib.Core.API import *
-#
-#
-#
 
-def create_torrent(input_):
+def create_torrent(source):
+    """ Creates a torrent file for the video source file. """
+
+    if isinstance(source, unicode):
+        usource = source
+    else:
+        usource = source.decode(sys.getfilesystemencoding())
+
+    duration = config.AVINFO_CLASS.get_video_duration(source, True)
+
+    print config.BT_TRACKER, duration, source
+
     tdef = TorrentDef()
-    tdef.add_content(input_, config.AVINFO_CLASS.get_video_duration(input_))
+    tdef.add_content(usource, playtime=duration)
     tdef.set_tracker(config.BT_TRACKER)
 
     tdef.set_piece_length(32768)
 
     tdef.finalize()
-    tdef.save(input_ + ".tstream")
+    tdef.save(source + '.tstream')
 
-    print 'READY!', config.BT_TRACKER, config.AVINFO_CLASS.get_video_duration(input_)
 
 if __name__ == '__main__':
     pass

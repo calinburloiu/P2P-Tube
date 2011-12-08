@@ -288,8 +288,9 @@ class BaseFileTransferer:
 
 class BaseAVInfo:
     @staticmethod
-    def get_video_duration(input_file):
+    def get_video_duration(input_file, formated=False):
         """
-        Returns the number of seconds of a video (int/float).
+        Returns the number of seconds of a video (int/float) if formated is
+        False and a string for duration formated as [HH:]:mm:ss otherwise.
         """
         pass
