@@ -65,16 +65,18 @@ class BaseTranscoder:
         """
         Transcodes the input file to an audio-video file.
 
-        container: possible values are listed in containers member as keys
-        a_codec: possible values are listed in a_codecs member as keys
-        v_codec: possible values are listed in v_codecs member as keys
-        a_bitrate: (numeric) audio bit rate
-        a_samplingrate: (numeric) audio sampling rate in Hz
-        a_channels: (numeric) number of audio channels
-        v_bitrate: (numeric) video bit rate
-        v_framerate: (numeric) number of frames per second for a video
-        v_resolution: (string) video image size as <width>x<height>
-        v_dar: video display aspect ratio as <den>x<num> or float
+        @param container: possible values are listed in containers member 
+        as keys
+        @param a_codec possible values are listed in a_codecs member as keys
+        @param v_codec possible values are listed in v_codecs member as keys
+        @param a_bitrate (numeric) audio bit rate
+        @param a_samplingrate (numeric) audio sampling rate in Hz
+        @param a_channels (numeric) number of audio channels
+        @param v_bitrate (numeric) video bit rate
+        @param v_framerate (numeric) number of frames per second for a video
+        @param v_resolution (string) video image size as <width>x<height>
+        @param v_dar video display aspect ratio as <den>x<num> or float
+        @return output file name
         """
 
         # Check parameters.
@@ -113,7 +115,7 @@ class BaseTranscoder:
         if ext is not None:
             self.output_file += '.' + ext
 
-        self._transcode(self.tr_container(container),
+        return self._transcode(self.tr_container(container),
                 self.tr_a_codec(a_codec), self.tr_v_codec(v_codec),
                 a_bitrate, a_samplingrate, a_channels,
                 v_bitrate, v_framerate, v_resolution, v_dar)
@@ -124,6 +126,8 @@ class BaseTranscoder:
         """
         Called by transcode; must be overridden by a child class which
         effectively transcodes the input file.
+
+        @return output file name
         """
         pass
 

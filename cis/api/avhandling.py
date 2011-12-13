@@ -96,6 +96,8 @@ class FFmpegTranscoder(base.BaseTranscoder):
 
         log.close()
 
+        return output_file
+
 
 class FFmpegThumbExtractor(base.BaseThumbExtractor):
     """
