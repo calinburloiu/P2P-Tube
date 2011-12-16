@@ -3,6 +3,7 @@
 from BaseLib.Core.API import *
 import tempfile
 import random
+import config
 
 def create_torrent(source):
     """
@@ -47,7 +48,7 @@ class BitTorrent:
         
         self.session = Session(sscfg)
 
-    def download(self, torrent, output_dir='.'):
+    def start_download(self, torrent, output_dir='.'):
         """
         Download (leech or seed) a file via BitTorrent.
         The code is adapted from Next-Share's 'BaseLib/Tools/cmdlinedl.py'.

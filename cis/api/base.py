@@ -225,7 +225,7 @@ class BaseThumbExtractor:
         for index in range (0, count):
             thumb_extracted = True
             try:
-                self.extract_thumb(seek_pos, resolution, index)
+                self.extract_thumb(seek_pos, resolution, n_thumbs_extracted)
             except api_exceptions.ThumbExtractionException as e:
                 thumb_extracted = False
 

@@ -7,7 +7,7 @@ They may extend BaseFileTransferer class.
 """
 
 import sys
-from ftplib import FTP_TLS
+import ftplib
 import base
 import ftp_config
 import socket
@@ -25,7 +25,7 @@ class FTPFileTransferer(base.BaseFileTransferer):
     def __init__(self, local_path='', remote_path=''):
         base.BaseFileTransferer.__init__(self, local_path, remote_path)
 
-        self.ftp = FTP_TLS(ftp_config.FTP_HOST, ftp_config.FTP_USER,
+        self.ftp = ftplib.FTP_TLS(ftp_config.FTP_HOST, ftp_config.FTP_USER,
                 ftp_config.FTP_PASSWD, ftp_config.FTP_ACCT)
         self.ftp.set_pasv(True)
 
