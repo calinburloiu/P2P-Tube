@@ -22,7 +22,7 @@ BT_TRACKER = "http://localhost:6969/announce"
 
 # === EXTERNAL PROGRAMS API CLASSES ===
 # API class for a prgram which retrives audio/video information, like duration.
-AVINFO_CLASS = avhandling.FFmpegAVInfo
+AVINFO_CLASS = avhandling.FFprobeAVInfo
 # API class for a prgram which transcodes an audio/video file.
 TRANSCODER_CLASS = avhandling.FFmpegTranscoder
 # API class for a prgram which extracts thumbnail images from a file.

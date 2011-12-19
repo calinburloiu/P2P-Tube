@@ -4,10 +4,12 @@
 Base classes for the external programs API.
 """
 
-import api_exceptions
+import os
 import re
-import cis_util
 import random
+
+import api_exceptions
+import cis_util
 
 class BaseTranscoder:
     """
@@ -106,7 +108,7 @@ class BaseTranscoder:
                 and re.match('[\d]+:[\d]+', v_dar) is None):
             raise ValueError('Video display aspect ratio must be a float or a string like <den>:<num>.')
 
-        self.output_file = self.dest_path + self.name
+        self.output_file = os.path.join(self.dest_path, self.name)
         if v_resolution is not None:
             self.output_file += '_'
             self.output_file += v_resolution[(v_resolution.rindex('x')+1):]
@@ -238,7 +240,7 @@ class BaseThumbExtractor:
 
     def get_output_file_name(self, index):
         """ Returns the name required as output file name based on index. """
-        output_file_name = self.dest_path + self.name \
+        output_file_name = os.path.join(self.dest_path, self.name) \
                 + '_t' + ("%02d" % index) + '.jpg'
         return output_file_name
 

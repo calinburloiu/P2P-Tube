@@ -41,7 +41,7 @@ class CIWorker(threading.Thread):
         </ul>
         """
 
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, name='CIWorker')
 
         self.queue = queue
         self.bit_torrent = bit_torrent
@@ -55,7 +55,7 @@ class CIWorker(threading.Thread):
 
         file_transfer = config.FILE_TRANSFERER_CLASS( \
                 self.raw_videos_dir, config.INPUT_PATH)
-        file_transfer.get(raw_video)
+        file_transfer.get([raw_video])
         file_transfer.close()
 
         print '** Transfering in finished.'
@@ -70,24 +70,15 @@ class CIWorker(threading.Thread):
         """
 
         transcoder = config.TRANSCODER_CLASS( \
-                input_file = video_name, \
+                input_file = os.path.join(self.raw_videos_dir, input_video), \
                 name = video_name, prog_bin = config.TRANSCODER_BIN)
         transcoder.dest_path = self.transcoded_videos_dir
         
         # Transcode the raw video in each requested format.
         # TODO report partial errors
         for transcode_config in transcode_configs:
-            transcode_config['output_file'] = transcoder.transcode( \
-                   container = transcode_config['container'], \
-                   a_codec = transcode_config['a_codec'], \
-                   a_bitrate = transcode_config['a_bitrate'], \
-                   a_samplingrate = transcode_config['a_samplingrate'], \
-                   a_channels = transcode_config['a_channels'], \
-                   v_codec = transcode_config['v_codec'], \
-                   v_bitrate = transcode_config['v_bitrate'], \
-                   v_framerate = transcode_config['v_framerate'], \
-                   v_resolution = transcode_config['v_resolution'], \
-                   v_dar = transcode_config['dar'])
+            transcode_config['output_file'] = \
+                    transcoder.transcode(**transcode_config)
 
         print '** Transcoding finished.'
 
@@ -104,7 +95,8 @@ class CIWorker(threading.Thread):
 
         # TODO report partial errors
         thumb_extractor = config.THUMB_EXTRACTOR_CLASS( \
-                input_file = input_video, name = video_name, \
+                input_file = os.path.join(self.raw_videos_dir, input_video), \
+                name = video_name, \
                 prog_bin = config.THUMB_EXTRACTOR_BIN)
         thumb_extractor.dest_path = self.thumbs_dir
         if thumbs == 'random':
@@ -179,35 +171,35 @@ class CIWorker(threading.Thread):
                 self.extract_thumbs(job['raw_video'], job['name'], \
                         job['thumbs'])
 
-            # * CREATE TORRENTS AND START SEEDING OF TRANSCODED VIDEOS
-            self.seed(job['transcode_configs'])
-
-            # Torrent files.
-            files = [f for f in os.listdir(self.torrents_dir) \
-                    if os.path.isfile(os.path.join( \
-                            self.torrents_dir, f))]
-            torrent_files = fnmatch.filter(files, name + "_*")
-
-            # Thumbnail images files.
-            files = [f for f in os.listdir(self.thumbs_dir) \
-                    if os.path.isfile(os.path.join( \
-                            self.thumbs_dir, f))]
-            thumb_files = fnmatch.filter(files, name + "_*")
-                
-            # Raw video files.
-            raw_files = [f for f in os.listdir(self.raw_videos_dir) \
-                    if os.path.isfile(os.path.join( \
-                            self.raw_videos_dir, f))]
-
-            # * TRANSFER TORRENTS AND THUMBNAIL IMAGES OUT
-            self.transfer_out(torrent_files, self.torrents_dir, \
-                    config.OUTPUT_TORRENTS_PATH)
-            self.transfer_out(thumb_files, self.thumbs_dir, \
-                    config.OUTPUT_THUMBS_PATH)
-            
-            # * CLEANUP RAW VIDEOS AND THUMBNAIL IMAGES
-            self.remove_files(raw_files, self.raw_videos_dir)
-            self.remove_files(thumb_files, self.thumbs_dir)
+#            # * CREATE TORRENTS AND START SEEDING OF TRANSCODED VIDEOS
+#            self.seed(job['transcode_configs'])
+#
+#            # Torrent files.
+#            files = [f for f in os.listdir(self.torrents_dir) \
+#                    if os.path.isfile(os.path.join( \
+#                            self.torrents_dir, f))]
+#            torrent_files = fnmatch.filter(files, name + "_*")
+#
+#            # Thumbnail images files.
+#            files = [f for f in os.listdir(self.thumbs_dir) \
+#                    if os.path.isfile(os.path.join( \
+#                            self.thumbs_dir, f))]
+#            thumb_files = fnmatch.filter(files, name + "_*")
+#                
+#            # Raw video files.
+#            raw_files = [f for f in os.listdir(self.raw_videos_dir) \
+#                    if os.path.isfile(os.path.join( \
+#                            self.raw_videos_dir, f))]
+#
+#            # * TRANSFER TORRENTS AND THUMBNAIL IMAGES OUT
+#            self.transfer_out(torrent_files, self.torrents_dir, \
+#                    config.OUTPUT_TORRENTS_PATH)
+#            self.transfer_out(thumb_files, self.thumbs_dir, \
+#                    config.OUTPUT_THUMBS_PATH)
+#            
+#            # * CLEANUP RAW VIDEOS AND THUMBNAIL IMAGES
+#            self.remove_files(raw_files, self.raw_videos_dir)
+#            self.remove_files(thumb_files, self.thumbs_dir)
 
             # * JOB FINISHED
             queue.task_done()
@@ -247,7 +239,7 @@ if __name__ == '__main__':
             'v_bitrate': v_bitrate,
             'v_resolution': v_resolution
         }
-        thumbs = 'random'
+        thumbs = 4
 
         job = {
             'raw_video': raw_video,
@@ -255,7 +247,7 @@ if __name__ == '__main__':
             'transcode_configs': [transcode_config],
             'thumbs': thumbs
         }
-            
+        
         queue.put(job)
 
     queue.join()

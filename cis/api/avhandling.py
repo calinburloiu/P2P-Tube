@@ -96,7 +96,7 @@ class FFmpegTranscoder(base.BaseTranscoder):
 
         log.close()
 
-        return output_file
+        return self.output_file
 
 
 class FFmpegThumbExtractor(base.BaseThumbExtractor):
@@ -144,16 +144,18 @@ class FFmpegThumbExtractor(base.BaseThumbExtractor):
                     'FFmpeg created an empty file.')
 
     def get_video_duration(self):
-        return FFmpegAVInfo.get_video_duration(self.input_file)
+        return FFprobeAVInfo.get_video_duration(self.input_file)
 
 
-class FFmpegAVInfo(base.BaseAVInfo):
+class FFprobeAVInfo(base.BaseAVInfo):
     
     prog_bin = "ffprobe"
 
+    log_file = 'log/FFprobeAVInfo.log'
+
     @staticmethod
     def get_video_duration(input_file, formated=False):
-        args = FFmpegAVInfo.prog_bin + ' -show_format "' \
+        args = FFprobeAVInfo.prog_bin + ' -show_format "' \
                 + input_file + '"'
 
         # READ handler for process's output.
@@ -161,11 +163,16 @@ class FFmpegAVInfo(base.BaseAVInfo):
                 stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'))
         pipe = p.stdout
 
+        # WRITE handler for logging.
+        log = open(FFprobeAVInfo.log_file, 'w')
+        log.write(args + '\n')
+
         # Parse ffprobe's output.
         while True:
             line = pipe.readline()
             if len(line) == 0:
                 break
+            log.write(line)
             
             # Search for the line which contains duration information.
             m = re.match(r"duration=([\d\.]+)", line)

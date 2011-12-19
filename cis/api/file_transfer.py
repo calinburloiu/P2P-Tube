@@ -30,43 +30,45 @@ class FTPFileTransferer(base.BaseFileTransferer):
         self.ftp.set_pasv(True)
 
     def get(self, files):
-        for crt_file in files:
-            crt_file = os.path.join(self.local_path, crt_file)
+        for crt_fn in files:
+            local_fn = os.path.join(self.local_path, crt_fn)
+            remote_fn = os.path.join(self.remote_path, crt_fn)
             try:
-                file_local = open(crt_file, 'wb')
+                file_local = open(local_fn, 'wb')
             except IOError as e:
                 raise api_exceptions.FileTransferException( \
                         "Could not open local file '%s' for writing: %s" \
-                        % (crt_file, repr(e)))
+                        % (local_fn, repr(e)))
 
             try:
                 self.ftp.cwd(self.remote_path)
-                self.ftp.retrbinary('RETR %s' % crt_file, file_local.write)
+                self.ftp.retrbinary('RETR %s' % crt_fn, file_local.write)
                 file_local.close()
             except ftplib.error_perm as e:
                 raise api_exceptions.FileTransferException( \
                         "Could not get file '%s' from Web Server: %s" \
-                        % (crt_file, repr(e)))
+                        % (remote_fn, repr(e)))
 
     def put(self, files):
-        for crt_file in files:
-            crt_file = os.path.join(self.local_path, crt_file)
+        for crt_fn in files:
+            local_fn = os.path.join(self.local_path, crt_fn)
+            remote_fn = os.path.join(self.local_path, crt_fn)
 
             try:
-                file_local = open(crt_file, 'rb')
+                file_local = open(local_fn, 'rb')
             except IOError as e:
                 raise api_exceptions.FileTransferException( \
                         "Could not open local file '%s' for reading: %s" \
-                        % (crt_file, repr(e)))
+                        % (local_fn, repr(e)))
                 
             try:
                 self.ftp.cwd(self.remote_path)
-                self.ftp.storbinary('STOR %s' % crt_file, file_local)
+                self.ftp.storbinary('STOR %s' % crt_fn, file_local)
                 file_local.close()
             except ftplib.error_perm as e:
                 raise api_exceptions.FileTransferException( \
                         "Could not get file '%s' from Web Server: %s" \
-                        % (crt_file, repr(e)))
+                        % (remote_fn, repr(e)))
 
     def close(self):
         if self.ftp is not None:
