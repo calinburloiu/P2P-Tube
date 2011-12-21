@@ -2,6 +2,7 @@
 
 import sys
 import os
+import fnmatch
 import shutil
 import time
 import threading
@@ -113,7 +114,7 @@ class CIWorker(threading.Thread):
         @param transcode_configs a list of dictionaries with format settings
         """
 
-        for transcode_config in transcode_cofigs:
+        for transcode_config in transcode_configs:
             # * CREATE TORRENTS FOR EACH TRANSCODED VIDEO
             # Create torrent file.
             bt.create_torrent(transcode_config['output_file'])
@@ -123,10 +124,13 @@ class CIWorker(threading.Thread):
             shutil.move(transcode_config['output_file'] + '.tstream', \
                     self.torrents_dir)
 
+            output_file = transcode_config['output_file'] + '.tstream'
+            output_file = output_file[(output_file.rindex('/') + 1):]
+
             # * SEED TORRENTS
             bit_torrent.start_download( \
-                    transcode_config['output_file'] + '.tstream',
-                    self_transcoded_videos_dir)
+                    os.path.join(self.torrents_dir, output_file),
+                    self.transcoded_videos_dir)
 
         print '** Creating torrents and seeding finished.'
 
@@ -145,7 +149,7 @@ class CIWorker(threading.Thread):
 
         print '** Creating torrents and seeding finished.'
 
-    def remove_file(self, files, path):
+    def remove_files(self, files, path):
         """
         Deletes files from a specified path.
         """
@@ -171,35 +175,35 @@ class CIWorker(threading.Thread):
                 self.extract_thumbs(job['raw_video'], job['name'], \
                         job['thumbs'])
 
-#            # * CREATE TORRENTS AND START SEEDING OF TRANSCODED VIDEOS
-#            self.seed(job['transcode_configs'])
-#
-#            # Torrent files.
-#            files = [f for f in os.listdir(self.torrents_dir) \
-#                    if os.path.isfile(os.path.join( \
-#                            self.torrents_dir, f))]
-#            torrent_files = fnmatch.filter(files, name + "_*")
-#
-#            # Thumbnail images files.
-#            files = [f for f in os.listdir(self.thumbs_dir) \
-#                    if os.path.isfile(os.path.join( \
-#                            self.thumbs_dir, f))]
-#            thumb_files = fnmatch.filter(files, name + "_*")
-#                
-#            # Raw video files.
-#            raw_files = [f for f in os.listdir(self.raw_videos_dir) \
-#                    if os.path.isfile(os.path.join( \
-#                            self.raw_videos_dir, f))]
-#
-#            # * TRANSFER TORRENTS AND THUMBNAIL IMAGES OUT
-#            self.transfer_out(torrent_files, self.torrents_dir, \
-#                    config.OUTPUT_TORRENTS_PATH)
-#            self.transfer_out(thumb_files, self.thumbs_dir, \
-#                    config.OUTPUT_THUMBS_PATH)
-#            
-#            # * CLEANUP RAW VIDEOS AND THUMBNAIL IMAGES
-#            self.remove_files(raw_files, self.raw_videos_dir)
-#            self.remove_files(thumb_files, self.thumbs_dir)
+            # * CREATE TORRENTS AND START SEEDING OF TRANSCODED VIDEOS
+            self.seed(job['transcode_configs'])
+
+            # Torrent files.
+            files = [f for f in os.listdir(self.torrents_dir) \
+                    if os.path.isfile(os.path.join( \
+                            self.torrents_dir, f))]
+            torrent_files = fnmatch.filter(files, name + "_*")
+
+            # Thumbnail images files.
+            files = [f for f in os.listdir(self.thumbs_dir) \
+                    if os.path.isfile(os.path.join( \
+                            self.thumbs_dir, f))]
+            thumb_files = fnmatch.filter(files, name + "_*")
+                
+            # Raw video files.
+            raw_files = [f for f in os.listdir(self.raw_videos_dir) \
+                    if os.path.isfile(os.path.join( \
+                            self.raw_videos_dir, f))]
+
+            # * TRANSFER TORRENTS AND THUMBNAIL IMAGES OUT
+            self.transfer_out(torrent_files, self.torrents_dir, \
+                    config.OUTPUT_TORRENTS_PATH)
+            self.transfer_out(thumb_files, self.thumbs_dir, \
+                    config.OUTPUT_THUMBS_PATH)
+            
+            # * CLEANUP RAW VIDEOS AND THUMBNAIL IMAGES
+            self.remove_files(raw_files, self.raw_videos_dir)
+            self.remove_files(thumb_files, self.thumbs_dir)
 
             # * JOB FINISHED
             queue.task_done()

@@ -30,6 +30,14 @@ class FTPFileTransferer(base.BaseFileTransferer):
         self.ftp.set_pasv(True)
 
     def get(self, files):
+        try:
+            self.ftp.cwd(self.remote_path)
+        except ftplib.error_perm as e:
+            raise api_exceptions.FileTransferException( \
+                    "Could not change remote directory '%s': %s" \
+                    % (self.remote_path, repr(e)))
+
+
         for crt_fn in files:
             local_fn = os.path.join(self.local_path, crt_fn)
             remote_fn = os.path.join(self.remote_path, crt_fn)
@@ -41,7 +49,6 @@ class FTPFileTransferer(base.BaseFileTransferer):
                         % (local_fn, repr(e)))
 
             try:
-                self.ftp.cwd(self.remote_path)
                 self.ftp.retrbinary('RETR %s' % crt_fn, file_local.write)
                 file_local.close()
             except ftplib.error_perm as e:
@@ -50,9 +57,15 @@ class FTPFileTransferer(base.BaseFileTransferer):
                         % (remote_fn, repr(e)))
 
     def put(self, files):
+        try:
+            self.ftp.cwd(self.remote_path)
+        except ftplib.error_perm as e:
+            raise api_exceptions.FileTransferException( \
+                    "Could not change remote directory '%s': %s" \
+                    % (self.remote_path, repr(e)))
+
         for crt_fn in files:
             local_fn = os.path.join(self.local_path, crt_fn)
-            remote_fn = os.path.join(self.local_path, crt_fn)
 
             try:
                 file_local = open(local_fn, 'rb')
@@ -62,13 +75,14 @@ class FTPFileTransferer(base.BaseFileTransferer):
                         % (local_fn, repr(e)))
                 
             try:
-                self.ftp.cwd(self.remote_path)
+                print('remote_path=' + self.remote_path \
+                        + '; crt_fn=' + crt_fn)
                 self.ftp.storbinary('STOR %s' % crt_fn, file_local)
                 file_local.close()
             except ftplib.error_perm as e:
                 raise api_exceptions.FileTransferException( \
-                        "Could not get file '%s' from Web Server: %s" \
-                        % (remote_fn, repr(e)))
+                        "Could not put file '%s' to Web Server: %s" \
+                        % (local_fn, repr(e)))
 
     def close(self):
         if self.ftp is not None:
