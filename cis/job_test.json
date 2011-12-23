@@ -1,0 +1,16 @@
+{
+    "raw_video": "test.ogv",
+    "name": "test",
+    "weight": 3,
+    "transcode_configs": [
+        {
+            "container": "webm",
+            "a_codec": "vorbis",
+            "a_bitrate": "128k",
+            "v_codec": "vp8",
+            "v_bitrate": "480k",
+            "v_resolution": "640x480"
+        }
+    ],
+    "thumbs": 4
+}

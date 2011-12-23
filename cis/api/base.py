@@ -85,10 +85,10 @@ class BaseTranscoder:
         if a_codec is None and v_codec is None:
             raise ValueError('No audio or video codec specified.')
 
-        if a_codec is not None and type(a_codec) is not str:
+        if a_codec is not None and type(a_codec) not in [str, unicode]:
             raise TypeError('Audio codec must be string.')
 
-        if v_codec is not None and type(v_codec) is not str:
+        if v_codec is not None and type(v_codec) not in [str, unicode]:
             raise TypeError('Video codec must be string.')
 
         if a_samplingrate is not None and type(a_samplingrate) is not int:
