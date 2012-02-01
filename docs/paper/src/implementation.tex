@@ -1,0 +1,50 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+%
+% Owner: Călin-Andrei Burloiu
+%
+\subsection{Programming Languages, Frameworks}
+\label{subsec:langs-and-frameworks}
+
+P2P-Tube server side application is implemented in PHP using CodeIgniter \cite{code-igniter} open-source framework. This increases opportunity to integrate this project in an open-source community, because both the programming language and the framework are very popular.
+
+On the client side, besides HTML and CSS, a very popular JavaScript framework is used, that is jQuery \cite{jquery}. As mentioned before at least one of the NextShare plugins need to be installed in order to play videos. SwarmPlayer requires HTML5 capabilities for video tag support and compatibility with Ogg video container and Vorbis + Theora codecs. A jQueryUI \cite{jqueryui} widget was developed which is used to control video playing with features like play, pause and stop buttons, time progress slider, volume control etc..
+
+Content Ingestion Server is written in Python, mainly because of the need of using threads. A master thread takes the role of a producer by receiving requests from clients and submitting them to a job queue. The consumer is a worker thread which gets jobs from the queue and executes them, using a first-come first-server servicing policy. If the queue is empty the worker waits without blocking until a new job is available. Client requests are received by the master with the aid of Web.py, a lightweight web framework \cite{webpy}.
+
+\subsection{Interoperability}
+\label{subsec:interoperability}
+
+The web server needs to communicate with Content Ingestion Server, whether or not through a CIS Load Balancer (CIS-LB), by sending a content ingestion request. By using a web service for this communication the overhead is reduced. Sending HTTP requests from PHP web server application is much more easy then creating a custom new protocol. The same applies at the other communication point, the Python server, where requests are received by Web.py framework, which makes HTTP methods processing extremely easy.
+
+If another framework decides to use our solution based on CIS, interoperability is simplified by using web service interfaces, no matter what programming language is used for web server application.
+
+\subsection{The Choice for the Web Service}
+\label{subsec:securing-cis}
+
+Our choice between a SOAP web service and a simple RESTful web service was based on our needs. We wanted to make a server with a low communication overhead and SOAP has the disadvantage of consuming more computational resources when processing requests. Our messages that need to be passed through different services have a simple structure. 
+
+The \textit{get load request} does not have any parameters, so a simple HTTP GET request is sufficient and any extra data transmitted as XML with SOAP is redundant.
+
+\textit{Content ingestion request} is a message with a greater complexity. The name of the uploaded file located on the web server needs to be transmitted, along with video formats information such as containers, codecs used, resolutions, frame rates, aspect ratios, audio sampling rates and bit rates. All these information would fit well as parameters in a SOAP message. However encoding then in a JSON seemed to be a much simpler solution. Both PHP and Python offer functions that convert their primitive types and data structures, like lists and dictionaries, into JSON strings. XML messages have a greater verbosity comparing to JSON messages. Features like XML tag attributes are not required for our application.
+
+We expect web servers and their CIS Load Balancers to know CIS peers in advance. So there is no need for discovery services that could provide contact information for new CIS peers. This would reduce administrative control and would raise security concerns like discovering malicious CIS peers. So there is no need for service discovery features like UDDI from SOAP ecosystem.
+
+Services functionality does not need to be described because it is expected to be known in advance by the client application, so SOAP's WSDL feature is not needed.
+
+The simplicity of our web services and our need for a low communication footprint suggest us to use a RESTful web service with JSON encoded information when the POST method is needed. SOAP extra features like WSDL and UDDI are not required for our application, giving us another reason to exclude it as a candidate.
+
+\subsection{Securing Content Ingestion Server}
+\label{subsec:securing-cis}
+
+As pointed in the previous section, we require a low communication overhead. In Section \ref{subsec:ws-sec-perf} we have shown that WS-Security needs more processing time for message parsing. But is this worth it?
+
+WS-Security offers end-to-end security, but P2P-Tube web servers and CIS peers are designed to be tightly coupled, usually being in the same data center or under the authority of the same organization. All these components communicate directly without proxies. So a simple point-to-point communication over HTTPS could be enough for our application.
+
+The additional overhead of WS-Security against TLS/SSL solution is a price to pay for the advantage of an end-to-end communication. However, our solution is not designed to use proxies. So HTTPS with TLS or SSL is enough for our application and is much more easy to implement. Usually any library that supports HTTP also supports HTTPS. On the server side two additional informations need to be passed: server's certificate and its private key.
+
+Because CIS communication with a CIS-LB or with a web server can be encrypted, authentication information can be added into messages when using the HTTP POST methods. CIS requires an user name and a password for content ingestion requests.
+
+If CIS, CIS-LB and web server peers are located in the same data center which is secured and isolated from the exterior, secure communication between them might not be required. Taking into account the fact that HTTPS doubles communication overhead, the system administrator must think twice before securing services' communication.
+
+File transfer between web server and CIS is made through a pluggable interface. Other protocols like FTP \cite{ftp}, scp \cite{scp} and rsync \cite{rsync} can be used. We currently implemented an FTP interface, where the control channel is encrypted using TLS. Data channel does not require encryption if the files are not secret. Securing this channel would substantially increase resource usage. We are planning to implement a rsync file transfer interface too. This protocol is secured by default because is built over SSH. It also has the advantage of reducing the amount of data sent over the network by transferring only the differences between files. 
+
