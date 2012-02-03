@@ -1,22 +1,41 @@
-% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
-%
-% Owner: Călin-Andrei Burloiu
-%
+One of the basic design principles of our platform was to publish it as open-source encouraging community contributions. To facilitate this we have chosen popular programming languages, frameworks and technologies in order to better attract open-source communities around our platform. These decisions along with implementation details are given in this section. Information found here accompanied with comments from the source code should hopefully provide enough information to a new contributor to this project.
+
+Our implementation was designed to work on \textbf{GNU/Linux} distributions, so our back end dependencies, such as FFmpeg, has been chosen based on this. However we tried as much as possible to choose them such that they also run on other operating systems, such as Windows. Thus, porting P2P-Tube for them should be easy.
+
+\subsection{Web Application Front End}
+\label{subsec:front-end}
+
+The front end of P2P-Tube provides an interface with the users of the platform. Today more and more applications are migrating from a classical desktop interface to a web interface. For instance, applications like Microsoft Office started to appear on the cloud, providing a web interface; one popular example is Google Docs. Besides this new trend, Next-Share content delivery platform was successfully implemented in browsers by P2P-Next. So implementing P2P-Tube as a web platform came as a natural choice.
+
+Because almost any hosting provider offers a standard LAMP stack, we decided to cope we such a configuration. LAMP stands for Linux, Apache, MySQL, PHP, the technologies which is based on. We tested P2P-Tube on an Apache web server, but it should work well on others.
+
+P2P-Tube server side application is implemented in \textbf{PHP} which is one of the most popular programming languages for this purpose. To facilitate development we decided to use \textbf{CodeIgniter} \cite{code-igniter} open-source framework. Thanks to this framework the platform uses a \textit{MVC (Model-View-Controller)} design pattern, which separates the user interface part (View), from the data stored (Model) under the rule of the Controller.
+
+Our implementation uses a \textbf{MySQL} database, but CodeIgniter abstracts the interface with the database. So porting our platform for a different SQL technology such as PostgreSQL should be easy.
+
+As a web application, on the client side P2P-Tube uses HTML, CSS and JavaScript. As stated before SwarmPlayer only works with browsers that support HTML5. We decided to use jQuery \cite{jquery} as a JavaScript framework to ease development on the client side programming. We developed a jQueryUI \cite{jqueryui} widget which is used to control video playing with features like play, pause and stop buttons, time progress slider, volume control etc.. This widget is detailed in Subsection \ref{subsec:video-widget}.
+
+\subsection{Video Widget}
+\label{subsec:video-widget}
+
+TODO
+
+\subsection{Content Ingestion Back End}
+\label{subsec:back-end}
+
+TODO
+
+\subsection{Front End and Back End Communication}
+\label{subsec:communication}
+
+The web server needs to communicate with Content Ingestion Server, whether or not through a CIS Load Balancer (CIS-LB), by sending a content ingestion request. By using a web service for this communication the implementation overhead is reduced. Sending HTTP requests from the PHP web server application is much more easy then creating a custom new protocol. The same applies at the other communication point, the Python server, where requests are received by Web.py framework, which makes HTTP methods processing extremely easy.
+
+If another framework decides to use our solution based on CIS machines, interoperability is simplified by using web service interfaces, no matter what programming language is used for web server application.
+
 \subsection{Programming Languages, Frameworks}
 \label{subsec:langs-and-frameworks}
 
-P2P-Tube server side application is implemented in PHP using CodeIgniter \cite{code-igniter} open-source framework. This increases opportunity to integrate this project in an open-source community, because both the programming language and the framework are very popular.
-
-On the client side, besides HTML and CSS, a very popular JavaScript framework is used, that is jQuery \cite{jquery}. As mentioned before at least one of the NextShare plugins need to be installed in order to play videos. SwarmPlayer requires HTML5 capabilities for video tag support and compatibility with Ogg video container and Vorbis + Theora codecs. A jQueryUI \cite{jqueryui} widget was developed which is used to control video playing with features like play, pause and stop buttons, time progress slider, volume control etc..
-
 Content Ingestion Server is written in Python, mainly because of the need of using threads. A master thread takes the role of a producer by receiving requests from clients and submitting them to a job queue. The consumer is a worker thread which gets jobs from the queue and executes them, using a first-come first-server servicing policy. If the queue is empty the worker waits without blocking until a new job is available. Client requests are received by the master with the aid of Web.py, a lightweight web framework \cite{webpy}.
-
-\subsection{Interoperability}
-\label{subsec:interoperability}
-
-The web server needs to communicate with Content Ingestion Server, whether or not through a CIS Load Balancer (CIS-LB), by sending a content ingestion request. By using a web service for this communication the overhead is reduced. Sending HTTP requests from PHP web server application is much more easy then creating a custom new protocol. The same applies at the other communication point, the Python server, where requests are received by Web.py framework, which makes HTTP methods processing extremely easy.
-
-If another framework decides to use our solution based on CIS, interoperability is simplified by using web service interfaces, no matter what programming language is used for web server application.
 
 \subsection{The Choice for the Web Service}
 \label{subsec:securing-cis}
