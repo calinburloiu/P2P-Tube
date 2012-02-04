@@ -1,0 +1,82 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+\documentclass[conference]{IEEEtran}
+
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+%\usepackage{hyperref}	  % use \url{http://$URL} or \href{http://$URL}{Name}
+\usepackage{underscore}	  % underscores need not be escaped
+\usepackage{subfigure}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{amsmath, amsthm, amssymb}
+
+% Support for including graphics
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+
+\usepackage[outerbars,color]{changebar}
+\cbcolor{red}
+
+\let\Oldcbstart\cbstart
+\let\Oldcbend\cbend
+%\renewcommand{\cbstart}{\color{red}\Oldcbstart}
+%\renewcommand{\cbend}{\Oldcbend\color{black}}
+\renewcommand{\cbstart}{}
+\renewcommand{\cbend}{}
+
+\begin{document}
+
+\title{P2P-Tube: A Video Sharing Web Platform Based on Next-Share Technology}
+
+\author{\IEEEauthorblockN{Călin-Andrei Burloiu}
+\IEEEauthorblockA{Automatic Control and Computers Faculty\\
+University Politehnica of Bucharest\\
+Emails: calin.burloiu@gmail.com}}
+
+\maketitle
+
+\begin{abstract}
+\input{src/abstract}
+\end{abstract}
+
+%\textbf{\textit{Keywords -- ala, bala, portocala}}
+
+\begin{IEEEkeywords}
+Video-On-Demand, NextShare, P2P-Next
+\end{IEEEkeywords}
+
+%\IEEEpeerreviewmaketitle
+
+\section{Introduction}
+\label{sec:introduction}
+\input{src/introduction}
+
+\section{P2P-Next's Next-Share Technology}
+\label{sec:next-share}
+\input{src/next-share}
+
+\section{Design Overview}
+\label{sec:design}
+\input{src/design}
+
+\section{Implementation}
+\label{sec:implementation}
+\input{src/implementation}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{src/conclusion}
+
+\section*{Acknowledgment}
+\label{sec:acknowledgment}
+
+Special thanks go to the P2P-Next~\cite{p2p-next} team who is working
+enthusiastically to deliver the next generation peer-to-peer content delivery
+platform. Their dedication, professionalism and vision are a constant factor
+of motivation and focus for our work.
+
+\bibliographystyle{abbrv}
+\bibliography{p2p-tube}
+
+\end{document}

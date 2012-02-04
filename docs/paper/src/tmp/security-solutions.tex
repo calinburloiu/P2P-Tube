@@ -1,0 +1,75 @@
+Real-world business solutions need more than standard Web service framework components that were previously mentioned. The need for security, reliable messaging or transactions have enforced the implementation of several extensions to the Web service architecture (WSA). There are several specifications that are in varying degrees of maturity and are maintained or supported by various standards bodies and entities. For example the Open Grid Service Architecture (OGSA) defines extensions to the WSA to support transient, stateful and lightweight service instances needed in grid computing environments~\cite{ogf-ws-ext}.
+
+Security in web services can be implemented in two ways:
+
+\begin{itemize}
+ \item By using additional Web service extensions specifically designed for ensuring security, like WS-Security, WS-SecureConversation, WS-Trust and others. Their role is to assure end-to-end protection between the service provider and service consumer by extending the SOAP offering encryption and message signing.
+ \item By encrypting comunication at the transport layer using standars such as TLS or SSL. For example, HTTPS can be used for the message exchange instead of HTTP.
+\end{itemize}
+
+\subsection{Web Service Security Extensions}
+\label{subsec:ws-sec-ext}
+
+We saw earlier that the SOAP protocol allows for multiple transport bindings, such as HTTP or SMTP. Taking this flexibility in account, a security  sollution that is independent on the protocol that is used in the transport layer is to add a SOAP-level protection mechanism. The most popular specification for implementing this feature is WS-Security, which incorporates security features in the header of each SOAP message at the application layer, in order to provide end-to-end protection between the service provider (server) and the service consumer (client).
+
+WS-Security does not provide a complete security solution for Web services. This specification is a building block that can be used in conjunction with other Web service extensions and higher-level application-specific protocols, to accommodate a wide variety of security models and security technologies. WS-Security covers three main security measures:
+\begin{itemize}
+ \item Signing SOAP messages to assure integrity. This is usually done using the XML Encryption~\cite{w3c-ws-enc} specification.
+ \item Encrypting SOAP messages to assure confidentiality. The most popular solution in this case is XML Signature~\cite{w3c-ws-sign}.
+ \item Attaching security tokens to verify the sender's identity. The specification is open to various security token models like X.509 certificates, Kerberos tickets, SAML assertions, userID-password credentials or custom-defined tokens.
+\end{itemize}
+
+All of these specifications work well with WS-Security, but add a significant overhead in comunication, especialy if there are frequent message exchanges. A performance improovement can be obtained, while preserving the end-to-end security feature, by using the WS-SecureConversation extension. WS-SecureConversation is a Web Services specification, created by IBM, that works in conjunction with WS-Security, WS-Trust and WS-Policy to allow the creation and sharing of security contexts. Extending the use cases of WS-Security, the purpose of WS-SecureConversation is to establish security contexts for multiple SOAP message exchanges, reducing the overhead of key establishment~\cite{ibm-ws-sec-conv}. Results have shown that the addition of WS-SecureConversation significantly reduces the processing overhead and increases the rate of messages exchanged (Table I). But the performance boost comes with more dependencies and a higher complexity of the system, by introducing the new layer on top of WS-Security consisting of other WSA extensions like WS-Addressing and WS-Trust~\cite{wiki-ws-sec-conv}.
+
+\subsection{Transport Layer Security}
+\label{subsec:ws-sec-ext}
+
+Transport Layer Security (TLS) is the succesor of Secure Sockets Layer (SSL), and is a cryptographic protocol that provides communication security over the Internet~\cite{rfc-tls}. TLS and SSL encrypt the segments of network connections above the Transport Layer, using asymmetric cryptography for key exchange, symmetric encryption for privacy, and message authentication codes for message integrity~\cite{wiki-tls}.
+
+A prominent use of TLS is for securing traffic carried by HTTP, using HTTPS. HTTPS is a combination of HTTP with the SSL/TLS protocol, for ensuring encrypted communication and secure identification of the endpoints using public key certificates. It is mostly used in electronic commerce applications and for sensitive transactions in corporate information systems.
+
+In Web services security, the point-to-point confidentiality and data integrity can be assured through the use of TLS. The typical SOAP use case for message exchange between the service provider and service consumer can be done using HTTPS, instead of HTTP, and the same protection level is assured as with the case of WS-Security. Also, applying TLS can significantly reduce the overhead involved, by removing the need to encode keys and message signatures into the XML messages before sending.
+
+A challenge in using TLS would be if messages needed to go through an application-level proxy server. In this case the server would see the request coming from the proxy, not the client; this could be worked around by having the proxy have a copy of the client's key and certificate, or by having a signing certificate trusted by the server, with which it could generate a key/certificate pair matching those of the client. However, as the proxy is operating on the message, it does not ensure end-to-end security like WS-Security, but only ensures point-to-point security~\cite{wiki-ws-sec}.
+
+
+\subsection{Performance Evaluation}
+\label{subsec:ws-sec-perf}
+
+Like previously mentioned, WS-Security adds significant overhead to SOAP processing due to the increased size of the message on the wire. Also XML signing and cryptographic processing require faster CPUs, and generally consume more memory and bandwidth.
+The results of a benchmark published in 2006 by Francois Lascelles et al~\cite{ws-sec-perf} clearly show in Table I that applying TLS reduces complexity and improves performance, the rate of messages sent over HTTPS beeing 9 times higher than the one when WS-Security was used, and 4 times higher than with the case of WS-SecureConversation. 
+
+\begin{table}
+\label{table:ws-sec-perf}
+\caption{Peformance comparison of security sollutions for Web services}
+\centering
+    \begin{tabular}{|p{4cm}|c|c|}
+        \hline
+        \textbf{Security Mechanism}      & \textbf{Messages/sec} & \textbf{CPU Load} \\ \hline
+        WS-Security (X.509) XML Signature  \&  Encryption & 352                 & 99\%       \\ \hline
+        WS-SecureConversation XML Signature  \&  Encryption & 798                 & 98\%     \\ \hline
+        Transport Layer Security                         & 2,918               & 95\%       \\ \hline
+        None (message routing only)                      & 5,088               & 96\%       \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Despite of these experimental results, WS-Security remains as the de facto solution for ensuring end-to-end protection in any Web service use scenario, over every type of comunication channel (with or without the use of a proxy server). The P2P-Tube application uses direct communication between the client and the service provider, so the potentialy unsecure and difficult to implement scenario of using TLS when the messages were sent through a proxy (Section \ref{subsec:ws-sec-ext}) is not applicable in our case.
+Considering this, together with the better performance results of the transport layer security sollution, we conclude that using HTTPS is the best match for implementing secure request exchange in the P2P-Tube application.
+
+The added protection comes with a decrease in performance though, as presented in Table II. We have measured the average request and response time to a web service in both cases, using an insecure HTTP communication and using a secure one with HTTPS (SSL/TLS). The experiment used a RESTful web service called through a GET method which responses with an empty string. For each situation, secure and insecure, the service was called 1000 times. As it can be seen from Table II, the communication overhead roughly doubles when using a secure connection. 
+
+\begin{table}
+\label{table:ws-sec-perf-p2p}
+\caption{Performance evalution of transport methods in P2P-Tube}
+\centering
+    \begin{tabular}{|p{3cm}|c|c|}
+        \hline 
+        \textbf{Request Exchange Method for P2P-Tube} & \textbf{Average Request Time} & \textbf{Std. Deviation} \\ \hline
+        Standard, using the HTTP protocol at transport layer. & 0.032755571024 & 17.65\% \\ \hline
+        Secured, using the HTTPS (TLS/SSL) protocol at transport layer. & 0.074047656492 & 9.6\% \\
+        \hline
+    \end{tabular}
+\end{table}
+
+The performance decrease measured for the P2P-Tube application, in the case of using an unsecured transport channel over a secured one, is comparable with the one measured by Francois Lascelles et al~\cite{ws-sec-perf} (Table I).
