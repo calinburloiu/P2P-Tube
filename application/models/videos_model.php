@@ -471,7 +471,7 @@ class Videos_model extends CI_Model {
 		// Search word fragments.
 		// sfc = search fragment condition
 		$sfc = "( ";
-		// sfr = serach fragment relevation
+		// sfr = search fragment relevance
 		$sfr = "( ";
 		$sep = ' +-*<>()~"';
 		$fragm = strtok($search_query, $sep);
@@ -481,7 +481,7 @@ class Videos_model extends CI_Model {
 					OR description LIKE '%$fragm%'
 					OR tags LIKE '%$fragm%') OR ";
 			
-			// Frament relevations are half of boolean relevations such
+			// Frament relevances are half of boolean relevances such
 			// that they will appear at the end of the results.
 			$sfr .= "0.25 * (title LIKE '%$fragm%')
 					+ 0.1 * (description LIKE '%$fragm%')
