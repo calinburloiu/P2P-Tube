@@ -75,8 +75,6 @@ class FTPFileTransferer(base.BaseFileTransferer):
                         % (local_fn, repr(e)))
                 
             try:
-                print('remote_path=' + self.remote_path \
-                        + '; crt_fn=' + crt_fn)
                 self.ftp.storbinary('STOR %s' % crt_fn, file_local)
                 file_local.close()
             except ftplib.error_perm as e:

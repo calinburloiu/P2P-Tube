@@ -160,7 +160,7 @@ class FFprobeAVInfo(base.BaseAVInfo):
 
         # READ handler for process's output.
         p = subprocess.Popen(args, shell=True,
-                stdout=subprocess.PIPE, stderr=open(os.devnull, 'w'))
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         pipe = p.stdout
 
         # WRITE handler for logging.

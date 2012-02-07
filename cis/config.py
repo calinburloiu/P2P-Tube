@@ -7,17 +7,21 @@ from api import file_transfer
 
 # === FILE TRANSFER CONFIGURATIONS ===
 # Path from the Web Server where the raw input video file is stored.
-INPUT_PATH = 'Downloads'
+WS_UPLOAD_PATH = 'tmp/data/upload'
 # Path from the Web Server where the output torrent files will be stored.
-OUTPUT_TORRENTS_PATH = 'Downloads/tmp1'
+WS_TORRENTS_PATH = 'tmp/data/torrents'
 # Path from the Web Server where the output thumbnail image files will be
 # stored.
-OUTPUT_THUMBS_PATH = 'Downloads/tmp2'
+WS_THUMBS_PATH = 'tmp/data/thumbs'
+
+
+SECURITY = False
 
 
 # === BITTORRENT CONFIGURATIONS ===
 #BT_TRACKER = "http://p2p-next-10.grid.pub.ro:6969/announce"
-BT_TRACKER = "http://localhost:6969/announce"
+BT_TRACKER = 'http://localhost:6969/announce'
+CIS_TORRENTS_PATH = 'tmp/torrents'
 
 
 # === EXTERNAL PROGRAMS API CLASSES ===
