@@ -1,0 +1,13 @@
+Our video-sharing platform is far from being a complete one, so we are planning to extend it in the following directions:
+
+\begin{itemize}
+ \item \textbf{Administration Interface}: the platform must have an advanced administration interface, where features, the user interface and moderation can be easily managed via a web interface. With moderation system administrators can ban users, delete video etc.. The general purpose open-source platform Joomla for example provides an administrion interface.
+ \item \textbf{Video Support}: extending P2P-Tube to support other video technologies besides Next-Share. Normal HTML5 and VLC support and also Adobe Flash Player support without P2P streaming must be considered.
+ \item \textbf{Swift Support}: P2P-Tube was designed to work with Next-Share by using BitTorrent protocol. Another better protocol that can be used is \textit{swift} \cite{swift}, which is currently an IETF draft.
+ \item \textbf{Hierarchical Categories}: categories are currently defined as a list. In the future they should have a tree structure with categories, subcategories, subsubcategories etc..
+ \item \textbf{Better language support}: currently our platform supports multiple languages with the native support from CodeIgniter and with article controllers language support. A better support would allow users to change the language directly from a P2P-Tube site. Also automatic language detection should be considered by locating the IP address of the user or by inferring it from the URL. For example, http://www.example.com/fr/page should use French, http://example.ro/ should be in Romanian and http://it.example.org/page should be in Italian. The current language should be reflected in the currect URL as in the previous examples such that search engines can also detect it, providing SEO (Search Engine Optimization).
+ \item \textbf{Better Search Feature}: changing the current implementation of the search mechanism which is based on MySQL Full-Text with a more powerful one, such as one based on Apache Lucene or Apache Solr.
+ \item \textbf{Porting for Other Operating Systems}: P2P-Tube should be ported for Windows Server.
+ \item \textbf{Alternative Features for CIS}: file transfers should be supported with other more reliable protocols such as rsync and other tools for transcoding and thumbnail extraction should be considered.
+ \item \textbf{Adapting CIS for Other Video Technologies}: if the platform includes normal support for HTML5, VLC, Adobe Flash or other technologies, CIS must be modified. One good reason could be that other technologies do not need seeding and creating torrents.
+\end{itemize}

@@ -1,0 +1,23 @@
+% vim: set tw=78 sts=2 sw=2 ts=8 aw et ai:
+
+The World Wide Web Consortium (W3C) defines a Web service as a software system identified by an uniform resource identifier (URI), whose public interfaces and bindings are defined and described using the Extensible Markup Language format (XML). It is designed to support inter-operable machine-to-machine interactions over a network. Its definition can be discovered by other software systems which then interact with the Web service in a manner prescribed by this definition~\cite{w3c-wsa-reqs}.
+
+The Web service model of inter-machine communication can be used in different ways, such as for remote procedure call functionality (RPC Web services) by providing a function call interface in the Web service's description. Other use cases are in service-oriented applications, where the basic unit of communication is a message, rather than an operation like in RPC Web services. Another use case is representational state transfer (REST) applications, where the goal is on interacting with stateful resources through an interface of standard operations inspired from the HTTP protocol: GET, POST, PUT or DELETE~\cite{wiki-ws}.
+
+The overview of the classic Web service architecture has several components, like the transport layer used for message passing and request delivery (using protocols like HTTP, HTTPS, SMTP etc). Also there is a messaging layer, where the information is packed in XML-based files (like SOAP), and the description layer where the interface is defined (using Web Services Description Language~\cite{wiki-wsdl} - WSDL, UDDI~\cite{wiki-uddi} or other XML-based formats). The architecture can be extended with specifications for other types of features (reliable messaging, transactions etc)
+
+In most cases the communication between endpoints is done using Simple Object Access Protocol (SOAP) messages, typically conveyed using HTTP with an XML serialization, in conjunction with other Web-related standards~\cite{w3c-ws-gloss}. SOAP is the protocol that provides the definition of the XML-based information, which can be used for exchanging structured and typed information between peers in a decentralized, distributed environment~\cite{ws-intro}.A SOAP message is composed of two parts: 
+\begin{itemize}
+ \item The header, which holds directives or contextual information related to the processing of the message (optional)
+ \item The body, which contains the actual message data.
+\end{itemize}
+
+
+
+% \subsection{SOAP}
+% \label{subsec:soap}
+% 
+% 
+% 
+% \subsection{RESTful}
+% \label{subsec:restful}
