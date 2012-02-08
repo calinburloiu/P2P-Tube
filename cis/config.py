@@ -1,8 +1,16 @@
 #!/usr/bin/env python
 
+import logger
+
 # Make here all necessary imports required for API classes.
 from api import avhandling
 from api import file_transfer
+
+
+# === GENERAL CONFIGURATIONS ===
+LOG_LEVEL = logger.LOG_LEVEL_DEBUG
+SECURITY = False
+START_DOWNLOADS_INTERVAL = 24 * 3600.0 # Once a day
 
 
 # === FILE TRANSFER CONFIGURATIONS ===
@@ -15,13 +23,15 @@ WS_TORRENTS_PATH = 'tmp/data/torrents'
 WS_THUMBS_PATH = 'tmp/data/thumbs'
 
 
-SECURITY = False
-
-
 # === BITTORRENT CONFIGURATIONS ===
 #BT_TRACKER = "http://p2p-next-10.grid.pub.ro:6969/announce"
 BT_TRACKER = 'http://localhost:6969/announce'
-CIS_TORRENTS_PATH = 'tmp/torrents'
+
+
+RAW_VIDEOS_PATH = 'tmp/raw'
+MEDIA_PATH = 'tmp/media'
+THUMBS_PATH = 'tmp/thumbs'
+TORRENTS_PATH = 'tmp/torrents' # In a distributed file system for multi-CIS
 
 
 # === EXTERNAL PROGRAMS API CLASSES ===

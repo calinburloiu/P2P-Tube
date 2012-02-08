@@ -4,6 +4,7 @@ from BaseLib.Core.API import *
 import tempfile
 import random
 import config
+import logger
 
 def create_torrent(source):
     """
@@ -58,7 +59,7 @@ class BitTorrent:
 
         # setup and start download
         dscfg = DownloadStartupConfig()
-        dscfg.set_dest_dir(output_dir);
+        dscfg.set_dest_dir(output_dir)
 
         if torrent.startswith("http") or torrent.startswith(P2PURL_SCHEME):
             tdef = TorrentDef.load_from_url(torrent)
@@ -66,6 +67,16 @@ class BitTorrent:
             tdef = TorrentDef.load(torrent)
         if tdef.get_live():
             raise ValueError("CIS does not support live torrents")
-            
-        d = self.session.start_download(tdef, dscfg)
+        
+        new_download = True
+        try:
+            d = self.session.start_download(tdef, dscfg)
+        except DuplicateDownloadException:
+            new_download = False
         #d.set_state_callback(state_callback, getpeerlist=False)
+        
+        if new_download:
+            logger.log_msg('download of torrent "%s" started' % torrent)
+        #else:
+            #logger.log_msg('download of torrent "%s" already started' \
+                    #% torrent, logger.LOG_LEVEL_DEBUG)

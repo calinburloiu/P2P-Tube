@@ -14,6 +14,7 @@ from web.wsgiserver import CherryPyWSGIServer
 import config
 import bt
 import users
+import logger
 
 if config.SECURITY:
     CherryPyWSGIServer.ssl_certificate = "cacert.pem"
@@ -27,11 +28,6 @@ class CIWorker(threading.Thread):
 
     CIWorker shares a Queue with its master where jobs are submitted.
     """
-
-    raw_videos_dir = 'tmp/raw'
-    transcoded_videos_dir = 'tmp/media'
-    thumbs_dir = 'tmp/thumbs'
-    torrents_dir = config.CIS_TORRENTS_PATH
 
     def __init__(self):
         """
@@ -47,10 +43,10 @@ class CIWorker(threading.Thread):
         @param raw_video raw video file name
         """
         
-        print '** Transfering in...'
+        logger.log_msg('#%s: transfering in...' % self.job_id)
         
         file_transfer = config.FILE_TRANSFERER_CLASS( \
-                self.raw_videos_dir, config.WS_UPLOAD_PATH)
+                config.RAW_VIDEOS_PATH, config.WS_UPLOAD_PATH)
         file_transfer.get([raw_video])
         file_transfer.close()
 
@@ -63,12 +59,12 @@ class CIWorker(threading.Thread):
         @param transcode_configs a list of dictionaries with format settings
         """
 
-        print '** Transcoding...'
+        logger.log_msg('#%s: transcoding...' % self.job_id)
         
         transcoder = config.TRANSCODER_CLASS( \
-                input_file = os.path.join(self.raw_videos_dir, input_video), \
+                input_file = os.path.join(config.RAW_VIDEOS_PATH, input_video), \
                 name = video_name, prog_bin = config.TRANSCODER_BIN)
-        transcoder.dest_path = self.transcoded_videos_dir
+        transcoder.dest_path = config.MEDIA_PATH
         
         # Transcode the raw video in each requested format.
         # TODO report partial errors
@@ -87,14 +83,14 @@ class CIWorker(threading.Thread):
         thumbnail
         """
 
-        print '** Extracting image thumbnails...'
+        logger.log_msg('#%s: extracting image thumbnails...' % self.job_id)
         
         # TODO report partial errors
         thumb_extractor = config.THUMB_EXTRACTOR_CLASS( \
-                input_file = os.path.join(self.raw_videos_dir, input_video), \
+                input_file = os.path.join(config.RAW_VIDEOS_PATH, input_video), \
                 name = video_name, \
                 prog_bin = config.THUMB_EXTRACTOR_BIN)
-        thumb_extractor.dest_path = self.thumbs_dir
+        thumb_extractor.dest_path = config.THUMBS_PATH
         if thumbs == 'random':
             thumb_extractor.extract_random_thumb()
         elif type(thumbs) is int and thumbs > 0:
@@ -107,7 +103,8 @@ class CIWorker(threading.Thread):
         @param transcode_configs a list of dictionaries with format settings
         """
         
-        print '** Creating torrents and starting seeding...'
+        logger.log_msg('#%s: creating torrents and starting seeding...' \
+                % self.job_id)
 
         for transcode_config in transcode_configs:
             # * CREATE TORRENTS FOR EACH TRANSCODED VIDEO
@@ -117,16 +114,16 @@ class CIWorker(threading.Thread):
             # The torrent file is created in the same directory with the
             # source file. Move it to the torrents directory.
             shutil.move(transcode_config['output_file'] + '.tstream', \
-                    self.torrents_dir)
+                    config.TORRENTS_PATH)
 
             output_file = transcode_config['output_file'] + '.tstream'
             output_file = output_file[(output_file.rindex('/') + 1):]
 
             # * SEED TORRENTS
             Server.bit_torrent.start_download( \
-                    os.path.join(self.torrents_dir, output_file),
-                    self.transcoded_videos_dir)
-
+                    os.path.join(config.TORRENTS_PATH, output_file),
+                    config.MEDIA_PATH)
+                    
     def transfer_out(self, local_files, local_path, remote_path):
         """
         Transfers some local files to a remote path of the Web Server.
@@ -135,7 +132,7 @@ class CIWorker(threading.Thread):
         @param remote_path destination path on the Web Server
         """
         
-        print '** Transfering out...'
+        logger.log_msg('#%s: transfering out...' % self.job_id)
 
         file_transfer = config.FILE_TRANSFERER_CLASS( \
                 local_path, remote_path)
@@ -147,7 +144,7 @@ class CIWorker(threading.Thread):
         Deletes files from a specified path.
         """
         
-        print '** Cleaning up...'
+        logger.log_msg('#%s: cleaning up...' % self.job_id)
 
         for f in files:
             os.unlink(os.path.join(path, f))
@@ -155,6 +152,7 @@ class CIWorker(threading.Thread):
     def run(self):
         while True:
             job = Server.queue.get()
+            self.job_id = job['id']
 
             # * TRANSFER RAW VIDEO IN
             self.transfer_in(job['raw_video'])
@@ -172,26 +170,26 @@ class CIWorker(threading.Thread):
             self.seed(job['transcode_configs'])
 
             # Torrent files.
-            files = [f for f in os.listdir(self.torrents_dir) \
+            files = [f for f in os.listdir(config.TORRENTS_PATH) \
                     if os.path.isfile(os.path.join( \
-                            self.torrents_dir, f))]
+                            config.TORRENTS_PATH, f))]
             torrent_files = fnmatch.filter(files, job['name'] + "_*")
 
             # Thumbnail images files.
-            files = [f for f in os.listdir(self.thumbs_dir) \
+            files = [f for f in os.listdir(config.THUMBS_PATH) \
                     if os.path.isfile(os.path.join( \
-                            self.thumbs_dir, f))]
+                            config.THUMBS_PATH, f))]
             thumb_files = fnmatch.filter(files, job['name'] + "_*")
 
             # * TRANSFER TORRENTS AND THUMBNAIL IMAGES OUT
-            self.transfer_out(torrent_files, self.torrents_dir, \
+            self.transfer_out(torrent_files, config.TORRENTS_PATH, \
                     config.WS_TORRENTS_PATH)
-            self.transfer_out(thumb_files, self.thumbs_dir, \
+            self.transfer_out(thumb_files, config.THUMBS_PATH, \
                     config.WS_THUMBS_PATH)
             
             # * CLEANUP RAW VIDEOS AND THUMBNAIL IMAGES
-            self.remove_files([ job['raw_video'] ], self.raw_videos_dir)
-            self.remove_files(thumb_files, self.thumbs_dir)
+            self.remove_files([ job['raw_video'] ], config.RAW_VIDEOS_PATH)
+            self.remove_files(thumb_files, config.THUMBS_PATH)
 
             # * JOB FINISHED
             Server.queue.task_done()
@@ -245,6 +243,23 @@ class Server:
         else:
             web.badrequest()
             return ""
+    
+    @staticmethod
+    def start_downloads():
+        # All torrent files.
+        files = [f for f in os.listdir(config.TORRENTS_PATH) \
+                if os.path.isfile(os.path.join( \
+                        config.TORRENTS_PATH, f))]
+        torrent_files = fnmatch.filter(files, "*.tstream")
+
+        for torrent_file in torrent_files:
+            Server.bit_torrent.start_download( \
+                    torrent_file,
+                    config.MEDIA_PATH)
+        
+        t = threading.Timer(config.START_DOWNLOADS_INTERVAL, \
+                Server.start_downloads)
+        t.start()
 
     def authenticate(self, username, password):
         if not config.SECURITY:
@@ -262,6 +277,8 @@ if __name__ == '__main__':
     Server.bit_torrent = bt.BitTorrent()
     Server.queue = Queue()
     Server.load = 0
+    
+    Server.start_downloads()
     
     # Worker thread.
     ci_worker = CIWorker()
