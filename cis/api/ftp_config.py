@@ -2,7 +2,7 @@
 Configuration file for FTPFileTransferer class.
 """
 
-FTP_HOST = "localhost"
-FTP_USER = "calinburloiu"
-FTP_PASSWD = "Ps1st1h14_"
+FTP_HOST = "koala.cs.pub.ro"
+FTP_USER = "ftp-p2p-next"
+FTP_PASSWD = "student"
 FTP_ACCT = ""

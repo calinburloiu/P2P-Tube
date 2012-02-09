@@ -3,8 +3,8 @@
 import logger
 
 # Make here all necessary imports required for API classes.
-from api import avhandling
-from api import file_transfer
+from api import ffmpeg
+from api import ftp
 
 
 # === GENERAL CONFIGURATIONS ===
@@ -15,34 +15,35 @@ START_DOWNLOADS_INTERVAL = 24 * 3600.0 # Once a day
 
 # === FILE TRANSFER CONFIGURATIONS ===
 # Path from the Web Server where the raw input video file is stored.
-WS_UPLOAD_PATH = 'tmp/data/upload'
+WS_UPLOAD_PATH = 'devel/data/upload'
 # Path from the Web Server where the output torrent files will be stored.
-WS_TORRENTS_PATH = 'tmp/data/torrents'
+WS_TORRENTS_PATH = 'devel/data/torrents'
 # Path from the Web Server where the output thumbnail image files will be
 # stored.
-WS_THUMBS_PATH = 'tmp/data/thumbs'
+WS_THUMBS_PATH = 'devel/data/thumbs'
 
 
 # === BITTORRENT CONFIGURATIONS ===
 #BT_TRACKER = "http://p2p-next-10.grid.pub.ro:6969/announce"
-BT_TRACKER = 'http://localhost:6969/announce'
+BT_TRACKER = 'http://p2p-next-10.grid.pub.ro:6969/announce'
 
 
 RAW_VIDEOS_PATH = 'tmp/raw'
 MEDIA_PATH = 'tmp/media'
 THUMBS_PATH = 'tmp/thumbs'
-TORRENTS_PATH = 'tmp/torrents' # In a distributed file system for multi-CIS
+# In a distributed file system for multi-CIS.
+TORRENTS_PATH = '/home/p2p/export/p2p-tube/torrents'
 
 
 # === EXTERNAL PROGRAMS API CLASSES ===
 # API class for a prgram which retrives audio/video information, like duration.
-AVINFO_CLASS = avhandling.FFprobeAVInfo
+AVINFO_CLASS = ffmpeg.FFprobeAVInfo
 # API class for a prgram which transcodes an audio/video file.
-TRANSCODER_CLASS = avhandling.FFmpegTranscoder
+TRANSCODER_CLASS = ffmpeg.FFmpegTranscoder
 # API class for a prgram which extracts thumbnail images from a file.
-THUMB_EXTRACTOR_CLASS = avhandling.FFmpegThumbExtractor
+THUMB_EXTRACTOR_CLASS = ffmpeg.FFmpegThumbExtractor
 # API class for a prgram which transfers files between Web Server and CIS.
-FILE_TRANSFERER_CLASS = file_transfer.FTPFileTransferer
+FILE_TRANSFERER_CLASS = ftp.FTPFileTransferer
 
 
 # === EXTERNAL PROGRAMS BINARY FILES ===

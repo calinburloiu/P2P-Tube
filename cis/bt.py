@@ -49,9 +49,10 @@ class BitTorrent:
         
         self.session = Session(sscfg)
 
-    def start_download(self, torrent, output_dir='.'):
+    def start_torrent(self, torrent, output_dir='.'):
         """
         Download (leech or seed) a file via BitTorrent.
+        
         The code is adapted from Next-Share's 'BaseLib/Tools/cmdlinedl.py'.
 
         @param torrent .torrent file or URL
@@ -80,3 +81,23 @@ class BitTorrent:
         #else:
             #logger.log_msg('download of torrent "%s" already started' \
                     #% torrent, logger.LOG_LEVEL_DEBUG)
+    
+    def stop_torrent(self, torrent, remove_content=False):
+        """
+        Stop leeching or seeding a file via BitTorrent.
+        
+        !!! Only tested with torrents started with .tstream files. Not tested
+        for torrents started with URLs.
+        
+        @param torrent .torrent file or URL
+        @param remove_content removes downloaded file
+        """
+        
+        downloads = self.session.get_downloads()
+        
+        for dl in downloads:
+            tdef = dl.get_def()
+            if torrent.find(tdef.get_name()) == 0:
+                self.session.remove_download(dl, remove_content)
+                logger.log_msg('torrent "%s" stopped' % torrent)
+                break

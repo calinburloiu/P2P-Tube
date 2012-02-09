@@ -137,7 +137,8 @@ class BaseTranscoder:
         """ Translates container API name into external program identifier."""
 
         if not self.containers.has_key(name) or self.containers[name] is None:
-            raise api_exceptions.NotImplementedException("Container " + name)
+            raise api_exceptions.NotImplementedException("Container " + name \
+                    + "not implemented")
 
         return self.containers[name]
 
@@ -158,7 +159,8 @@ class BaseTranscoder:
         """ Translates audio codec API name into external program identifier."""
 
         if not self.a_codecs.has_key(name) or self.a_codecs[name] is None:
-            raise api_exceptions.NotImplementedException("Audio Codec " + name)
+            raise api_exceptions.NotImplementedException("Audio Codec " + name \
+                    + "not implemented")
 
         return self.a_codecs[name]
 
@@ -166,7 +168,8 @@ class BaseTranscoder:
         """ Translates video codec API name into external program identifier."""
 
         if not self.v_codecs.has_key(name) or self.v_codecs[name] is None:
-            raise api_exceptions.NotImplementedException("Video Codec " + name)
+            raise api_exceptions.NotImplementedException("Video Codec " + name \
+                    + "not implemented")
 
         return self.v_codecs[name]
 

@@ -6,5 +6,6 @@ if [ $# -ne 1 ]; then
 fi
 
 JSON_FILE="$1"
+CIS_URL="http://p2p-next-02.grid.pub.ro:8080/"
 
-curl -H application/json --data-binary @"$JSON_FILE" http://localhost:8080/ingest_content
+curl -H 'Content-Type: application/json' --data-binary @"$JSON_FILE" ${CIS_URL}ingest_content
