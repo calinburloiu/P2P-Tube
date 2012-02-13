@@ -1,6 +1,7 @@
 <?php
 
 /*
+ * OBSOLETE!
  * These functions retrieve information about audio and video files.
  * Depends on MediaInfo CLI program (http://mediainfo.sourceforge.net/)
  * 

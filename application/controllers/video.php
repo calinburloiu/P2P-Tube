@@ -18,38 +18,22 @@ class Video extends CI_Controller {
 	
 	public function index()
 	{
-		
 	}
 	
-	public function test($video_id)
+	public function test()
 	{
-		// Display page.
-		$params = array(	'title' => $this->config->item('site_name'),
-									'css' => array(
-										'video.css'
-		),
-									'js' => array(
-										'jquery.ui.ajax_links_maker.js'
-		),
-		//'metas' => array('description'=>'','keywords'=>'')
-		);
-		$this->load->library('html_head_params', $params);
-		
-		// **
-		// ** LOADING VIEWS
-		// **
-		$this->load->view('html_begin', $this->html_head_params);
-		$this->load->view('header');
-		
-		$main_params['content'] =
-			$this->load->view('echo', array('output'=> 
-				$this->_ajax_comment(TRUE, $video_id)),
-			TRUE);
-		$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
-		$this->load->view('main', $main_params);
-		
-		$this->load->view('footer');
-		$this->load->view('html_end');
+		$r = new HttpRequest('http://example.com/form.php', HttpRequest::METH_POST);
+		$r->setOptions(array('cookies' => array('lang' => 'de')));
+		$r->addPostFields(array('user' => 'mike', 'pass' => 's3c|r3t'));
+		$r->addPostFile('image', 'profile.jpg', 'image/jpeg');
+		try
+		{
+			echo $r->send()->getBody();
+		}
+		catch (HttpException $ex) 
+		{
+			echo $ex;
+		}
 	}
 	
 	/**
@@ -117,68 +101,6 @@ class Video extends CI_Controller {
 		$this->load->view('footer');
 		$this->load->view('html_end');
 	}
-        
-//	public function upload()
-//	{
-//		$this->load->library('form_validation');
-//
-//		$this->form_validation->set_error_delimiters('<span class="error">',
-//				'</span>');
-//		$error_upload = '';
-//
-//		if ($this->form_validation->run('upload'))
-//		{
-//			if ($_FILES['video-upload-file']['tmp_name'])
-//			{
-//				// Upload library
-//				$config_upload['upload_path'] = './data/upload';
-//				$this->load->library('upload', $config_upload);
-//
-//				$b_validation = $this->upload->do_upload('video-upload-file');
-//				$error_upload = 
-//					$this->upload->display_errors('<span class="error">',
-//							'</span>');
-//			}
-//			else
-//			{
-//				$b_validation = FALSE;
-//			}
-//		}
-//		else
-//			$b_validation = FALSE;
-//
-//		if ($b_validation === FALSE)
-//		{
-//			$params = array('title' =>
-//								$this->lang->line('ui_nav_menu_upload')
-//									.' &ndash; '
-//									. $this->config->item('site_name'),
-//							//'metas' => array('description'=>'')
-//			);
-//			$this->load->library('html_head_params', $params);
-//
-//			// **
-//			// ** LOADING VIEWS
-//			// **
-//			$this->load->view('html_begin', $this->html_head_params);
-//			$this->load->view('header',
-//					array('selected_menu' => 'upload'));
-//
-//			$main_params['content'] = $this->load->view(
-//					'video/upload_view',
-//					array('error_upload'=> $error_upload),
-//					TRUE);
-//			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
-//			$this->load->view('main', $main_params);
-//
-//			$this->load->view('footer');
-//			$this->load->view('html_end');
-//		}
-//		else
-//		{
-//
-//		}
-//	}
 		
 	public function upload()
 	{
@@ -186,7 +108,8 @@ class Video extends CI_Controller {
 
 		$this->form_validation->set_error_delimiters('<span class="error">',
 				'</span>');
-		$error_upload = '';
+		
+		// TODO check if user is logged in
 
 		if ($this->form_validation->run('upload') === FALSE)
 		{
@@ -206,9 +129,7 @@ class Video extends CI_Controller {
 					array('selected_menu' => 'upload'));
 
 			$main_params['content'] = $this->load->view(
-					'video/upload_view',
-					array('error_upload'=> $error_upload),
-					TRUE);
+					'video/upload_view', array(), TRUE);
 			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
 			$this->load->view('main', $main_params);
 
@@ -217,7 +138,20 @@ class Video extends CI_Controller {
 		}
 		else
 		{
-
+			$this->load->model('videos_model');
+			$this->load->helper('video');
+			
+			$file_name = './data/upload/'. $_FILES['video-upload-file']['name'];
+			$av_info = get_av_info($file_name);
+			
+			// TODO category_id, user_id
+//			$this->videos_model->add_video(
+//					$this->input->post('video-title'),
+//					$this->input->post('video-description'),
+//					$this->input->post('video-tags'),
+//					$av_info, 0, 1);
+			
+			// TODO call CIS
 		}
 	}
 	
@@ -351,16 +285,6 @@ class Video extends CI_Controller {
 		return TRUE;
 	}
 	
-	public function _required_upload($file)
-	{
-		if ($_FILES['video-upload-file']['tmp_name'])
-		{
-			return TRUE;
-		}
-		
-		return FALSE;
-	}
-	
 	public function _valid_upload($file)
 	{
 		if ($_FILES['video-upload-file']['tmp_name'])
@@ -375,12 +299,17 @@ class Video extends CI_Controller {
 			{
 				return TRUE;
 			}
-			
-			$this->form_validation->set_message('_valid_upload',
-					$this->upload->display_errors('<span class="error">',
-							'</span>'));
+			else
+			{
+				$this->form_validation->set_message('_valid_upload',
+						$this->upload->display_errors('<span class="error">',
+								'</span>'));
+				return FALSE;
+			}
 		}
 		
+		$this->form_validation->set_message('_valid_upload',
+				$this->lang->line('_required_upload'));
 		return FALSE;
 	}
 	

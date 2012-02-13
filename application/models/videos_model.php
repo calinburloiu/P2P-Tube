@@ -166,11 +166,11 @@ class Videos_model extends CI_Model {
 	 * If $name does not match with the video's `name` from the DB an error is
 	 * marked in the key 'err'. If it's NULL it is ignored.
 	 *
-	 * @access		public
-	 * @param		string $id	video's `id` column from `videos` DB table
-	 * @param		string $name	video's `name` column from `videos` DB
+	 * @access public
+	 * @param string $id	video's `id` column from `videos` DB table
+	 * @param string $name	video's `name` column from `videos` DB
 	 * table. NULL means there is no name provided.
-	 * @return		array	an associative list with information about a video
+	 * @return array	an associative list with information about a video
 	 * with the following keys:
 	 * <ul>
 	 *   <li>all columns form DB with some exceptions that are overwritten or new</li>
@@ -246,6 +246,68 @@ class Videos_model extends CI_Model {
 				$video['description'], 128);
 		
 		return $video;
+	}
+	
+	public function compute_video_name($title)
+	{
+		$name = str_replace(' ', '-', $title);
+		
+		return urlencode($name);
+	}
+	
+	/**
+	 * Adds a new uploaded video to the DB.
+	 * 
+	 * @param type $title
+	 * @param type $description
+	 * @param type $tags comma separated tags
+	 * @param type $av_info a dictionary of video properties containing keys
+	 * width, height, dar (display aspect ratio), duration and size; is can be
+	 * returned with function get_av_info from video helper
+	 */
+	public function add_video($title, $description, $tags, $av_info,
+			$category_id, $user_id)
+	{
+		$name = $this->compute_video_name($title);
+		
+		// Tags.
+		$json_tags = array();
+		$tok = strtok($tags, ',');
+		while ($tok != FALSE)
+		{
+			$json_tags[trim($tok)] = 0;
+			
+			$tok = strtok(',');
+		}
+		$json_tags = json_encode($json_tags);
+		
+		// TODO formats
+		$json_formats = '[{"res":"1280x720","ext":"ogv","dar":"16:9"},'
+				. '{"res":"1067x600","ext":"ogv","dar":"16:9"}]';
+		
+		
+		$query = $this->db->query("INSERT INTO `videos`
+				(name, title, description, duration, formats, category_id,
+						user_id, tags, date)
+				VALUES ('$name', '$title', '$description', '"
+						. $av_info['duration']. "', '$json_formats', $category_id,
+						$user_id, '$json_tags', utc_timestamp())");
+		if ($query === FALSE)
+			return FALSE;
+		
+		// Find out the id of the new video added.
+		$query = $this->db->query("SELECT id from `videos`
+				WHERE name = '$name'");
+		if ($query->num_rows() === 0)
+			return FALSE;
+		$video_id = $query->row()->id;
+		
+		// Activation code.
+		$activation_code = Videos_model::gen_activation_code();
+		
+		$query = $this->db->query("INSERT INTO `videos_unactivated`
+				(video_id, activation_code)
+				VALUES ($video_id, '$activation_code')");
 	}
 	
 	/**
@@ -616,6 +678,19 @@ class Videos_model extends CI_Model {
 	{
 		return (preg_match('/\*|\+|\-|>|\<|\(|\)|~|"/', $search_query) == 0
 			? FALSE : TRUE);
+	}
+	
+	public static function gen_activation_code()
+	{
+		$ci =& get_instance();
+		
+		$activation_code = substr(
+			sha1($ci->config->item('encryption_key')
+				. mt_rand()),
+			0,
+			16);
+		
+		return $activation_code;
 	}
 }
 

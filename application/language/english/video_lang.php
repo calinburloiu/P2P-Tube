@@ -22,6 +22,7 @@ $lang['video_description'] = 'Description';
 $lang['video_tags'] = 'Tags';
 $lang['video_tags_hint'] = 'comma separated tags';
 $lang['video_submit_upload'] = 'Upload';
+$lang['video_msg_video_uploaded'] = 'Your video has been uploaded and is now being processed.';
 
 
 /* End of file video_lang.php */

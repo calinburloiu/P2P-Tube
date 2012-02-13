@@ -100,5 +100,26 @@ function get_closest_res($haystack, $needle, $access_function = NULL)
 	return $i_min;
 }
 
+/**
+ * Returns information about an Audio/Video file.
+ * 
+ * @param string $file_name Audio/Video file
+ * @return dictionary a dictionary of audio/video properties with keys:
+ * <ul>
+ *   <li>width</li>
+ *   <li>height</li>
+ *   <li>dar (display aspect ratio)</li>
+ *   <li>duration (formated as [HH:]mm:ss)</li>
+ *   <li>size (in bytes)</li>
+ * </ul>
+ */
+function get_av_info($file_name)
+{
+	// TODO use ffprobe to return width, height, DAR, duration and size of a video
+	
+	return array('width'=> 800, 'height'=> 600, 'dar'=> '16:9',
+			'duration'=> '00:10', 'size'=> 1101693);
+}
+
 /* End of file video_helper.php */
 /* Location: ./application/helpers/video_helper.php */

@@ -129,7 +129,7 @@ $config = array(
 		array(
 			'field'=>'video-upload-file',
 			'label'=>'lang:video_upload_file',
-			'rules'=>'callback__required_upload|callback__valid_upload'
+			'rules'=>'callback__valid_upload'
 		),
 		array(
 			'field'=>'video-title',

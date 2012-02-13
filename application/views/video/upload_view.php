@@ -12,7 +12,6 @@
 		<td><input type="file" name="video-upload-file" size="32" /></td>
 	</tr>
 	<tr><td></td><td><?php echo form_error('video-upload-file') ?></td></tr>
-	<!--<tr><td></td><td><?php echo $error_upload ?></td></tr>-->
 	
 	<tr><td></td><td>&nbsp;</td></tr>
 
