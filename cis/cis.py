@@ -10,11 +10,13 @@ from Queue import Queue
 import web
 import json
 from web.wsgiserver import CherryPyWSGIServer
+import urllib
 
 import config
 import bt
 import users
 import logger
+import cis_exceptions
 
 if config.SECURITY:
     CherryPyWSGIServer.ssl_certificate = "cacert.pem"
@@ -149,26 +151,41 @@ class CIWorker(threading.Thread):
         for f in files:
             os.unlink(os.path.join(path, f))
 
+    def notify_completion(self):
+        logger.log_msg('#%s: notifying web server about the job completion...'\
+                % self.job_id)
+        
+        f = urllib.urlopen(config.WS_COMPLETION)
+        f.read()
+    
     def run(self):
         while True:
             job = Server.queue.get()
-            self.job_id = job['id']
+            self.job_id = job['code']
 
             # * TRANSFER RAW VIDEO IN
             try:
                 self.transfer_in(job['raw_video'])
+            except cis_exceptions.FileAlreadyExistsException as e:
+                logger.log_msg('#%s: %s' \
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_ERROR)
+                continue
             except Exception as e:
                 logger.log_msg('#%s: error while transferring in: %s' \
-                        % (job['id'], str(e)), logger.LOG_LEVEL_FATAL) 
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
                 continue
 
             # * TRANSCODE RAW VIDEO
             try:
                 self.transcode(job['raw_video'], job['name'], \
                         job['transcode_configs'])
+            except cis_exceptions.FileAlreadyExistsException as e:
+                logger.log_msg('#%s: %s' \
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_ERROR)
+                continue
             except Exception as e:
                 logger.log_msg('#%s: error while transcoding: %s' \
-                        % (job['id'], str(e)), logger.LOG_LEVEL_FATAL) 
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
                 continue
 
             # * EXTRACT THUMBNAIL IMAGES
@@ -176,10 +193,14 @@ class CIWorker(threading.Thread):
                 try:
                     self.extract_thumbs(job['raw_video'], job['name'], \
                             job['thumbs'])
+                except cis_exceptions.FileAlreadyExistsException as e:
+                    logger.log_msg('#%s: %s' \
+                            % (job['code'], repr(e)), logger.LOG_LEVEL_ERROR)
+                    continue
                 except Exception as e:
                     logger.log_msg( \
                             '#%s: error while extracting thumbnail images: %s' \
-                            % (job['id'], str(e)), logger.LOG_LEVEL_FATAL) 
+                            % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
                     continue
 
             # * CREATE TORRENTS AND START SEEDING OF TRANSCODED VIDEOS
@@ -205,7 +226,17 @@ class CIWorker(threading.Thread):
                         config.WS_THUMBS_PATH)
             except Exception as e:
                 logger.log_msg('#%s: error while transferring out: %s' \
-                        % (job['id'], str(e)), logger.LOG_LEVEL_FATAL) 
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
+                continue
+            
+            # * NOTIFY WEB SERVER ABOUT CONTENT INGESTION COMPLETION
+            # TODO in the future web server should also be notified about errors
+            try:
+                self.notify_completion()
+            except Exception as e:
+                logger.log_msg(
+                        '#%s: error while notifying web server about the job completion: %s' \
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
                 continue
             
             # * CLEANUP RAW VIDEOS AND THUMBNAIL IMAGES
@@ -236,13 +267,17 @@ class Server:
             resp = {"load": Server.load}
             web.header('Content-Type', 'application/json')
             return json.dumps(resp)
+        elif request == 'get_torrent_list':
+            resp = Server.bit_torrent.get_torrent_list()
+            web.header('Content-Type', 'application/json')
+            return json.dumps(resp)
         #elif request == 'shutdown':
-            #sys.exit(0)
+            #exit(0)
         elif request == 'test':
             return ''
         else:
             web.badrequest()
-            return ""
+            return ''
         
 
     def POST(self, request):

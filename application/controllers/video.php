@@ -117,6 +117,109 @@ class Video extends CI_Controller {
 		$this->load->view('footer');
 		$this->load->view('html_end');
 	}
+        
+//	public function upload()
+//	{
+//		$this->load->library('form_validation');
+//
+//		$this->form_validation->set_error_delimiters('<span class="error">',
+//				'</span>');
+//		$error_upload = '';
+//
+//		if ($this->form_validation->run('upload'))
+//		{
+//			if ($_FILES['video-upload-file']['tmp_name'])
+//			{
+//				// Upload library
+//				$config_upload['upload_path'] = './data/upload';
+//				$this->load->library('upload', $config_upload);
+//
+//				$b_validation = $this->upload->do_upload('video-upload-file');
+//				$error_upload = 
+//					$this->upload->display_errors('<span class="error">',
+//							'</span>');
+//			}
+//			else
+//			{
+//				$b_validation = FALSE;
+//			}
+//		}
+//		else
+//			$b_validation = FALSE;
+//
+//		if ($b_validation === FALSE)
+//		{
+//			$params = array('title' =>
+//								$this->lang->line('ui_nav_menu_upload')
+//									.' &ndash; '
+//									. $this->config->item('site_name'),
+//							//'metas' => array('description'=>'')
+//			);
+//			$this->load->library('html_head_params', $params);
+//
+//			// **
+//			// ** LOADING VIEWS
+//			// **
+//			$this->load->view('html_begin', $this->html_head_params);
+//			$this->load->view('header',
+//					array('selected_menu' => 'upload'));
+//
+//			$main_params['content'] = $this->load->view(
+//					'video/upload_view',
+//					array('error_upload'=> $error_upload),
+//					TRUE);
+//			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+//			$this->load->view('main', $main_params);
+//
+//			$this->load->view('footer');
+//			$this->load->view('html_end');
+//		}
+//		else
+//		{
+//
+//		}
+//	}
+		
+	public function upload()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_error_delimiters('<span class="error">',
+				'</span>');
+		$error_upload = '';
+
+		if ($this->form_validation->run('upload') === FALSE)
+		{
+			$params = array('title' =>
+								$this->lang->line('ui_nav_menu_upload')
+									.' &ndash; '
+									. $this->config->item('site_name'),
+							//'metas' => array('description'=>'')
+			);
+			$this->load->library('html_head_params', $params);
+
+			// **
+			// ** LOADING VIEWS
+			// **
+			$this->load->view('html_begin', $this->html_head_params);
+			$this->load->view('header',
+					array('selected_menu' => 'upload'));
+
+			$main_params['content'] = $this->load->view(
+					'video/upload_view',
+					array('error_upload'=> $error_upload),
+					TRUE);
+			$main_params['side'] = $this->load->view('side_default', NULL, TRUE);
+			$this->load->view('main', $main_params);
+
+			$this->load->view('footer');
+			$this->load->view('html_end');
+		}
+		else
+		{
+
+		}
+	}
 	
 	/**
 	* Increments (dis)likes count for video with the specified id and returns to
@@ -231,6 +334,54 @@ class Video extends CI_Controller {
 		$user_id = intval($this->session->userdata('user_id'));
 		
 		$this->videos_model->comment_video($video_id, $user_id, $comment);
+	}
+	
+	public function _valid_tags($tags)
+	{
+		$tok = strtok($tags, ',');
+		while ($tok != FALSE)
+		{
+			$tok = trim($tok);
+			if (!ctype_alnum($tok))
+				return FALSE;
+			
+			$tok = strtok(',');
+		}
+		
+		return TRUE;
+	}
+	
+	public function _required_upload($file)
+	{
+		if ($_FILES['video-upload-file']['tmp_name'])
+		{
+			return TRUE;
+		}
+		
+		return FALSE;
+	}
+	
+	public function _valid_upload($file)
+	{
+		if ($_FILES['video-upload-file']['tmp_name'])
+		{
+			// Upload library
+			$config_upload = array();
+			$config_upload['upload_path'] = './data/upload';
+			$config_upload['allowed_types'] = '*';
+			$this->load->library('upload', $config_upload);
+
+			if ($this->upload->do_upload('video-upload-file'))
+			{
+				return TRUE;
+			}
+			
+			$this->form_validation->set_message('_valid_upload',
+					$this->upload->display_errors('<span class="error">',
+							'</span>'));
+		}
+		
+		return FALSE;
 	}
 	
 	/**

@@ -20,7 +20,7 @@ else
 <table class="form">
 	<tr>
 		<td></td>
-		<td><span class="required"><?php echo $this->lang->line('user_note_required_fields') ?></span></td>
+		<td><span class="required"><?php echo $this->lang->line('ui_required_fields') ?></span></td>
 	</tr>
 	
 	<tr><td></td><td>&nbsp;</td></tr>

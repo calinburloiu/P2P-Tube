@@ -59,6 +59,10 @@
 		<?php echo ($selected_menu == 'account' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_account') ?></a>
 	</li>
 	
+	<li class="menu-right"><a href="<?php echo site_url('video/upload') ?>"
+		<?php echo ($selected_menu == 'upload' ? 'class="selected"' : '') ?>><?php echo $this->lang->line('ui_nav_menu_upload') ?></a>
+	</li>
+	
 	<li class="menu-right"><span class="menu-greeting">
 		<?php echo $this->lang->line('ui_hello'). ', '. $username. '!&nbsp;&nbsp;&nbsp;' ?></span>
 	</li> 

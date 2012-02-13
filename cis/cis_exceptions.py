@@ -11,6 +11,9 @@ class NotImplementedException(Exception):
     def __str__(self):
         return repr(self.value)
 
+class FileAlreadyExistsException(Exception):
+    pass
+
 class TranscodingException(Exception):
     pass
 

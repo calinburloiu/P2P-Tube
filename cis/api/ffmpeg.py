@@ -7,7 +7,7 @@ videos and thumbnail extraction from videos using FFmpeg CLI program.
 """
 
 import base
-import api_exceptions
+import cis_exceptions
 import subprocess
 import re
 import os
@@ -91,7 +91,7 @@ class FFmpegTranscoder(base.BaseTranscoder):
 
         exit_code = p.wait()
         if exit_code > 0:
-            raise api_exceptions.TranscodingException( \
+            raise cis_exceptions.TranscodingException( \
                     'FFmpeg exited with code ' + str(exit_code) + '.')
 
         log.close()
@@ -133,14 +133,14 @@ class FFmpegThumbExtractor(base.BaseThumbExtractor):
 
         exit_code = p.wait()
         if exit_code > 0:
-            raise api_exceptions.ThumbExtractionException( \
+            raise cis_exceptions.ThumbExtractionException( \
                     'FFmpeg exited with code ' + str(exit_code) + '.')
 
         # FFmpeg bug: when no key frame is found from seek_pos to the
         # end of file an empty image file is created.
         if os.path.getsize(output_file) == 0L:
             os.unlink(output_file)
-            raise api_exceptions.ThumbExtractionException( \
+            raise cis_exceptions.ThumbExtractionException( \
                     'FFmpeg created an empty file.')
 
     def get_video_duration(self):
@@ -194,5 +194,5 @@ class FFprobeAVInfo(base.BaseAVInfo):
 
         exit_code = p.wait()
         if exit_code > 0:
-            raise api_exceptions.AVInfoException( \
+            raise cis_exceptions.AVInfoException( \
                     'ffprobe exited with code ' + str(exit_code) + '.')

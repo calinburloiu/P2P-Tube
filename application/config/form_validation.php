@@ -124,6 +124,28 @@ $config = array(
 			'label'=>'lang:video_comment',
 			'rules'=>'trim|required|xss_clean|callback__is_user_loggedin'
 		)
+	),
+	'upload'=> array(
+		array(
+			'field'=>'video-upload-file',
+			'label'=>'lang:video_upload_file',
+			'rules'=>'callback__required_upload|callback__valid_upload'
+		),
+		array(
+			'field'=>'video-title',
+			'label'=>'lang:video_title',
+			'rules'=>'trim|required|xss_clean'
+		),
+		array(
+			'field'=>'video-description',
+			'label'=>'lang:video_description',
+			'rules'=>'trim|required|xss_clean'
+		),
+		array(
+			'field'=>'video-tags',
+			'label'=>'lang:video_tags',
+			'rules'=>'required|callback__valid_tags'
+		)
 	)
 );
 

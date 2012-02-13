@@ -6,6 +6,7 @@ $lang['ui_nav_menu_install_plugins'] = 'Install Plugins';
 $lang['ui_nav_menu_about'] = 'About';
 $lang['ui_nav_menu_help'] = 'Help';
 $lang['ui_nav_menu_contact'] = 'Contact';
+$lang['ui_nav_menu_upload'] = 'Upload';
 $lang['ui_nav_menu_log_in'] = 'Log In';
 $lang['ui_nav_menu_register'] = 'Register';
 $lang['ui_nav_menu_account'] = 'Account';
@@ -68,6 +69,8 @@ $lang['ui_chars_left'] = 'characters left';
 $lang['ui_captcha'] = 'CAPTCHA';
 $lang['ui_captcha_instructions'] = 'Please insert the text from the image below in order to demonstrate that you are a human:';
 $lang['ui_change_captcha'] = 'Change CAPTCHA image';
+
+$lang['ui_required_fields'] = '* Required fields!';
 
 /* End of file ui_lang.php */
 /* Location: ./application/language/english/ui_lang.php */

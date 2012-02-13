@@ -27,5 +27,10 @@ $lang['_do_recover_password']		= 'Username and e-mail address are not associated
 // Comment Video
 $lang['_is_user_loggedin'] 		= 'In order to comment a video you must be logged in.';
 
+// Upload Video
+$lang['_valid_tags']				= 'Tags are alphanumeric words separated by commas.';
+$lang['_required_upload']			= 'The %s field is required.';
+$lang['_valid_upload']				= 'The uploaded video file is not supported.';
+
 /* End of file form_validation_lang.php */
 /* Location: ./system/language/english/form_validation_lang.php */

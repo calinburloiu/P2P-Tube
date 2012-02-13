@@ -101,3 +101,17 @@ class BitTorrent:
                 self.session.remove_download(dl, remove_content)
                 logger.log_msg('torrent "%s" stopped' % torrent)
                 break
+    
+    def get_torrent_list(self):
+        """
+        Returns a list of all torrents started.
+        """
+        
+        downloads = self.session.get_downloads()
+        torrent_list = []
+        
+        for dl in downloads:
+            tdef = dl.get_def()
+            torrent_list.append(tdef.get_name() + '.tstream')
+        
+        return torrent_list

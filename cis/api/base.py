@@ -8,7 +8,7 @@ import os
 import re
 import random
 
-import api_exceptions
+import cis_exceptions
 import cis_util
 
 class BaseTranscoder:
@@ -109,6 +109,10 @@ class BaseTranscoder:
             raise ValueError('Video display aspect ratio must be a float or a string like <den>:<num>.')
 
         self.output_file = os.path.join(self.dest_path, self.name)
+        if os.path.exists(self.output_file):
+            raise cis_exceptions.FileAlreadyExistsException( \
+                    'file "%s" already exists' % self.output_file)
+        
         if v_resolution is not None:
             self.output_file += '_'
             self.output_file += v_resolution[(v_resolution.rindex('x')+1):]
@@ -137,7 +141,7 @@ class BaseTranscoder:
         """ Translates container API name into external program identifier."""
 
         if not self.containers.has_key(name) or self.containers[name] is None:
-            raise api_exceptions.NotImplementedException("Container " + name \
+            raise cis_exceptions.NotImplementedException("Container " + name \
                     + "not implemented")
 
         return self.containers[name]
@@ -159,7 +163,7 @@ class BaseTranscoder:
         """ Translates audio codec API name into external program identifier."""
 
         if not self.a_codecs.has_key(name) or self.a_codecs[name] is None:
-            raise api_exceptions.NotImplementedException("Audio Codec " + name \
+            raise cis_exceptions.NotImplementedException("Audio Codec " + name \
                     + "not implemented")
 
         return self.a_codecs[name]
@@ -168,7 +172,7 @@ class BaseTranscoder:
         """ Translates video codec API name into external program identifier."""
 
         if not self.v_codecs.has_key(name) or self.v_codecs[name] is None:
-            raise api_exceptions.NotImplementedException("Video Codec " + name \
+            raise cis_exceptions.NotImplementedException("Video Codec " + name \
                     + "not implemented")
 
         return self.v_codecs[name]
@@ -231,7 +235,7 @@ class BaseThumbExtractor:
             thumb_extracted = True
             try:
                 self.extract_thumb(seek_pos, resolution, n_thumbs_extracted)
-            except api_exceptions.ThumbExtractionException as e:
+            except cis_exceptions.ThumbExtractionException as e:
                 thumb_extracted = False
 
             if thumb_extracted:
@@ -245,6 +249,11 @@ class BaseThumbExtractor:
         """ Returns the name required as output file name based on index. """
         output_file_name = os.path.join(self.dest_path, self.name) \
                 + '_t' + ("%02d" % index) + '.jpg'
+                
+        if os.path.exists(output_file_name):
+            raise cis_exceptions.FileAlreadyExistsException( \
+                    'file "%s" already exists' % output_file_name)
+        
         return output_file_name
 
     def get_video_duration(self):

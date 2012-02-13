@@ -33,7 +33,6 @@ $lang['user_video_prefs'] = 'Video Preferences';
 $lang['user_registration_date'] = 'Registration Date';
 $lang['user_last_login'] = 'Last Login Time';
 
-$lang['user_note_required_fields'] = '* Required fields!';
 $lang['user_submit_register'] = 'Register';
 $lang['user_submit_save'] = 'Save';
 

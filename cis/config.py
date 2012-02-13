@@ -23,14 +23,19 @@ WS_TORRENTS_PATH = 'devel/data/torrents'
 WS_THUMBS_PATH = 'devel/data/thumbs'
 
 
-# === BITTORRENT CONFIGURATIONS ===
+# === URLS ===
 #BT_TRACKER = "http://p2p-next-10.grid.pub.ro:6969/announce"
+# BitTorrent tracker URL.
 BT_TRACKER = 'http://p2p-next-10.grid.pub.ro:6969/announce'
+# Web server's URL for content ingestion completion.
+WS_COMPLETION = 'http://p2p-next-03.grid.pub.ro:8081/cis_completion'
+#WS_COMPLETION = 'http://koala.cs.pub.ro/video/cis_completion'
 
 
+# === CIS PATHS ===
 RAW_VIDEOS_PATH = 'tmp/raw'
-MEDIA_PATH = 'tmp/media'
 THUMBS_PATH = 'tmp/thumbs'
+MEDIA_PATH = '/home/p2p/export/p2p-tube/media'
 # In a distributed file system for multi-CIS.
 TORRENTS_PATH = '/home/p2p/export/p2p-tube/torrents'
 
