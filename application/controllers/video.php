@@ -9,6 +9,8 @@
  */
 class Video extends CI_Controller {
 
+	protected $uploaded_file;
+	
 	public function __construct()
 	{
 		parent::__construct();
@@ -18,22 +20,12 @@ class Video extends CI_Controller {
 	
 	public function index()
 	{
+		//phpinfo();
 	}
 	
 	public function test()
 	{
-		$r = new HttpRequest('http://example.com/form.php', HttpRequest::METH_POST);
-		$r->setOptions(array('cookies' => array('lang' => 'de')));
-		$r->addPostFields(array('user' => 'mike', 'pass' => 's3c|r3t'));
-		$r->addPostFile('image', 'profile.jpg', 'image/jpeg');
-		try
-		{
-			echo $r->send()->getBody();
-		}
-		catch (HttpException $ex) 
-		{
-			echo $ex;
-		}
+		var_dump($this->session->userdata('user_id'));
 	}
 	
 	/**
@@ -104,13 +96,22 @@ class Video extends CI_Controller {
 		
 	public function upload()
 	{
+		$user_id = $this->session->userdata('user_id');
+		
+		// Action not possible if an user is not logged in.
+		if (!$user_id)
+		{
+			$this->load->helper('message');
+			show_error_msg_page($this, 
+				$this->lang->line('ui_msg_login_restriction'));
+			return;
+		}
+		
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_error_delimiters('<span class="error">',
 				'</span>');
 		
-		// TODO check if user is logged in
-
 		if ($this->form_validation->run('upload') === FALSE)
 		{
 			$params = array('title' =>
@@ -140,18 +141,37 @@ class Video extends CI_Controller {
 		{
 			$this->load->model('videos_model');
 			$this->load->helper('video');
+			$this->config->load('content_ingestion');
 			
-			$file_name = './data/upload/'. $_FILES['video-upload-file']['name'];
+			$file_name = $this->uploaded_file;
 			$av_info = get_av_info($file_name);
+			$name = urlencode(str_replace(' ', '-',
+					$this->input->post('video-title')));
+			$category_id = $this->input->post('video-category');
 			
-			// TODO category_id, user_id
-//			$this->videos_model->add_video(
-//					$this->input->post('video-title'),
-//					$this->input->post('video-description'),
-//					$this->input->post('video-tags'),
-//					$av_info, 0, 1);
+			// Prepare formats
+			$formats = $this->config->item('formats');
+			$prepared_formats = prepare_formats($formats, $av_info,
+					$this->config->item('elim_dupl_res'));
 			
-			// TODO call CIS
+			// Add video to DB.
+			$activation_code = $this->videos_model->add_video($name,
+					$this->input->post('video-title'),
+					$this->input->post('video-description'),
+					$this->input->post('video-tags'),
+					$av_info['duration'],
+					$prepared_formats['db_formats'], $category_id, $user_id);
+			
+			// Send a content ingestion request to
+			// CIS (Content Ingestion Server).
+			$this->_send_content_ingestion($activation_code,
+					$file_name,
+					$name, $av_info['size'],
+					$prepared_formats['transcode_configs']);
+			
+			$this->load->helper('message');
+			show_info_msg_page($this, 
+				$this->lang->line('video_msg_video_uploaded'));
 		}
 	}
 	
@@ -251,6 +271,50 @@ class Video extends CI_Controller {
 			return $output;
 	}
 	
+	/**
+	 * Request content_ingest to the CIS in order to start the content
+	 * ingestion process.
+	 * 
+	 * @param string $activation_code
+	 * @param string $raw_video_fn uploaded video file name
+	 * @param string $name
+	 * @param int $raw_video_size uploaded video file size in bytes
+	 * @param array $transcode_configs dictionary which must be included in
+	 * the JSON data that needs to be sent to CIS
+	 * @return mixed return the HTTP content (body) on success and FALSE
+	 * otherwise
+	 */
+	protected function _send_content_ingestion($activation_code, $raw_video_fn,
+			$name, $raw_video_size, $transcode_configs)
+	{
+		$this->config->load('content_ingestion');
+		
+		$url = $this->config->item('cis_url') . 'ingest_content';
+		$data = array(
+			'code'=>$activation_code,
+			'raw_video'=>$raw_video_fn,
+			'name'=>$name,
+			'weight'=>$raw_video_size,
+			'transcode_configs'=>$transcode_configs,
+			'thumbs'=>$this->config->item('thumbs_count')
+		);
+		$json_data = json_encode($data);
+		
+		// Send request to CIS.
+		$r = new HttpRequest($url, HttpRequest::METH_POST);
+		$r->setBody($json_data);
+		try
+		{
+			$response = $r->send()->getBody();
+		}
+		catch (HttpException $ex) 
+		{
+			return FALSE;
+		}
+		
+		return $response;
+	}
+	
 	public function _is_user_loggedin($param)
 	{
 		if (! $this->session->userdata('user_id'))
@@ -297,6 +361,8 @@ class Video extends CI_Controller {
 
 			if ($this->upload->do_upload('video-upload-file'))
 			{
+				$this->uploaded_file = $this->upload->data();
+				$this->uploaded_file = $this->uploaded_file['file_name'];
 				return TRUE;
 			}
 			else

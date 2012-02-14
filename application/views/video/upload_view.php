@@ -1,3 +1,11 @@
+<?php
+	// Categories
+	foreach ($this->config->item('categories') as $id => $name)
+	{
+		$categories[$id] = $this->lang->line("ui_categ_$name");
+	}
+?>
+
 <?php echo form_open_multipart("video/upload") ?>
 <table class="form">
 	<tr>
@@ -26,6 +34,14 @@
 		<td><textarea name="video-description" rows="4" cols="32"><?php echo set_value('video-description') ?></textarea></td>
 	</tr>
 	<tr><td></td><td><?php echo form_error('video-description') ?></td></tr>
+	
+	<tr>
+		<th><?php echo $this->lang->line('video_category') ?> <span class="required">*</span> : </th>
+		<td><?php echo form_dropdown('video-category', $categories, 
+				// TODO set_value not working
+				set_value('video-category', '1')) ?></td>
+	</tr>
+	<tr><td></td><td></td></tr>
 	
 	<tr>
 		<th><?php echo $this->lang->line('video_tags') ?> <span class="required">*</span> : </th>

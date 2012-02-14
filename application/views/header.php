@@ -87,7 +87,7 @@
 	<?php echo form_open('catalog/search', array('id'=>'quick-search')); ?>
 		<label for="search-category"><?php echo $this->lang->line('ui_search_in') ?></label> <?php 
 			echo form_dropdown('search-category', $categories, 
-				$search_category_name, 'id=search-category') ?>:
+				$search_category_name, 'id="search-category"') ?>:
 		<input type="text" id="search" name="search" value="<?php echo htmlentities($search_query) ?>" />
 		<input type="submit" id="button-quick-search" value="<?php echo $this->lang->line('ui_search') ?>" />
 		<a href="#" id="button-js-quick-search" style="display:none">

@@ -40,7 +40,7 @@ class FFmpegTranscoder(base.BaseTranscoder):
         "vp8": "libvpx"
     }
 
-    def _transcode(self, container, a_codec=None, v_codec=None,
+    def _transcode(self, container, extension=None, a_codec=None, v_codec=None,
             a_bitrate=None, a_samplingrate=None, a_channels=None,
             v_bitrate=None, v_framerate=None, v_resolution=None, v_dar=None):
 

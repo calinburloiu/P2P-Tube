@@ -9,7 +9,11 @@ from api import ftp
 
 # === GENERAL CONFIGURATIONS ===
 LOG_LEVEL = logger.LOG_LEVEL_DEBUG
+# Security features are experimental, incomplete and may not work.
 SECURITY = False
+# CIS periodically scans TORRENTS_PATH for new torrents at
+# START_DOWNLOADS_INTERVAL seconds. Note that this is a backup measure, because
+# CIS normally finds out about new torrents from start_torrents messages.
 START_DOWNLOADS_INTERVAL = 24 * 3600.0 # Once a day
 
 
@@ -27,16 +31,23 @@ WS_THUMBS_PATH = 'devel/data/thumbs'
 #BT_TRACKER = "http://p2p-next-10.grid.pub.ro:6969/announce"
 # BitTorrent tracker URL.
 BT_TRACKER = 'http://p2p-next-10.grid.pub.ro:6969/announce'
-# Web server's URL for content ingestion completion.
+# Web server's URL for content ingestion completion. P2P-Tube uses
+# http://<site>/video/cis_completion .
 WS_COMPLETION = 'http://p2p-next-03.grid.pub.ro:8081/cis_completion'
 #WS_COMPLETION = 'http://koala.cs.pub.ro/video/cis_completion'
 
 
 # === CIS PATHS ===
-RAW_VIDEOS_PATH = 'tmp/raw'
-THUMBS_PATH = 'tmp/thumbs'
-MEDIA_PATH = '/home/p2p/export/p2p-tube/media'
-# In a distributed file system for multi-CIS.
+# RAW_VIDEOS_PATH, THUMBS_PATH and MEDIA_PATH need not to be in distributed
+# file system.
+# Temporary directory for uploaded videos transfered from the web server.
+RAW_VIDEOS_PATH = '/home/p2p/tmp/raw'
+# Temporary directory for image thumbnails.
+THUMBS_PATH = '/home/p2p/tmp/thumbs'
+# Temporary directory for converted videos.
+MEDIA_PATH = '/home/p2p/media'
+# TORRENTS_PATH contains torrents files shared by all CIS machines and needs to
+# be placed in a distributed file system.
 TORRENTS_PATH = '/home/p2p/export/p2p-tube/torrents'
 
 
@@ -53,7 +64,9 @@ FILE_TRANSFERER_CLASS = ftp.FTPFileTransferer
 
 # === EXTERNAL PROGRAMS BINARY FILES ===
 # Set this values to None if you want default values provided by the API
-# class to be used.
+# class to be used. It may be useful to complete this parameters if you
+# compiled the third-party binaries from sources and you don't have
+# administrative privileges to install them.
 # Binary of a prgram which retrives audio/video information, like duration.
 AVINFO_BIN = None
 # Binary of a prgram which transcodes an audio/video file.

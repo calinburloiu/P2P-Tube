@@ -61,7 +61,7 @@ class BaseTranscoder:
 
         self.name = name
 
-    def transcode(self, container, a_codec=None, v_codec=None,
+    def transcode(self, container, extension=None, a_codec=None, v_codec=None,
             a_bitrate=None, a_samplingrate=None, a_channels=None,
             v_bitrate=None, v_framerate=None, v_resolution=None, v_dar=None):
         """
@@ -117,16 +117,19 @@ class BaseTranscoder:
             self.output_file += '_'
             self.output_file += v_resolution[(v_resolution.rindex('x')+1):]
             self.output_file += 'p'
-        ext = self.tr_extension(container, (v_codec is not None))
+        if extension == None:
+            ext = self.tr_extension(container, (v_codec is not None))
+        else:
+            ext = extension
         if ext is not None:
             self.output_file += '.' + ext
 
-        return self._transcode(self.tr_container(container),
+        return self._transcode(self.tr_container(container), ext,
                 self.tr_a_codec(a_codec), self.tr_v_codec(v_codec),
                 a_bitrate, a_samplingrate, a_channels,
                 v_bitrate, v_framerate, v_resolution, v_dar)
 
-    def _transcode(self, container, a_codec=None, v_codec=None,
+    def _transcode(self, container, extension=None, a_codec=None, v_codec=None,
             a_bitrate=None, a_samplingrate=None, a_channels=None,
             v_bitrate=None, v_framerate=None, v_resolution=None, v_dar=None):
         """

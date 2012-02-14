@@ -28,7 +28,7 @@ $.widget( "ui.nsvideo", {
 	},
 	
 	_create: function() {
-		var widget = this;
+		widget = this;
 		
 		widget.element
 			.addClass( "ui-widget ui-widget-content ui-corner-all" );
@@ -382,6 +382,8 @@ $.widget( "ui.nsvideo", {
 	},
 	
 	_setWidgetWidth: function() {
+        var widget = this;
+        
 		if (widget.$video.width() < 640)
 		{
 			widget.element.css('width',
@@ -704,6 +706,8 @@ $.widget( "ui.nsvideo", {
 		},
 		
 		refreshState: function() {
+            var widget = this;
+            
 			var err = "";
 			var normal = "";
 			var network = "";

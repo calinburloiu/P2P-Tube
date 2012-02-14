@@ -1,6 +1,6 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-// P2P-Tube specific configuration files
+// P2P-Tube specific configuration file
 
 /*
 |--------------------------------------------------------------------------

@@ -117,8 +117,77 @@ function get_av_info($file_name)
 {
 	// TODO use ffprobe to return width, height, DAR, duration and size of a video
 	
-	return array('width'=> 800, 'height'=> 600, 'dar'=> '16:9',
-			'duration'=> '00:10', 'size'=> 1101693);
+	return array('width'=> 1440, 'height'=> 1080, 'dar'=> '16:9',
+			'duration'=> '00:10', 'size'=> 5568748);
+}
+
+/**
+ * Return a dictionary with formats compliant for DB and CIS and computes
+ * resolutions such that an uploaded video will not be converted to a higher
+ * resolution.
+ * 
+ * @param type $formats formats as in content_ingestion config file
+ * @param type $av_info structure as returned by get_av_info function from this
+ * helper
+ * @param type $elim_dupl_res eliminate consecutive formats with the same
+ * resolution
+ * @return array a dictionary with DB format at key 'db_formats' and CIS format
+ * at key 'transcode_configs' 
+ */
+function prepare_formats($formats, $av_info, $elim_dupl_res=FALSE)
+{
+	$transcode_configs = array();
+	$db_formats = array();
+	
+	for ($i = 0; $i < count($formats); $i++)
+	{
+		$transcode_configs[$i]['container'] = $formats[$i]['container'];
+		$transcode_configs[$i]['extension'] = $formats[$i]['extension'];
+		$db_formats[$i]['ext'] = $formats[$i]['extension'];
+		$transcode_configs[$i]['a_codec'] = $formats[$i]['audio_codec'];
+		$transcode_configs[$i]['a_bitrate'] = $formats[$i]['audio_bit_rate'];
+		$transcode_configs[$i]['a_samplingrate'] = $formats[$i]['audio_sampling_rate'];
+		$transcode_configs[$i]['a_channels'] = $formats[$i]['audio_channels'];
+		$transcode_configs[$i]['v_codec'] = $formats[$i]['video_codec'];
+		$transcode_configs[$i]['v_bitrate'] = $formats[$i]['video_bit_rate'];
+		$transcode_configs[$i]['v_framerate'] = $formats[$i]['video_frame_rate'];
+		$transcode_configs[$i]['v_dar'] = $av_info['dar'];
+		$db_formats[$i]['dar'] = $av_info['dar'];
+
+		$sar = $av_info['width'] / $av_info['height'];
+		
+		if ($av_info['height'] < $formats[$i]['video_height'])
+		{
+			$width = $av_info['width'];
+			$height = $av_info['height'];
+		}
+		else
+		{
+			$height = $formats[$i]['video_height'];
+			$width = round($sar * $height);
+		}
+		
+		$transcode_configs[$i]['v_resolution'] = "${width}x${height}";
+		$db_formats[$i]['res'] = "${width}x${height}";
+	}
+	
+	// Eliminate formats with duplicate resolutions.
+	if ($elim_dupl_res)
+	{
+		for ($i = 1; $i < count($transcode_configs); $i++)
+		{
+			if ($transcode_configs[$i]['v_resolution']
+					=== $transcode_configs[$i - 1]['v_resolution'])
+			{
+				unset($transcode_configs[$i - 1]);
+				unset($db_formats[$i - 1]);
+				$i--;
+			}
+		}
+	}
+	
+	return array('transcode_configs'=>$transcode_configs,
+		'db_formats'=>$db_formats);
 }
 
 /* End of file video_helper.php */

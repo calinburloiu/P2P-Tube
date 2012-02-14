@@ -19,6 +19,7 @@ $lang['video_submit_post_comment'] = 'Post';
 $lang['video_upload_file'] = 'Video File';
 $lang['video_title'] = 'Title';
 $lang['video_description'] = 'Description';
+$lang['video_category'] = 'Category';
 $lang['video_tags'] = 'Tags';
 $lang['video_tags_hint'] = 'comma separated tags';
 $lang['video_submit_upload'] = 'Upload';

@@ -1,16 +1,32 @@
 {
     "code": "33",
-    "raw_video": "test.ogv",
+    "raw_video": "test.mts",
     "name": "test",
-    "weight": 3,
+    "weight": 5568748,
     "transcode_configs": [
         {
-            "container": "webm",
+            "container": "ogg",
+            "extension": "ogv",
             "a_codec": "vorbis",
             "a_bitrate": "128k",
-            "v_codec": "vp8",
-            "v_bitrate": "480k",
-            "v_resolution": "640x480"
+            "a_samplingrate": 44100,
+            "a_channels": 2,
+            "v_codec": "theora",
+            "v_bitrate": "768k",
+            "v_framerate": 25,
+            "v_resolution": "800x600"
+        },
+        {
+            "container": "ogg",
+            "extension": "ogv",
+            "a_codec": "vorbis",
+            "a_bitrate": "192k",
+            "a_samplingrate": 44100,
+            "a_channels": 2,
+            "v_codec": "theora",
+            "v_bitrate": "1536k",
+            "v_framerate": 25,
+            "v_resolution": "1440x1080"
         }
     ],
     "thumbs": 4

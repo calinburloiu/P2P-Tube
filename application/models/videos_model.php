@@ -248,28 +248,23 @@ class Videos_model extends CI_Model {
 		return $video;
 	}
 	
-	public function compute_video_name($title)
-	{
-		$name = str_replace(' ', '-', $title);
-		
-		return urlencode($name);
-	}
-	
 	/**
 	 * Adds a new uploaded video to the DB.
 	 * 
-	 * @param type $title
-	 * @param type $description
-	 * @param type $tags comma separated tags
-	 * @param type $av_info a dictionary of video properties containing keys
-	 * width, height, dar (display aspect ratio), duration and size; is can be
-	 * returned with function get_av_info from video helper
+	 * @param string $name
+	 * @param string $title
+	 * @param string $description
+	 * @param string $tags comma separated tags
+	 * @param string $duration video duration formatted [HH:]mm:ss
+	 * @param array $formats a dictionary corresponding to `formats` JSON
+	 * column from `videos` table
+	 * @param int $category_id
+	 * @param int $user_id
+	 * @return mixed returns an activation code on success or FALSE otherwise
 	 */
-	public function add_video($title, $description, $tags, $av_info,
-			$category_id, $user_id)
+	public function add_video($name, $title, $description, $tags, $duration,
+			$formats, $category_id, $user_id)
 	{
-		$name = $this->compute_video_name($title);
-		
 		// Tags.
 		$json_tags = array();
 		$tok = strtok($tags, ',');
@@ -282,15 +277,13 @@ class Videos_model extends CI_Model {
 		$json_tags = json_encode($json_tags);
 		
 		// TODO formats
-		$json_formats = '[{"res":"1280x720","ext":"ogv","dar":"16:9"},'
-				. '{"res":"1067x600","ext":"ogv","dar":"16:9"}]';
-		
+		$json_formats = json_encode($formats);
 		
 		$query = $this->db->query("INSERT INTO `videos`
 				(name, title, description, duration, formats, category_id,
 						user_id, tags, date)
-				VALUES ('$name', '$title', '$description', '"
-						. $av_info['duration']. "', '$json_formats', $category_id,
+				VALUES ('$name', '$title', '$description', '$duration',
+						'$json_formats', $category_id,
 						$user_id, '$json_tags', utc_timestamp())");
 		if ($query === FALSE)
 			return FALSE;
@@ -308,6 +301,8 @@ class Videos_model extends CI_Model {
 		$query = $this->db->query("INSERT INTO `videos_unactivated`
 				(video_id, activation_code)
 				VALUES ($video_id, '$activation_code')");
+		
+		return $activation_code;
 	}
 	
 	/**
