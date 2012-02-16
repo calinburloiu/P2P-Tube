@@ -253,9 +253,9 @@ class BaseThumbExtractor:
         output_file_name = os.path.join(self.dest_path, self.name) \
                 + '_t' + ("%02d" % index) + '.jpg'
                 
-        if os.path.exists(output_file_name):
-            raise cis_exceptions.FileAlreadyExistsException( \
-                    'file "%s" already exists' % output_file_name)
+        #if os.path.exists(output_file_name):
+            #raise cis_exceptions.FileAlreadyExistsException( \
+                    #'file "%s" already exists' % output_file_name)
         
         return output_file_name
 

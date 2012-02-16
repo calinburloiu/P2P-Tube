@@ -17,6 +17,18 @@ class Catalog extends CI_Controller {
 
 	public function index()
 	{
+		$user_id = $this->session->userdata('user_id');
+		if ($user_id)
+		{
+			if (intval($user_id) & USER_ROLE_ADMIN)
+				$allow_unactivated = TRUE;
+			else
+				$allow_unactivated = FALSE;
+		}
+		else
+			$allow_unactivated = FALSE;
+			
+		
 		// **
 		// ** LOADING MODEL
 		// **
@@ -26,7 +38,8 @@ class Catalog extends CI_Controller {
 		{
 			// Videos
 			$vs_data['videos'] = $this->videos_model->get_videos_summary(
-					$id, NULL, 0, $this->config->item('videos_per_row'));
+					$id, NULL, 0, $this->config->item('videos_per_row'),
+					$allow_unactivated);
 
 			// Category
 			$vs_data['category_name'] = $name;
@@ -78,6 +91,17 @@ class Catalog extends CI_Controller {
 
 	public function category($category_name, $ordering = 'hottest', $offset = 0)
 	{
+		$user_id = $this->session->userdata('user_id');
+		if ($user_id)
+		{
+			if (intval($user_id) & USER_ROLE_ADMIN)
+				$allow_unactivated = TRUE;
+			else
+				$allow_unactivated = FALSE;
+		}
+		else
+			$allow_unactivated = FALSE;
+		
 		// **
 		// ** LOADING MODEL
 		// **
@@ -88,7 +112,8 @@ class Catalog extends CI_Controller {
 		$this->load->model('videos_model');
 		$vs_data['videos'] = $this->videos_model->get_videos_summary(
 				$category_data['category_id'], NULL, intval($offset), 
-				$this->config->item('videos_per_page'), $ordering);
+				$this->config->item('videos_per_page'), $ordering,
+				$allow_unactivated);
 
 		$vs_data['ordering'] = $ordering;
 
@@ -98,7 +123,7 @@ class Catalog extends CI_Controller {
 				"catalog/category/$category_name/$ordering/");
 		$pg_config['uri_segment'] = 5;
 		$pg_config['total_rows'] = $this->videos_model->get_videos_count(
-				$category_data['category_id']);
+				$category_data['category_id'], NULL, $allow_unactivated);
 		$pg_config['per_page'] = $this->config->item('videos_per_page');
 		$this->pagination->initialize($pg_config);
 		$vs_data['pagination'] = $this->pagination->create_links();

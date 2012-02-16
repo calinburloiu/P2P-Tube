@@ -151,11 +151,16 @@ class CIWorker(threading.Thread):
         for f in files:
             os.unlink(os.path.join(path, f))
 
-    def notify_completion(self):
+    def notify_completion(self, code):
         logger.log_msg('#%s: notifying web server about the job completion...'\
                 % self.job_id)
         
-        f = urllib.urlopen(config.WS_COMPLETION)
+        if config.WS_COMPLETION[len(config.WS_COMPLETION) - 1] == '/':
+            url = config.WS_COMPLETION + code
+        else:
+            url = config.WS_COMPLETION + '/' + code
+        
+        f = urllib.urlopen(url)
         f.read()
     
     def run(self):
@@ -232,7 +237,7 @@ class CIWorker(threading.Thread):
             # * NOTIFY WEB SERVER ABOUT CONTENT INGESTION COMPLETION
             # TODO in the future web server should also be notified about errors
             try:
-                self.notify_completion()
+                self.notify_completion(job['code'])
             except Exception as e:
                 logger.log_msg(
                         '#%s: error while notifying web server about the job completion: %s' \
@@ -246,6 +251,8 @@ class CIWorker(threading.Thread):
             # * JOB FINISHED
             Server.queue.task_done()
             Server.load -= job['weight']
+            logger.log_msg('#%s: finished' \
+                        % job['code'], logger.LOG_LEVEL_INFO)                     
 
 
 class Server:

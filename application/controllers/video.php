@@ -10,6 +10,7 @@
 class Video extends CI_Controller {
 
 	protected $uploaded_file;
+	protected $av_info;
 	
 	public function __construct()
 	{
@@ -23,12 +24,14 @@ class Video extends CI_Controller {
 		//phpinfo();
 	}
 	
-	public function test($fn)
+	public function test()
 	{
-		$fn = "data/upload/$fn";
-		$this->load->helper('video');
+		$this->load->model('videos_model');
 		
-		var_dump(get_av_info($fn));
+		$videos = $this->videos_model->get_videos_summary(1, NULL, 0, 10,
+				'alphabetically', TRUE);
+		
+		var_dump($videos);
 	}
 	
 	/**
@@ -44,17 +47,67 @@ class Video extends CI_Controller {
 		// **
 		// ** LOADING MODEL
 		// **
-		// Retrieve video information.
 		$this->load->model('videos_model');
-		$this->videos_model->inc_views($id);
+		
+		$data['user_id'] = $this->session->userdata('user_id');
+		if ($data['user_id'] === FALSE)
+			$data['user_id'] = '';
+		else
+			$data['user_id'] = intval($data['user_id']);
+		$user_roles = intval($this->session->userdata('roles'));
+//		echo USER_ROLE_ADMIN . ' / ';
+//		var_dump($user_roles);
+//		var_dump($user_roles | USER_ROLE_ADMIN);
+//		die();
+		
+		// Retrieve video information.
 		$data['video'] = $this->videos_model->get_video($id, $name);
+		if ($data['video'] === FALSE)
+		{	
+			$this->load->helper('message');
+			show_error_msg_page($this, 
+				$this->lang->line('video_msg_no_video'));
+			return;
+		}
+		
+		// Video is being processed by CIS.
+		if ($data['video']['activation_code']
+				&& !$data['video']['content_ingested'])
+		{
+			$this->load->helper('message');
+			show_error_msg_page($this, 
+				$this->lang->line('video_msg_video_not_ready'));
+			return;
+		}
+		
+		// Unlogged in user can't see unactivated videos.
+		if (empty($data['user_id']))
+			$allow_unactivated = FALSE;
+		else
+		{
+			if (($user_roles & USER_ROLE_ADMIN) == 0
+					&& $data['user_id'] != $data['video']['user_id'])
+				$allow_unactivated = FALSE;
+			else
+				$allow_unactivated = TRUE;
+		}
+		
+		// Video is not activated; can be seen by owner and admin.
+		if ($data['video']['activation_code'] && !$allow_unactivated)
+		{
+			$this->load->helper('message');
+			show_error_msg_page($this, 
+				$this->lang->line('video_msg_video_unactivated'));
+			return;
+		}			
+		
 		$categories = $this->config->item('categories');
 		$data['video']['category_name'] = 
 			$categories[ $data['video']['category_id'] ];
 		$data['plugin_type'] = ($plugin === NULL ? 'auto' : $plugin);
-		$data['user_id'] = $this->session->userdata('user_id');
-		if ($data['user_id'] === FALSE)
-			$data['user_id'] = '';
+		
+		// Increment the number of views for the video.
+		$this->videos_model->inc_views($id);
 		
 		// Display page.
 		$params = array(	'title' => $data['video']['title'] . ' &ndash; '
@@ -161,7 +214,8 @@ class Video extends CI_Controller {
 					$this->input->post('video-description'),
 					$this->input->post('video-tags'),
 					$this->av_info['duration'],
-					$prepared_formats['db_formats'], $category_id, $user_id);
+					$prepared_formats['db_formats'], $category_id, $user_id,
+					$this->uploaded_file);
 			
 			// Send a content ingestion request to
 			// CIS (Content Ingestion Server).
@@ -174,6 +228,18 @@ class Video extends CI_Controller {
 			show_info_msg_page($this, 
 				$this->lang->line('video_msg_video_uploaded'));
 		}
+	}
+	
+	public function cis_completion($activation_code)
+	{
+		$this->load->model('videos_model');
+		
+		if ($this->config->item('require_moderation'))
+			$this->videos_model->set_content_ingested($activation_code);
+		else
+			$this->videos_model->activate_video($activation_code);
+		
+//		log_message('info', "cis_completion $activation_code");
 	}
 	
 	/**

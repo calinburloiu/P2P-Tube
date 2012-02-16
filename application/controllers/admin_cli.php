@@ -19,7 +19,8 @@ class Admin_cli extends CI_Controller {
 	}
 	
 	public function index()
-	{		
+	{
+		echo "P2P-Tube".PHP_EOL;
 	}
 	
 	/**
@@ -38,6 +39,38 @@ class Admin_cli extends CI_Controller {
 			echo "Users unactivated within $days_to_expire days were successfully deleted from the database.".PHP_EOL;
 		else
 			echo "No users were deleted.".PHP_EOL;
+	}
+	
+	public function print_unactivated_videos()
+	{
+		$this->load->model('videos_model');
+		
+		$videos = $this->videos_model->get_unactivated_videos();
+		
+		if ($videos)
+		{
+			foreach($videos as $video)
+			{
+				echo $video['video_id']. '  '
+						. site_url("watch/". $video['video_id']
+								. "/". $video['name']). PHP_EOL;
+			}
+		}
+	}
+	
+	public function activate_video($video_id = NULL)
+	{
+		$this->load->model('videos_model');
+		$video_id = intval($video_id);
+		
+		if ($video_id == 0)
+		{
+			echo 'usage: admin_cli activate_video $video_id'.PHP_EOL;
+			return;
+		}
+		
+		if (!$this->videos_model->activate_video(intval($video_id)))
+			echo 'error: an error occured while activating the video'.PHP_EOL;
 	}
 }
 

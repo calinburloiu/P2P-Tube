@@ -26,7 +26,7 @@ class User extends CI_Controller {
 	
 	public function test($user_id = 1)
 	{
-		echo extension_loaded('gd') ? 'gd' : 'nu';
+//		echo extension_loaded('gd') ? 'gd' : 'nu';
 	}
 	
 	// DEBUG
@@ -179,6 +179,7 @@ class User extends CI_Controller {
 		$this->session->unset_userdata('user_id');
 		$this->session->unset_userdata('username');
 		$this->session->unset_userdata('auth_src');
+		$this->session->unset_userdata('roles');
 		$this->session->unset_userdata('time_zone');
 		
 		header('Location: '. site_url(urldecode_segments($redirect)));
@@ -348,6 +349,17 @@ class User extends CI_Controller {
 	{
 		// TODO handle user not found
 		
+		$user_id = $this->session->userdata('user_id');
+		if ($user_id)
+		{
+			if (intval($user_id) & USER_ROLE_ADMIN)
+				$allow_unactivated = TRUE;
+			else
+				$allow_unactivated = FALSE;
+		}
+		else
+			$allow_unactivated = FALSE;
+		
 		$this->load->config('localization');
 		$this->load->helper('date');
 		$this->lang->load('date');
@@ -370,15 +382,16 @@ class User extends CI_Controller {
 		// User's videos
 		$this->load->model('videos_model');
 		$vs_data['videos'] = $this->videos_model->get_videos_summary(
-			NULL, $username, intval($videos_offset),
-			$this->config->item('videos_per_page'));
+				NULL, $username, intval($videos_offset),
+				$this->config->item('videos_per_page'), 'hottest',
+				$allow_unactivated);
 		
 		// Pagination
 		$this->load->library('pagination');
 		$pg_config['base_url'] = site_url("user/profile/$username/");
 		$pg_config['uri_segment'] = 4;
 		$pg_config['total_rows'] = $this->videos_model->get_videos_count(
-			NULL, $username);
+			NULL, $username, $allow_unactivated);
 		$pg_config['per_page'] = $this->config->item('videos_per_page');
 		$this->pagination->initialize($pg_config);
 		$vs_data['pagination'] = $this->pagination->create_links();
@@ -687,6 +700,7 @@ class User extends CI_Controller {
 			'user_id'=> $user['id'],
 			'username'=> $user['username'],
 			'auth_src'=> $user['auth_src'],
+			'roles'=> $user['roles'],
 			'time_zone'=> $user['time_zone']
 		));
 		$this->import = (isset($user['import']) ? $user['import'] : FALSE);

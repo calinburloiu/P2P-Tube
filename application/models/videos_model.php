@@ -26,11 +26,12 @@ class Videos_model extends CI_Model {
 	 *
 	 * @param		int $category_id	DB category ID; pass NULL for all
 	 * categories
-	 * @param		mixed $user			an user_id (as int) or an username 
+	 * @param mixed $user an user_id (as int) or an username 
 	 * (as string); pass NULL for all users
-	 * @param		int $offset
-	 * @param		int $count
-	 * @param		string $ordering	control videos ording by these
+	 * @param int $offset
+	 * @param int $count number of videos to retrieve; if set to TRUE this
+	 * method will retrieve the number of videos that satisfy condition
+	 * @param string $ordering	control videos ording by these
 	 * possibilities:
 	 * <ul>
 	 *   <li><strong>'hottest':</strong> newest most appreciated first. An
@@ -39,7 +40,9 @@ class Videos_model extends CI_Model {
 	 *   <li><strong>'newest':</strong> newest first.</li>
 	 *   <li><strong>'alphabetically':</strong> sort alphabetically.</li>
 	 * </ul>
-	 * @return		array	a list of videos, each one being an assoc array with:
+	 * @param bool $unactivated whether to retrieve or not ingested unactivated
+	 * videos; typically only administrators should see this kind of assets
+	 * @return array a list of videos, each one being an assoc array with:
 	 * <ul>
 	 *   <li>id, name, title, duration, thumbs_count, default_thumb, views => from DB</li>
 	 *   <li>shorted_title => ellipsized title</li>
@@ -49,26 +52,36 @@ class Videos_model extends CI_Model {
 	 * </ul>
 	 */
 	public function get_videos_summary($category_id, $user, $offset, $count,
-		$ordering = 'hottest')
+		$ordering = 'hottest', $unactivated = FALSE)
 	{
 		$this->load->helper('text');
 		
-		// Ordering
-		switch ($ordering)
+		$order_statement = "";
+		if ($count !== TRUE)
 		{
-		case 'hottest':
-			$order_statement = "ORDER BY date DESC, score DESC, RAND()";
-			break;
-		case 'newest':
-			$order_statement = "ORDER BY date DESC";
-			break;
-		case 'alphabetically':
-			$order_statement = "ORDER BY title";
-			break;
-			
-		default:
-			$order_statement = "";
+			// Ordering
+			switch ($ordering)
+			{
+			case 'hottest':
+				$order_statement = "ORDER BY date DESC, score DESC, RAND()";
+				break;
+			case 'newest':
+				$order_statement = "ORDER BY date DESC";
+				break;
+			case 'alphabetically':
+				$order_statement = "ORDER BY title";
+				break;
+
+			default:
+				$order_statement = "";
+			}
 		}
+		
+		// Show unactivated videos.
+		$cond_unactivated = ($unactivated
+				? '(a.activation_code IS NULL OR a.activation_code IS NOT NULL
+					AND a.content_ingested = 1)'
+				: 'a.activation_code IS NULL');
 		
 		// Category filtering
 		if ($category_id === NULL)
@@ -90,17 +103,31 @@ class Videos_model extends CI_Model {
 				$cond_user = "u.username = '$user'";
 		}
 		
-		$query = $this->db->query(
-			"SELECT v.id, name, title, duration, user_id, u.username, views,
+		if ($count === TRUE)
+			$fields = "COUNT(*) count";
+		else
+			$fields = "v.id, name, title, duration, user_id, u.username, views,
 				thumbs_count, default_thumb,
-				(views + likes - dislikes) AS score
-			FROM `videos` v, `users` u
+				(views + likes - dislikes) AS score,
+				a.activation_code, a.content_ingested";
+		
+		$query = $this->db->query(
+			"SELECT $fields
+			FROM `videos` v 
+				LEFT JOIN `videos_unactivated` a ON (id = a.video_id),
+				`users` u
 			WHERE v.user_id = u.id AND $cond_category AND $cond_user
+				AND $cond_unactivated
 			$order_statement
 			LIMIT $offset, $count"); 
 		
 		if ($query->num_rows() > 0)
+		{
+			if ($count === TRUE)
+				return $query->row()->count;
+			
 			$videos = $query->result_array();
+		}
 		else
 			return array();
 		
@@ -128,36 +155,14 @@ class Videos_model extends CI_Model {
 	 * NULL parameters count videos from all categories and / or all users.
 	 * 
 	 * @param int $category_id
-	 * @param mixed $user	an user_id (as int) or an username (as string)
-	 * @return int	number of videos or FALSE if an error occured
+	 * @param mixed $user an user_id (as int) or an username (as string)
+	 * @return int number of videos or FALSE if an error occured
 	 */
-	public function get_videos_count($category_id = NULL, $user = NULL)
+	public function get_videos_count($category_id = NULL, $user = NULL,
+			$unactivated = FALSE)
 	{
-		if ($category_id === NULL)
-			$cond_category = "1";
-		else
-			$cond_category = "category_id = $category_id";
-		
-		if ($user === NULL)
-			$cond_user = "1";
-		else
-		{
-			if (is_int($user))
-				$cond_user = "v.user_id = $user";
-			else if(is_string($user))
-				$cond_user = "u.username = '$user'";
-		}
-		
-		$query = $this->db->query(
-			"SELECT COUNT(*) count
-			FROM `videos` v, `users` u
-			WHERE v.user_id = u.id AND $cond_category AND $cond_user");
-		
-		if ($query->num_rows() > 0)
-			return $query->row()->count;
-		
-		// Error
-		return FALSE;
+		return $this->get_videos_summary($category_id, $user, 0, TRUE, NULL,
+				$unactivated);
 	}
 	
 	/**
@@ -191,9 +196,12 @@ class Videos_model extends CI_Model {
 		$this->load->helper('video');
 		$this->load->helper('text');
 		
-		$query = $this->db->query("SELECT v.*, u.username 
-								FROM `videos` v, `users` u
-								WHERE v.user_id = u.id AND v.id = $id");
+		$query = $this->db->query("SELECT v.*, u.username,
+					a.activation_code, a.content_ingested
+				FROM `videos` v 
+					LEFT JOIN `videos_unactivated` a ON (v.id = a.video_id),
+					`users` u
+				WHERE v.user_id = u.id AND v.id = $id");
 		$video = array();
 		
 		if ($query->num_rows() > 0)
@@ -204,8 +212,7 @@ class Videos_model extends CI_Model {
 		}
 		else
 		{
-			$video['err'] = 'INVALID_ID';
-			return $video;
+			return FALSE;
 		}
 		
 		// Convert JSON encoded string to arrays.
@@ -260,10 +267,11 @@ class Videos_model extends CI_Model {
 	 * column from `videos` table
 	 * @param int $category_id
 	 * @param int $user_id
+	 * @param string $uploaded_file the raw video file uploaded by the user
 	 * @return mixed returns an activation code on success or FALSE otherwise
 	 */
 	public function add_video($name, $title, $description, $tags, $duration,
-			$formats, $category_id, $user_id)
+			$formats, $category_id, $user_id, $uploaded_file)
 	{
 		// Tags.
 		$json_tags = array();
@@ -299,10 +307,67 @@ class Videos_model extends CI_Model {
 		$activation_code = Videos_model::gen_activation_code();
 		
 		$query = $this->db->query("INSERT INTO `videos_unactivated`
-				(video_id, activation_code)
-				VALUES ($video_id, '$activation_code')");
+				(video_id, activation_code, uploaded_file)
+				VALUES ($video_id, '$activation_code', '$uploaded_file')");
 		
 		return $activation_code;
+	}
+	
+	public function set_content_ingested($activation_code)
+	{
+		return $this->db->query("UPDATE `videos_unactivated`
+			SET content_ingested = 1
+			WHERE activation_code = '$activation_code'");
+	}
+	
+	/**
+	 * Activates a video by deleting its entry from `videos_unactivated`.
+	 * 
+	 * @param mixed $code_or_id use type string for activation_code or type
+	 * int for video_id
+	 * @return boolean TRUE on success, FALSE otherwise
+	 */
+	public function activate_video($code_or_id)
+	{
+		if (is_string($code_or_id))
+			$query = $this->db->query("SELECT uploaded_file from `videos_unactivated`
+				WHERE activation_code = '$code_or_id'");
+		else if (is_int($code_or_id))
+			$query = $this->db->query("SELECT uploaded_file from `videos_unactivated`
+				WHERE video_id = '$code_or_id'");
+		else
+			return FALSE;
+		
+		if ($query->num_rows() > 0)
+			$uploaded_file = $query->row()->uploaded_file;
+		else
+			return FALSE;
+		
+		if (is_string($code_or_id))
+			$query = $this->db->query("DELETE FROM `videos_unactivated`
+				WHERE activation_code = '$code_or_id'");
+		else if (is_int($code_or_id))
+			$query = $this->db->query("DELETE FROM `videos_unactivated`
+				WHERE video_id = '$code_or_id'");
+		else
+			return FALSE;
+		
+		if (!$query)
+			return $query;
+		
+		return unlink("data/upload/$uploaded_file");		
+	}
+	
+	public function get_unactivated_videos()
+	{
+		$query = $this->db->query("SELECT a.video_id, v.name, a.content_ingested
+			FROM `videos_unactivated` a, `videos` v
+			WHERE a.video_id = v.id AND a.content_ingested = 1");
+		
+		if ($query->num_rows() > 0)
+			return $query->result_array();
+		else
+			return FALSE;
 	}
 	
 	/**

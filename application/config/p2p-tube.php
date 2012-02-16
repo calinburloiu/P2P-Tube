@@ -90,7 +90,12 @@ $config['default_torrent_ext'] = 'tstream';
 | IDs must be numeric and must preferably start from 1.
 |
 */
-$config['categories'] = array(1 => 'movies', 2 => 'tech-talks', 3 => 'events', 4 => 'karaoke');
+$config['categories'] = array(
+	1 => 'movies',
+	2 => 'tech-talks',
+	3 => 'events',
+	4 => 'karaoke'
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -156,3 +161,14 @@ $config['available_languages_list'] = array(
 |
 */
 $config['noreply_email'] = 'no-reply@p2p-next.cs.pub.ro';
+
+/*
+|--------------------------------------------------------------------------
+| Require Moderation
+|--------------------------------------------------------------------------
+|
+| Set whether or not a new uploaded video must be aproved by an
+| administrator.
+|
+*/
+$config['require_moderation'] = TRUE;

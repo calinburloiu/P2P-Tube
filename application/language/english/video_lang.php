@@ -23,7 +23,11 @@ $lang['video_category'] = 'Category';
 $lang['video_tags'] = 'Tags';
 $lang['video_tags_hint'] = 'comma separated tags';
 $lang['video_submit_upload'] = 'Upload';
+
 $lang['video_msg_video_uploaded'] = 'Your video has been uploaded and is now being processed.';
+$lang['video_msg_no_video'] = 'This video does not exist.';
+$lang['video_msg_video_not_ready'] = 'This video is being processed and is not available yet.';
+$lang['video_msg_video_unactivated'] = 'This video requires moderation and must be approved by an administrator.';
 
 
 /* End of file video_lang.php */
