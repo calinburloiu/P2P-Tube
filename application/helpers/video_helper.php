@@ -101,10 +101,49 @@ function get_closest_res($haystack, $needle, $access_function = NULL)
 }
 
 /**
+ * "Private" function used by get_av_info which returns the value from a
+ * "key=value" formatted string.
+ * 
+ * @param string $str_key_value a string formatted as key=value
+ * @return string
+ */
+function _parse_value($str_key_value)
+{
+	return trim(substr(
+			$str_key_value, 
+			strpos($str_key_value, '=') + 1,
+			strlen($str_key_value)
+			));
+}
+
+/**
+ * Formats the floating number of seconds to a string with format [HH:]mm:ss .
+ * 
+ * @param float $secs
+ * @return string 
+ */
+function format_duration($secs)
+{
+	$secs = intval(round($secs));
+	
+	$h = intval(floor($secs / 3600));
+	$m = intval(floor(($secs % 3600) / 60));
+	$s = $secs % 3600 % 60;
+	
+	$duration = sprintf('%02d', $m) . ':' . sprintf('%02d', $s);
+	
+	if ($h > 0)
+		return sprintf('%02d', $h) . ':' . $duration;
+	
+	return $duration;
+}
+
+/**
  * Returns information about an Audio/Video file.
  * 
  * @param string $file_name Audio/Video file
- * @return dictionary a dictionary of audio/video properties with keys:
+ * @return dictionary FALSE on error or a dictionary of audio/video properties
+ * with the following keys otherwise:
  * <ul>
  *   <li>width</li>
  *   <li>height</li>
@@ -115,10 +154,60 @@ function get_closest_res($haystack, $needle, $access_function = NULL)
  */
 function get_av_info($file_name)
 {
-	// TODO use ffprobe to return width, height, DAR, duration and size of a video
+	$h = popen('ffprobe -show_streams -show_format "'
+			. $file_name . '" 2> /dev/null', 'r');
+
+	$tag = NULL;
 	
-	return array('width'=> 1440, 'height'=> 1080, 'dar'=> '16:9',
-			'duration'=> '00:10', 'size'=> 5568748);
+	while ( ($r = fgets($h, 512)) !== FALSE)
+	{
+		// Match tags.
+		if (preg_match('/^\[FORMAT\]/', $r))
+		{
+			$tag = 'FORMAT';	
+			continue;
+		}
+		if (preg_match('/^\[STREAM\]/', $r))
+		{
+			$tag = 'STREAM';
+			continue;
+		}
+		
+		if ($tag == 'FORMAT')
+		{
+			// Duration
+			if (preg_match('/^duration=/', $r))
+				$duration = format_duration(floatval(_parse_value($r)));
+			
+			// Size
+			if (preg_match('/^size=/', $r))
+				$size = intval(_parse_value ($r));
+		}
+		
+		if ($tag == 'STREAM')
+		{
+			// Width
+			if (preg_match('/^width=/', $r))
+				$width = intval(_parse_value($r));
+			
+			// Height
+			if (preg_match('/^height=/', $r))
+				$height = intval(_parse_value($r));
+			
+			// DAR
+			if (preg_match('/^display_aspect_ratio=/', $r))
+				$dar = _parse_value($r);
+		}
+	}
+	
+	if (pclose($h) > 0)
+		return FALSE;
+	
+	return array('width'=>$width, 'height'=>$height, 'dar'=>$dar,
+		'duration'=>$duration, 'size'=>$size);
+	
+//	return array('width'=> 1440, 'height'=> 1080, 'dar'=> '16:9',
+//			'duration'=> '00:10', 'size'=> 5568748);
 }
 
 /**

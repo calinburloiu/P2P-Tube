@@ -23,9 +23,12 @@ class Video extends CI_Controller {
 		//phpinfo();
 	}
 	
-	public function test()
+	public function test($fn)
 	{
-		var_dump($this->session->userdata('user_id'));
+		$fn = "data/upload/$fn";
+		$this->load->helper('video');
+		
+		var_dump(get_av_info($fn));
 	}
 	
 	/**
@@ -143,15 +146,13 @@ class Video extends CI_Controller {
 			$this->load->helper('video');
 			$this->config->load('content_ingestion');
 			
-			$file_name = $this->uploaded_file;
-			$av_info = get_av_info($file_name);
 			$name = urlencode(str_replace(' ', '-',
 					$this->input->post('video-title')));
 			$category_id = $this->input->post('video-category');
 			
 			// Prepare formats
 			$formats = $this->config->item('formats');
-			$prepared_formats = prepare_formats($formats, $av_info,
+			$prepared_formats = prepare_formats($formats, $this->av_info,
 					$this->config->item('elim_dupl_res'));
 			
 			// Add video to DB.
@@ -159,14 +160,14 @@ class Video extends CI_Controller {
 					$this->input->post('video-title'),
 					$this->input->post('video-description'),
 					$this->input->post('video-tags'),
-					$av_info['duration'],
+					$this->av_info['duration'],
 					$prepared_formats['db_formats'], $category_id, $user_id);
 			
 			// Send a content ingestion request to
 			// CIS (Content Ingestion Server).
 			$this->_send_content_ingestion($activation_code,
-					$file_name,
-					$name, $av_info['size'],
+					$this->uploaded_file,
+					$name, $this->av_info['size'],
 					$prepared_formats['transcode_configs']);
 			
 			$this->load->helper('message');
@@ -361,8 +362,14 @@ class Video extends CI_Controller {
 
 			if ($this->upload->do_upload('video-upload-file'))
 			{
-				$this->uploaded_file = $this->upload->data();
-				$this->uploaded_file = $this->uploaded_file['file_name'];
+				$upload_data = $this->upload->data();
+				$this->uploaded_file = $upload_data['file_name'];
+				
+				$this->load->helper('video');
+				$this->av_info = get_av_info($upload_data['full_path']);
+				if (!$this->av_info)
+					return FALSE;
+				
 				return TRUE;
 			}
 			else
