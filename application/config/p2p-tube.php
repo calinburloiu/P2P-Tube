@@ -171,4 +171,4 @@ $config['noreply_email'] = 'no-reply@p2p-next.cs.pub.ro';
 | administrator.
 |
 */
-$config['require_moderation'] = TRUE;
+$config['require_moderation'] = FALSE;

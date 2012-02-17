@@ -382,7 +382,7 @@ $.widget( "ui.nsvideo", {
 	},
 	
 	_setWidgetWidth: function() {
-        var widget = this;
+        //var widget = this;
         
 		if (widget.$video.width() < 640)
 		{
@@ -706,7 +706,7 @@ $.widget( "ui.nsvideo", {
 		},
 		
 		refreshState: function() {
-            var widget = this;
+            //var widget = this;
             
 			var err = "";
 			var normal = "";

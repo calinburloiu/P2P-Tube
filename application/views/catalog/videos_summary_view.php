@@ -26,12 +26,14 @@
 	<p><?php echo $this->lang->line('user_no_videos_uploaded') ?></p>
   <?php else: ?>
 	<?php foreach($videos as $video):
-		$thumb_src = $video['thumbs'][ $video['default_thumb'] ];
+		$default_thumb = $video['thumbs'][ $video['default_thumb'] ];
 		?>
 	<div class="video-icon">
 		<div class="video-thumb ui-widget-content ui-corner-all">
 			<a href="<?php echo $video['video_url'] ?>">
-				<img src="<?php echo $thumb_src ?>" />
+				<img class="video-thumb-img"
+						src="<?php echo $default_thumb ?>"
+						data-src='<?php echo $video['json_thumbs'] ?>' />
 				<div class="video-duration"><?php echo $video['duration'] ?></div>
 			</a>
 		</div>
@@ -71,6 +73,8 @@
 				
 			window.location = uri;
 		});
+		
+		$('.video-thumb-img').thumbs();
 	});
 
 </script>

@@ -60,7 +60,7 @@ class Catalog extends CI_Controller {
 			'css' => array(
 				'catalog.css'
 			),
-				//'js' => array(),
+				'js' => array('jquery.ui.thumbs.js'),
 				//'metas' => array('description'=>'','keywords'=>'')
 		);
 		$this->load->library('html_head_params', $params);
@@ -135,8 +135,9 @@ class Catalog extends CI_Controller {
 			. $this->config->item('site_name'),
 			'css' => array(
 				'catalog.css'
-			)
-				//'metas' => array('description'=>'','keywords'=>'')
+			),
+			'js' => array('jquery.ui.thumbs.js')
+			//'metas' => array('description'=>'','keywords'=>'')
 		);
 		$this->load->library('html_head_params', $params);
 
@@ -234,8 +235,8 @@ class Catalog extends CI_Controller {
 			'css' => array(
 				'catalog.css'
 			),
-				//'js' => array(),
-				//'metas' => array('description'=>'','keywords'=>'')
+			'js' => array('jquery.ui.thumbs.js'),
+			//'metas' => array('description'=>'','keywords'=>'')
 		);
 		$this->load->library('html_head_params', $params);
 

@@ -3,7 +3,7 @@
  * Library Article_Controller can be extended by a controller to be used for 
  * content pages that depend on the language.
  *
- * The page views are usually located in
+ * The page views are located in
  * "application/views/article/$language/$method".
  * Parameters:
  * <ul>

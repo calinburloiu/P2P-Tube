@@ -140,6 +140,7 @@ class Videos_model extends CI_Model {
 			// Thumbnails
 			$video['thumbs'] = $this->get_thumbs($video['name'], 
 				$video['thumbs_count']);
+			$video['json_thumbs'] = json_encode($video['thumbs']);
 				
 			// Ellipsized title
 			//$video['shorted_title'] = ellipsize($video['title'], 45, 0.75);
@@ -273,6 +274,8 @@ class Videos_model extends CI_Model {
 	public function add_video($name, $title, $description, $tags, $duration,
 			$formats, $category_id, $user_id, $uploaded_file)
 	{
+		$this->load->config('content_ingestion');
+		
 		// Tags.
 		$json_tags = array();
 		$tok = strtok($tags, ',');
@@ -284,15 +287,19 @@ class Videos_model extends CI_Model {
 		}
 		$json_tags = json_encode($json_tags);
 		
-		// TODO formats
 		$json_formats = json_encode($formats);
+		
+		// Thumbnail images
+		$thumbs_count = $this->config->item('thumbs_count');
+		$default_thumb = rand(0, $thumbs_count - 1);
 		
 		$query = $this->db->query("INSERT INTO `videos`
 				(name, title, description, duration, formats, category_id,
-						user_id, tags, date)
+						user_id, tags, date, thumbs_count, default_thumb)
 				VALUES ('$name', '$title', '$description', '$duration',
 						'$json_formats', $category_id,
-						$user_id, '$json_tags', utc_timestamp())");
+						$user_id, '$json_tags', utc_timestamp(),
+						$thumbs_count, $default_thumb)");
 		if ($query === FALSE)
 			return FALSE;
 		
@@ -684,6 +691,7 @@ class Videos_model extends CI_Model {
 			// Thumbnails
 			$video['thumbs'] = $this->get_thumbs($video['name'], 
 				$video['thumbs_count']);
+			$video['json_thumbs'] = json_encode($video['thumbs']);
 				
 			// Ellipsized title
 			//$video['shorted_title'] = ellipsize($video['title'], 45, 0.75);
