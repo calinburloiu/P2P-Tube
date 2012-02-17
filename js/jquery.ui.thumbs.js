@@ -17,7 +17,7 @@ $.widget( "ui.thumbs", {
 	version: "1.0.0 beta",
 	options: {
 		// in milliseconds
-		period: 750,
+		period: 667,
 		src: []
 	},
 	
