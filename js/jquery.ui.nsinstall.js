@@ -109,6 +109,7 @@ $.widget( "ui.nsinstall", {
 	_createSwarmPlayerInstall: function() {
 		var widget = this;
 		var msg;
+		var $box;
 		
 		if (widget.options.error == 'none')
 		{
@@ -126,6 +127,9 @@ $.widget( "ui.nsinstall", {
 		}
 		else if (widget.options.error == 'already installed')
 		{
+			$box = $('<div id="install-swarmplayer"></div>')
+				.appendTo(widget.element);
+			
 			$box
 				.html('<div class="ui-widget">'
 						+ '<div style="padding: 0 .7em;" class="ui-state-highlight ui-corner-all">' 
@@ -139,7 +143,7 @@ $.widget( "ui.nsinstall", {
 		}
 		else
 		{
-			var $box = $('<div id="install-swarmplayer"></div>')
+			$box = $('<div id="install-swarmplayer"></div>')
 				.appendTo(widget.element);
 			
 			$box
@@ -158,6 +162,8 @@ $.widget( "ui.nsinstall", {
 	
 	_createNextSharePCInstall: function() {
 		var widget = this;
+		var msg;
+		var $box;
 		
 		if (widget.options.error == 'none')
 		{
@@ -175,7 +181,7 @@ $.widget( "ui.nsinstall", {
 		}
 		else if (widget.options.error == 'already installed')
 		{
-			var $box = $('<div id="install-nextsharepc"></div>')
+			$box = $('<div id="install-nextsharepc"></div>')
 				.appendTo(widget.element);
 			
 			$box
@@ -186,12 +192,12 @@ $.widget( "ui.nsinstall", {
 				+ '</div>'
 			+ '</div>');
 			
-			var msg = 'NextSharePC ' + widget.options.msg[widget.options.error];
+			msg = 'NextSharePC ' + widget.options.msg[widget.options.error];
 			$('#install-nextsharepc-msg').html(msg);
 		}
 		else
 		{
-			var $box = $('<div id="install-nextsharepc"></div>')
+			$box = $('<div id="install-nextsharepc"></div>')
 				.appendTo(widget.element);
 			
 			$box
@@ -202,7 +208,7 @@ $.widget( "ui.nsinstall", {
 					+ '</div>'
 				+ '</div>');
 			
-			var msg = 'NextSharePC ' + widget.options.msg[widget.options.error];
+			msg = 'NextSharePC ' + widget.options.msg[widget.options.error];
 			$('#install-nextsharepc-msg').html(msg);
 		}
 	},
@@ -231,6 +237,9 @@ $.widget( "ui.nsinstall", {
 	},
 	
 	isSwarmPlayerAlreadyInstalled: function() {
+		if (typeof swarmTransport != 'undefined')
+			return true;
+		
 		return false;
 	},
 	

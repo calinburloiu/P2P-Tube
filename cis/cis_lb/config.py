@@ -1,4 +1,20 @@
 
+# CIS URLs
+CIS_URLS = [ \
+    'http://p2p-next-01.grid.pub.ro:31500/', \
+    'http://p2p-next-03.grid.pub.ro:31500/', \
+    'http://p2p-next-04.grid.pub.ro:31500/', \
+    'http://p2p-next-05.grid.pub.ro:31500/', \
+    'http://p2p-next-06.grid.pub.ro:31500/', \
+    'http://p2p-next-07.grid.pub.ro:31500/', \
+    'http://p2p-next-08.grid.pub.ro:31500/', \
+    'http://p2p-next-10.grid.pub.ro:31500/' \
+]
+
+import logger
+
+LOG_LEVEL = logger.LOG_LEVEL_DEBUG
+
 # Number of threads which execute load balancing jobs through LBWorker class.
 JOB_THREADS_COUNT = 5
 # Number of threads controlled by job which make HTTP requests.

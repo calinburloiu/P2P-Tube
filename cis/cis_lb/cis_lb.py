@@ -7,6 +7,7 @@ import time
 import threading
 from Queue import Queue
 
+from load_balancer.random_lb import RandomLoadBalancer
 # Located in the parent directory; execute from that location or put it in PYTHONPATH
 import logger
 import config
@@ -40,7 +41,7 @@ class Server:
     
     def POST(self, request):
         
-        Server.queue.put( ('POST', request, web.data()) )
+        Server.queue.put( (request, web.data()) )
         
         #return web.data()
 
@@ -51,7 +52,7 @@ if __name__ == '__main__':
     # Create job threads.
     lb_workers = []
     for i in range(0, config.JOB_THREADS_COUNT):
-        lb_worker = LBWorker(i)
+        lb_worker = RandomLoadBalancer(i, Server.queue)
         lb_worker.daemon = True
         lb_worker.start()
         lb_workers.append(lb_worker)
