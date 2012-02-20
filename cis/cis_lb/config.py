@@ -16,8 +16,11 @@ CIS_URLS = [ \
 # http://<site>/video/cis_error .
 WS_ERROR = 'http://p2p-next.cs.pub.ro/devel/video/cis_error'
 
-import load_balancer.random_lb
-LOAD_BALANCER = load_balancer.random_lb.RandomLoadBalancer
+#import load_balancer.random_lb
+import load_balancer.randomized_suboptimal_lb
+#LOAD_BALANCER = load_balancer.random_lb.RandomLoadBalancer
+LOAD_BALANCER = load_balancer.randomized_suboptimal_lb.RandomizedSuboptimalLoadBalancer
+RANDOMIZED_SUBOPTIMAL_LB_K = 3
 
 import logger
 

@@ -2,6 +2,7 @@
 
 import web
 import sys
+import json
 
 urls = (
     '/(.*)', 'Hello'
@@ -13,7 +14,7 @@ print 'load is %s' % LOAD
 app = web.application(urls, globals())
 
 class Hello:
-    def GET(self, name):
+    def GET(self, request):
         if request == 'get_load':
             resp = {"load": LOAD}
             web.header('Content-Type', 'application/json')

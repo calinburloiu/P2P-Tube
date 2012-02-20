@@ -24,6 +24,7 @@ class LoadBalancer(threading.Thread):
             (request, data) = self.queue.get()
             urls = config.CIS_URLS[:]
             code = json.loads(data)['code']
+            success = False
             
             while len(urls) != 0:
                 cis = self.choose(urls)
@@ -37,12 +38,13 @@ class LoadBalancer(threading.Thread):
                             logger.LOG_LEVEL_ERROR)
                     continue
                 
+                success = True
                 logger.log_msg('#%s: Request forwarded to %s' \
                             % (code, cis), \
                         logger.LOG_LEVEL_INFO)
                 break
             
-            if len(urls) == 0:
+            if len(urls) == 0 and not success:
                 logger.log_msg('#%s: Failed to forward request to any CIS' \
                             % code, \
                             logger.LOG_LEVEL_FATAL)
