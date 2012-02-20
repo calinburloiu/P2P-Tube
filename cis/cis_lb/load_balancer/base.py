@@ -1,8 +1,10 @@
 import threading
 import urllib
+import json
 
 import config
 import logger
+
 
 class LoadBalancer(threading.Thread):
     
@@ -21,6 +23,7 @@ class LoadBalancer(threading.Thread):
         while True:
             (request, data) = self.queue.get()
             urls = config.CIS_URLS[:]
+            code = json.loads(data)['code']
             
             while len(urls) != 0:
                 cis = self.choose(urls)
@@ -29,15 +32,36 @@ class LoadBalancer(threading.Thread):
                 try:
                     urllib.urlopen(cis + request, data)
                 except IOError:
-                    logger.log_msg('Failed to forward request to %s' % cis, \
+                    logger.log_msg('#%s: Failed to forward request to %s' \
+                            % (code, cis), \
                             logger.LOG_LEVEL_ERROR)
                     continue
                 
-                logger.log_msg('Request forwarded to %s' % cis, \
+                logger.log_msg('#%s: Request forwarded to %s' \
+                            % (code, cis), \
                         logger.LOG_LEVEL_INFO)
                 break
             
+            if len(urls) == 0:
+                logger.log_msg('#%s: Failed to forward request to any CIS' \
+                            % code, \
+                            logger.LOG_LEVEL_FATAL)
+                self.notify_error(code)
+            
             self.queue.task_done()
+    
+    def notify_error(self, code):
+        logger.log_msg('#%s: notifying web server about the error...'\
+                % code)
+        
+        if config.WS_ERROR[len(config.WS_ERROR) - 1] == '/':
+            url = config.WS_ERROR + code
+        else:
+            url = config.WS_ERROR + '/' + code
+        url = url + '/' + 'unreachable'
+        
+        f = urllib.urlopen(url)
+        f.read()
         
     def choose(self, urls):
         """

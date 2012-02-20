@@ -24,11 +24,12 @@ class Video extends CI_Controller {
 		//phpinfo();
 	}
 	
-	public function test()
+	public function test($param)
 	{
-		$this->load->helper('video');
+		$this->load->model('videos_model');
 		
-		var_dump(get_av_info('data/upload/test.ogv'));
+		echo $this->videos_model->send_upload_error_email($param,
+				CIS_RESP_UNREACHABLE) ? 's-a trimis' : 'nu s-a trimis';
 	}
 	
 	/**
@@ -69,7 +70,7 @@ class Video extends CI_Controller {
 		
 		// Video is being processed by CIS.
 		if ($data['video']['activation_code']
-				&& !$data['video']['content_ingested'])
+				&& $data['video']['cis_response'] == CIS_RESP_NONE)
 		{
 			$this->load->helper('message');
 			show_error_msg_page($this, 
@@ -213,13 +214,31 @@ class Video extends CI_Controller {
 					$this->av_info['duration'],
 					$prepared_formats['db_formats'], $category_id, $user_id,
 					$this->uploaded_file);
+			if ($activation_code == FALSE)
+			{
+				$this->load->helper('message');
+				show_error_msg_page($this, 
+					$this->lang->line('video_msg_add_video_db_error'));
+				return;
+			}
 			
 			// Send a content ingestion request to
 			// CIS (Content Ingestion Server).
-			$this->_send_content_ingestion($activation_code,
+			$r = $this->videos_model->send_content_ingestion($activation_code,
 					$this->uploaded_file,
 					$name, $this->av_info['size'],
 					$prepared_formats['transcode_configs']);
+			if ($r == FALSE)
+			{
+				$this->videos_model->set_cis_response($activation_code,
+						CIS_RESP_UNREACHABLE);
+				
+				$this->load->helper('message');
+				show_error_msg_page($this, 
+						$this->lang->line(
+								'video_msg_send_content_ingestion_error'));
+				return;
+			}
 			
 			$this->load->helper('message');
 			show_info_msg_page($this, 
@@ -227,16 +246,63 @@ class Video extends CI_Controller {
 		}
 	}
 	
+	/**
+	 * URL used by CIS service to announce its content ingestion completion.
+	 * 
+	 * @param string $activation_code 
+	 */
 	public function cis_completion($activation_code)
 	{
 		$this->load->model('videos_model');
 		
 		if ($this->config->item('require_moderation'))
-			$this->videos_model->set_content_ingested($activation_code);
+			$this->videos_model->set_cis_response($activation_code,
+					CIS_RESP_COMPLETION);
 		else
 			$this->videos_model->activate_video($activation_code);
 		
 //		log_message('info', "cis_completion $activation_code");
+	}
+	
+	/**
+	 * URL used by CIS service to annouce an error which occured while
+	 * ingesting content.
+	 * 
+	 * @param string $activation_code
+	 * @param string $error_name 'internal_error' corresponds to constant
+	 * CIS_RESP_INTERNAL_ERROR and 'unreachable' corresponds to constant
+	 * CIS_RESP_UNREACHABLE
+	 */
+	public function cis_error($activation_code, $error_name = 'internal_error')
+	{
+		$this->load->model('videos_model');
+		
+		if ($error_name == 'internal_error')
+		{
+			$this->videos_model->set_cis_response ($activation_code,
+					CIS_RESP_INTERNAL_ERROR);
+			log_message('error',
+					"Internal CIS error for activation code $activation_code");
+			$this->videos_model->send_upload_error_email($activation_code,
+					CIS_RESP_INTERNAL_ERROR);
+		}
+		// Unreachable error is announced by a CIS-LB which was unable to
+		// contact an CIS.
+		else if ($error_name == 'unreachable')
+		{
+			$this->videos_model->set_cis_response($activation_code,
+					CIS_RESP_UNREACHABLE);
+			log_message('error',
+					"CIS-LB could not reach any CIS for activation code $activation_code");
+			$this->videos_model->send_upload_error_email($activation_code,
+					CIS_RESP_UNREACHABLE);
+		}
+		else
+		{
+			log_message('error',
+					"Invalid error name received from CIS / CIS-LB for activation code $activation_code");
+		}
+		
 	}
 	
 	/**
@@ -333,50 +399,6 @@ class Video extends CI_Controller {
 		
 		if ($return_output)
 			return $output;
-	}
-	
-	/**
-	 * Request content_ingest to the CIS in order to start the content
-	 * ingestion process.
-	 * 
-	 * @param string $activation_code
-	 * @param string $raw_video_fn uploaded video file name
-	 * @param string $name
-	 * @param int $raw_video_size uploaded video file size in bytes
-	 * @param array $transcode_configs dictionary which must be included in
-	 * the JSON data that needs to be sent to CIS
-	 * @return mixed return the HTTP content (body) on success and FALSE
-	 * otherwise
-	 */
-	protected function _send_content_ingestion($activation_code, $raw_video_fn,
-			$name, $raw_video_size, $transcode_configs)
-	{
-		$this->config->load('content_ingestion');
-		
-		$url = $this->config->item('cis_url') . 'ingest_content';
-		$data = array(
-			'code'=>$activation_code,
-			'raw_video'=>$raw_video_fn,
-			'name'=>$name,
-			'weight'=>$raw_video_size,
-			'transcode_configs'=>$transcode_configs,
-			'thumbs'=>$this->config->item('thumbs_count')
-		);
-		$json_data = json_encode($data);
-		
-		// Send request to CIS.
-		$r = new HttpRequest($url, HttpRequest::METH_POST);
-		$r->setBody($json_data);
-		try
-		{
-			$response = $r->send()->getBody();
-		}
-		catch (HttpException $ex) 
-		{
-			return FALSE;
-		}
-		
-		return $response;
 	}
 	
 	public function _is_user_loggedin($param)

@@ -167,6 +167,19 @@ class CIWorker(threading.Thread):
         
         f = urllib.urlopen(url)
         f.read()
+        
+    def notify_error(self, code):
+        logger.log_msg('#%s: notifying web server about the error...'\
+                % self.job_id)
+        
+        if config.WS_ERROR[len(config.WS_ERROR) - 1] == '/':
+            url = config.WS_ERROR + code
+        else:
+            url = config.WS_ERROR + '/' + code
+        url = url + '/' + 'internal_error'
+        
+        f = urllib.urlopen(url)
+        f.read()
     
     def run(self):
         while True:
@@ -179,10 +192,12 @@ class CIWorker(threading.Thread):
             except cis_exceptions.FileAlreadyExistsException as e:
                 logger.log_msg('#%s: %s' \
                         % (job['code'], repr(e)), logger.LOG_LEVEL_ERROR)
+                self.notify_error(job['code'])
                 continue
             except Exception as e:
                 logger.log_msg('#%s: error while transferring in: %s' \
-                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL)
+                self.notify_error(job['code'])
                 continue
 
             # * TRANSCODE RAW VIDEO
@@ -192,10 +207,12 @@ class CIWorker(threading.Thread):
             except cis_exceptions.FileAlreadyExistsException as e:
                 logger.log_msg('#%s: %s' \
                         % (job['code'], repr(e)), logger.LOG_LEVEL_ERROR)
+                self.notify_error(job['code'])
                 continue
             except Exception as e:
                 logger.log_msg('#%s: error while transcoding: %s' \
-                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL)
+                self.notify_error(job['code'])
                 continue
 
             # * EXTRACT THUMBNAIL IMAGES
@@ -206,11 +223,13 @@ class CIWorker(threading.Thread):
                 except cis_exceptions.FileAlreadyExistsException as e:
                     logger.log_msg('#%s: %s' \
                             % (job['code'], repr(e)), logger.LOG_LEVEL_ERROR)
+                    self.notify_error(job['code'])
                     continue
                 except Exception as e:
                     logger.log_msg( \
                             '#%s: error while extracting thumbnail images: %s' \
-                            % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
+                            % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL)
+                    self.notify_error(job['code'])
                     continue
 
             # * CREATE TORRENTS AND START SEEDING OF TRANSCODED VIDEOS
@@ -237,16 +256,17 @@ class CIWorker(threading.Thread):
             except Exception as e:
                 logger.log_msg('#%s: error while transferring out: %s' \
                         % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
+                self.notify_error(job['code'])
                 continue
             
             # * NOTIFY WEB SERVER ABOUT CONTENT INGESTION COMPLETION
-            # TODO in the future web server should also be notified about errors
             try:
                 self.notify_completion(job['code'])
             except Exception as e:
                 logger.log_msg(
                         '#%s: error while notifying web server about the job completion: %s' \
-                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL) 
+                        % (job['code'], repr(e)), logger.LOG_LEVEL_FATAL)
+                self.notify_error(job['code'])
                 continue
             
             # * CLEANUP RAW VIDEOS AND THUMBNAIL IMAGES

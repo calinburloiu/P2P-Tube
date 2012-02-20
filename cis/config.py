@@ -33,8 +33,10 @@ WS_THUMBS_PATH = 'devel/data/thumbs'
 BT_TRACKER = 'http://p2p-next-10.grid.pub.ro:6969/announce'
 # Web server's URL for content ingestion completion. P2P-Tube uses
 # http://<site>/video/cis_completion .
-#WS_COMPLETION = 'http://p2p-next-03.grid.pub.ro:8081/cis_completion'
 WS_COMPLETION = 'http://p2p-next.cs.pub.ro/devel/video/cis_completion'
+# Web server's URL for content ingestion errors. P2P-Tube uses
+# http://<site>/video/cis_error .
+WS_ERROR = 'http://p2p-next.cs.pub.ro/devel/video/cis_error'
 
 
 # === CIS PATHS ===

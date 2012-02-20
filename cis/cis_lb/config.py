@@ -12,6 +12,9 @@ CIS_URLS = [ \
     'http://p2p-next-09.grid.pub.ro:31500/', \
     'http://p2p-next-10.grid.pub.ro:31500/' \
 ]
+# Web server's URL for content ingestion errors. P2P-Tube uses
+# http://<site>/video/cis_error .
+WS_ERROR = 'http://p2p-next.cs.pub.ro/devel/video/cis_error'
 
 import load_balancer.random_lb
 LOAD_BALANCER = load_balancer.random_lb.RandomLoadBalancer

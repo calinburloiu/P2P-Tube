@@ -46,5 +46,19 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 define('USER_ROLE_STANDARD',			0);
 define('USER_ROLE_ADMIN',				1);
 
+/*
+|--------------------------------------------------------------------------
+| CIS Responses
+|--------------------------------------------------------------------------
+|
+| Reponses of a CIS for the ingest_content request as they appear coded
+| in the DB in `videos_unactivated` table, column `cis_response`.
+|
+*/
+define('CIS_RESP_NONE',				0);
+define('CIS_RESP_COMPLETION',		1);
+define('CIS_RESP_UNREACHABLE',		2);
+define('CIS_RESP_INTERNAL_ERROR',	3);
+
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

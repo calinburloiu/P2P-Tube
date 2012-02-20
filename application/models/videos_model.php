@@ -80,7 +80,7 @@ class Videos_model extends CI_Model {
 		// Show unactivated videos.
 		$cond_unactivated = ($unactivated
 				? '(a.activation_code IS NULL OR a.activation_code IS NOT NULL
-					AND a.content_ingested = 1)'
+					AND a.cis_response = '. CIS_RESP_COMPLETION. ')'
 				: 'a.activation_code IS NULL');
 		
 		// Category filtering
@@ -109,7 +109,7 @@ class Videos_model extends CI_Model {
 			$fields = "v.id, name, title, duration, user_id, u.username, views,
 				thumbs_count, default_thumb,
 				(views + likes - dislikes) AS score,
-				a.activation_code, a.content_ingested";
+				a.activation_code, a.cis_response";
 		
 		$query = $this->db->query(
 			"SELECT $fields
@@ -198,7 +198,7 @@ class Videos_model extends CI_Model {
 		$this->load->helper('text');
 		
 		$query = $this->db->query("SELECT v.*, u.username,
-					a.activation_code, a.content_ingested
+					a.activation_code, a.cis_response
 				FROM `videos` v 
 					LEFT JOIN `videos_unactivated` a ON (v.id = a.video_id),
 					`users` u
@@ -320,11 +320,89 @@ class Videos_model extends CI_Model {
 		return $activation_code;
 	}
 	
-	public function set_content_ingested($activation_code)
+	/**
+	 * Request content_ingest to the CIS in order to start the content
+	 * ingestion process.
+	 * 
+	 * @param string $activation_code
+	 * @param string $raw_video_fn uploaded video file name
+	 * @param string $name
+	 * @param int $raw_video_size uploaded video file size in bytes
+	 * @param array $transcode_configs dictionary which must be included in
+	 * the JSON data that needs to be sent to CIS
+	 * @return mixed return the HTTP content (body) on success and FALSE
+	 * otherwise
+	 */
+	public function send_content_ingestion($activation_code, $raw_video_fn,
+			$name, $raw_video_size, $transcode_configs)
+	{
+		$this->config->load('content_ingestion');
+		
+		$url = $this->config->item('cis_url') . 'ingest_content';
+		$data = array(
+			'code'=>$activation_code,
+			'raw_video'=>$raw_video_fn,
+			'name'=>$name,
+			'weight'=>$raw_video_size,
+			'transcode_configs'=>$transcode_configs,
+			'thumbs'=>$this->config->item('thumbs_count')
+		);
+		$json_data = json_encode($data);
+		
+		// Send request to CIS.
+		$r = new HttpRequest($url, HttpRequest::METH_POST);
+		$r->setBody($json_data);
+		try
+		{
+			$response = $r->send()->getBody();
+		}
+		catch (HttpException $ex) 
+		{
+			return FALSE;
+		}
+		
+		return $response;
+	}
+	
+	public function set_cis_response($activation_code,
+			$response = CIS_RESP_COMPLETION)
 	{
 		return $this->db->query("UPDATE `videos_unactivated`
-			SET content_ingested = 1
+			SET cis_response = $response
 			WHERE activation_code = '$activation_code'");
+	}
+	
+	public function send_upload_error_email($activation_code,
+			$cis_response = CIS_RESP_INTERNAL_ERROR)
+	{
+		$query = $this->db->query("SELECT v.title, u.email
+			FROM `videos_unactivated` a, `videos` v, `users` u
+			WHERE a.activation_code = '$activation_code'
+				AND a.video_id = v.id AND v.user_id = u.id");
+		
+		if ($query->num_rows() > 0)
+		{
+			$title = $query->row()->title;
+			$email = $query->row()->email;
+		}
+		else
+			return FALSE;
+		
+		$subject = '['. $this->config->item('site_name')
+				. '] Upload Error';
+		if ($cis_response == CIS_RESP_INTERNAL_ERROR)
+		{
+			$msg = sprintf($this->lang->line(
+					'video_internal_cis_error_email_content'), $title);
+		}
+		else if ($cis_response == CIS_RESP_UNREACHABLE)
+		{
+			$msg = sprintf($this->lang->line(
+					'video_unreachable_cis_error_email_content'), $title);
+		}
+		$headers = "From: ". $this->config->item('noreply_email');
+		
+		return mail($email, $subject, $msg, $headers);
 	}
 	
 	/**
@@ -367,9 +445,10 @@ class Videos_model extends CI_Model {
 	
 	public function get_unactivated_videos()
 	{
-		$query = $this->db->query("SELECT a.video_id, v.name, a.content_ingested
+		$query = $this->db->query("SELECT a.video_id, v.name, a.cis_response
 			FROM `videos_unactivated` a, `videos` v
-			WHERE a.video_id = v.id AND a.content_ingested = 1");
+			WHERE a.video_id = v.id AND a.cis_response = "
+				. CIS_RESP_COMPLETION);
 		
 		if ($query->num_rows() > 0)
 			return $query->result_array();

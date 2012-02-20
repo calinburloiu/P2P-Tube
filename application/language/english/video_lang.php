@@ -28,6 +28,23 @@ $lang['video_msg_video_uploaded'] = 'Your video has been uploaded and is now bei
 $lang['video_msg_no_video'] = 'This video does not exist.';
 $lang['video_msg_video_not_ready'] = 'This video is being processed and is not available yet.';
 $lang['video_msg_video_unactivated'] = 'This video requires moderation and must be approved by an administrator.';
+$lang['video_msg_add_video_db_error'] = 'An error occured while adding your video to our database.';
+$lang['video_msg_send_content_ingestion_error'] = 'We are sorry for the inconvenience, but your video cannot be processed for the moment.';
+
+$lang['video_internal_cis_error_email_content'] =
+'Hello,
+
+We are sorry for the inconvenience, but an error occured while processing your video "%s".
+
+Best regards!
+';
+$lang['video_unreachable_cis_error_email_content'] = 
+'Hello,
+
+We are sorry for the inconvenience, but your video "%s" cannot be processed for the moment.
+
+Best regards!
+';
 
 
 /* End of file video_lang.php */

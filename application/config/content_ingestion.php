@@ -19,6 +19,7 @@
 |
 */
 $config['cis_url'] = 'http://localhost:31500/';
+//$config['cis_url'] = 'http://p2p-next-03.grid.pub.ro:31500/';
 
 /*
 |--------------------------------------------------------------------------
@@ -88,11 +89,14 @@ $config['thumbs_count'] = 4;
 
 /*
 |--------------------------------------------------------------------------
-| Eliminate Duplicate Resolutions
+| Eliminate Duplicate Resolutions (DISABLED)
 |--------------------------------------------------------------------------
 |
 | Eliminate consecutive formats with the same resolution after processing
 | them.
+|
+| THIS FEATURE HAS BEEN DISABLED BECAUSE IS CAUSES THE CREATION OF A
+| MALFORMED CONTENT INGESTION JSON.
 |
 */
 $config['elim_dupl_res'] = TRUE;

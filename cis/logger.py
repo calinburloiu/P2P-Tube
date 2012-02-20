@@ -1,4 +1,5 @@
 import sys
+import datetime
 
 LOG_LEVEL_ALL = 0
 LOG_LEVEL_DEBUG = 1
@@ -33,5 +34,8 @@ def log_msg(msg, level=LOG_LEVEL_INFO):
         f = sys.stderr
     else:
         f = sys.stdout
+    
+    now = datetime.datetime.now()
+    date_time = now.strftime('%Y-%m-%d %H:%M:%S')
         
-    f.write('[%s] %s\n' % (LOG_LEVEL_NAMES[level], msg))
+    f.write('[%s][%s] %s\n' % (LOG_LEVEL_NAMES[level], date_time, msg))
