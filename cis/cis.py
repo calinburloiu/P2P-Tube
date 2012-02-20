@@ -113,13 +113,18 @@ class CIWorker(threading.Thread):
             # Create torrent file.
             bt.create_torrent(transcode_config['output_file'])
             
-            # The torrent file is created in the same directory with the
-            # source file. Move it to the torrents directory.
-            shutil.move(transcode_config['output_file'] + '.tstream', \
-                    config.TORRENTS_PATH)
-
             output_file = transcode_config['output_file'] + '.tstream'
             output_file = output_file[(output_file.rindex('/') + 1):]
+            
+            # The torrent file is created in the same directory with the
+            # source file. Move it to the torrents directory.
+            #if not os.path.exists(
+            #        os.path.join(output_file, config.TORRENTS_PATH)):
+            try:
+                shutil.move(transcode_config['output_file'] + '.tstream', \
+                        config.TORRENTS_PATH)
+            except:
+                pass
 
             # * SEED TORRENTS
             Server.bit_torrent.start_torrent( \

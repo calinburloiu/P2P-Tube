@@ -158,6 +158,7 @@ function get_av_info($file_name)
 			. $file_name . '" 2> /dev/null', 'r');
 
 	$tag = NULL;
+	$codec_type = NULL;
 	
 	while ( ($r = fgets($h, 512)) !== FALSE)
 	{
@@ -175,10 +176,6 @@ function get_av_info($file_name)
 		
 		if ($tag == 'FORMAT')
 		{
-			// Duration
-			if (preg_match('/^duration=/', $r))
-				$duration = format_duration(floatval(_parse_value($r)));
-			
 			// Size
 			if (preg_match('/^size=/', $r))
 				$size = intval(_parse_value ($r));
@@ -197,6 +194,15 @@ function get_av_info($file_name)
 			// DAR
 			if (preg_match('/^display_aspect_ratio=/', $r))
 				$dar = _parse_value($r);
+			
+			// Codec Type
+			if (preg_match('/^codec_type=/', $r))
+				$codec_type = _parse_value($r);
+			
+			// Duration
+			if (preg_match('/^duration=/', $r)
+					&& strcmp($codec_type, 'video') == 0)
+				$duration = format_duration(floatval(_parse_value($r)));
 		}
 	}
 	
@@ -261,19 +267,19 @@ function prepare_formats($formats, $av_info, $elim_dupl_res=FALSE)
 	}
 	
 	// Eliminate formats with duplicate resolutions.
-	if ($elim_dupl_res)
-	{
-		for ($i = 1; $i < count($transcode_configs); $i++)
-		{
-			if ($transcode_configs[$i]['v_resolution']
-					=== $transcode_configs[$i - 1]['v_resolution'])
-			{
-				unset($transcode_configs[$i - 1]);
-				unset($db_formats[$i - 1]);
-				$i--;
-			}
-		}
-	}
+//	if ($elim_dupl_res)
+//	{
+//		for ($i = 1; $i < count($transcode_configs); $i++)
+//		{
+//			if ($transcode_configs[$i]['v_resolution']
+//					=== $transcode_configs[$i - 1]['v_resolution'])
+//			{
+//				unset($transcode_configs[$i - 1]);
+//				unset($db_formats[$i - 1]);
+//				$i--;
+//			}
+//		}
+//	}
 	
 	return array('transcode_configs'=>$transcode_configs,
 		'db_formats'=>$db_formats);

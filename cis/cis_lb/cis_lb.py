@@ -7,7 +7,6 @@ import time
 import threading
 from Queue import Queue
 
-from load_balancer.random_lb import RandomLoadBalancer
 # Located in the parent directory; execute from that location or put it in PYTHONPATH
 import logger
 import config
@@ -52,7 +51,7 @@ if __name__ == '__main__':
     # Create job threads.
     lb_workers = []
     for i in range(0, config.JOB_THREADS_COUNT):
-        lb_worker = RandomLoadBalancer(i, Server.queue)
+        lb_worker = config.LOAD_BALANCER(i, Server.queue)
         lb_worker.daemon = True
         lb_worker.start()
         lb_workers.append(lb_worker)

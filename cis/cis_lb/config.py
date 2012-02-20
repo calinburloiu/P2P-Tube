@@ -2,14 +2,19 @@
 # CIS URLs
 CIS_URLS = [ \
     'http://p2p-next-01.grid.pub.ro:31500/', \
+    'http://p2p-next-02.grid.pub.ro:31500/', \
     'http://p2p-next-03.grid.pub.ro:31500/', \
     'http://p2p-next-04.grid.pub.ro:31500/', \
     'http://p2p-next-05.grid.pub.ro:31500/', \
     'http://p2p-next-06.grid.pub.ro:31500/', \
     'http://p2p-next-07.grid.pub.ro:31500/', \
     'http://p2p-next-08.grid.pub.ro:31500/', \
+    'http://p2p-next-09.grid.pub.ro:31500/', \
     'http://p2p-next-10.grid.pub.ro:31500/' \
 ]
+
+import load_balancer.random_lb
+LOAD_BALANCER = load_balancer.random_lb.RandomLoadBalancer
 
 import logger
 

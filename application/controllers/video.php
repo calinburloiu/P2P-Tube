@@ -26,12 +26,9 @@ class Video extends CI_Controller {
 	
 	public function test()
 	{
-		$this->load->model('videos_model');
+		$this->load->helper('video');
 		
-		$videos = $this->videos_model->get_videos_summary(1, NULL, 0, 10,
-				'alphabetically', TRUE);
-		
-		var_dump($videos);
+		var_dump(get_av_info('data/upload/test.ogv'));
 	}
 	
 	/**
