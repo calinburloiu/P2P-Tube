@@ -8,7 +8,7 @@ from api import ftp
 
 
 # === GENERAL CONFIGURATIONS ===
-LOG_LEVEL = logger.LOG_LEVEL_DEBUG
+LOG_LEVEL = logger.LOG_LEVEL_WARNING
 # Security features are experimental, incomplete and may not work.
 SECURITY = False
 # CIS periodically scans TORRENTS_PATH for new torrents at
@@ -19,12 +19,12 @@ START_DOWNLOADS_INTERVAL = 24 * 3600.0 # Once a day
 
 # === FILE TRANSFER CONFIGURATIONS ===
 # Path from the Web Server where the raw input video file is stored.
-WS_UPLOAD_PATH = 'devel/data/upload'
+WS_UPLOAD_PATH = 'data/upload'
 # Path from the Web Server where the output torrent files will be stored.
-WS_TORRENTS_PATH = 'devel/data/torrents'
+WS_TORRENTS_PATH = 'data/torrents'
 # Path from the Web Server where the output thumbnail image files will be
 # stored.
-WS_THUMBS_PATH = 'devel/data/thumbs'
+WS_THUMBS_PATH = 'data/thumbs'
 
 
 # === URLS ===
@@ -33,10 +33,10 @@ WS_THUMBS_PATH = 'devel/data/thumbs'
 BT_TRACKER = 'http://p2p-next-10.grid.pub.ro:6969/announce'
 # Web server's URL for content ingestion completion. P2P-Tube uses
 # http://<site>/video/cis_completion .
-WS_COMPLETION = 'http://p2p-next.cs.pub.ro/devel/video/cis_completion'
+WS_COMPLETION = 'http://p2p-next.cs.pub.ro/video/cis_completion'
 # Web server's URL for content ingestion errors. P2P-Tube uses
 # http://<site>/video/cis_error .
-WS_ERROR = 'http://p2p-next.cs.pub.ro/devel/video/cis_error'
+WS_ERROR = 'http://p2p-next.cs.pub.ro/video/cis_error'
 
 
 # === CIS PATHS ===
@@ -46,7 +46,7 @@ WS_ERROR = 'http://p2p-next.cs.pub.ro/devel/video/cis_error'
 RAW_VIDEOS_PATH = '/home/p2p/tmp/raw'
 # Temporary directory for image thumbnails.
 THUMBS_PATH = '/home/p2p/tmp/thumbs'
-# Temporary directory for converted videos.
+# Directory for converted videos.
 MEDIA_PATH = '/home/p2p/media'
 # TORRENTS_PATH contains torrents files shared by all CIS machines and needs to
 # be placed in a distributed file system.
