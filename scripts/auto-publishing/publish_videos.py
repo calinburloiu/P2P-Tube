@@ -142,7 +142,7 @@ def main():
 
     # Connect to DB
     dbConn = MySQLdb.connect(host = 'koala.cs.pub.ro', user = 'koala_p2pnext',
-            passwd = 'ahmitairoo', db = 'koala_livinglab')
+            passwd = '', db = '')
     dbCur = dbConn.cursor()
 
     allNames = VideosTable.getAllNames(dbCur, category_id)

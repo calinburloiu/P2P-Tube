@@ -42,8 +42,8 @@ $active_group = 'default';
 $active_record = TRUE;
 
 $db['default']['hostname'] = 'koala.cs.pub.ro';
-$db['default']['username'] = 'koala_p2pnext';
-$db['default']['password'] = 'ahmitairoo';
+$db['default']['username'] = '';
+$db['default']['password'] = '';
 $db['default']['database'] = 'koala_livinglab';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
