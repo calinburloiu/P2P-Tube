@@ -1,0 +1,15 @@
+P2P-Tube is a video sharing web platform, similar with YouTube, which uses
+Next-Share, a video sharing technology developed within European project
+[P2P-Next](http://www.p2p-next.org/). This project's goal is to build the next
+generation peer-to-peer content delivery platform. Next-Share is based on two
+browser plugins which provide video-on-demand and live streaming through
+BitTorrent peer-to-peer protocols. Users are able to retrieve video content not
+only from a number of delivery servers, which assume the role of seeders, but
+also concomitantly from other users, which are leechers in BitTorrent parlance.
+
+GETTING STARTED
+---------------
+
+To get started with P2P-Tube you can read [the
+paper](http://www.scribd.com/doc/97258576/P2P-Tube-A-Video-Sharing-Web-Platform-Based-on-Next-Share-Technology)
+which is also available in LaTeX format in 'docs/paper' directory.
