@@ -402,7 +402,8 @@ class User extends CI_Controller {
 			'title'=> $this->lang->line('user_appelation').' '.$username
 				.' &ndash; '
 				. $this->config->item('site_name'),
-			'css'=> array('catalog.css')
+			'css'=> array('catalog.css'),
+			'js' => array('jquery.ui.thumbs.js')
 			//'metas' => array('description'=>'')
 		);
 		$this->load->library('html_head_params', $params);
