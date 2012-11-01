@@ -28,9 +28,11 @@ config.mk
 .512b
 .directory
 *.patch
+img/captcha/*.jpg
 application/logs/*.php
-data/thumbs/*
-data/torrents/*
-data/user_pictures/*
+data/thumbs/*.jpg
+data/torrents/*.tstream
+data/upload/*
+data/user_pictures/*.jpg
 data/media/*
 cis/log/*
