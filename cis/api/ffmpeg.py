@@ -18,7 +18,7 @@ class FFmpegTranscoder(base.BaseTranscoder):
     FFmpeg CLI API for video transcoding.
     """
 
-    prog_bin = "ffmpeg"
+    prog_bin = "avconv"
 
     log_file = 'log/FFmpegTranscoder.log'
 
@@ -104,7 +104,7 @@ class FFmpegThumbExtractor(base.BaseThumbExtractor):
     FFmpeg CLI API for video thumbnail extraction.
     """
 
-    prog_bin = "ffmpeg"
+    prog_bin = "avconv"
 
     log_file = 'log/FFmpegThumbExtractor.log'
 
@@ -149,7 +149,7 @@ class FFmpegThumbExtractor(base.BaseThumbExtractor):
 
 class FFprobeAVInfo(base.BaseAVInfo):
     
-    prog_bin = "ffprobe"
+    prog_bin = "avprobe"
 
     log_file = 'log/FFprobeAVInfo.log'
 
@@ -167,7 +167,7 @@ class FFprobeAVInfo(base.BaseAVInfo):
         log = open(FFprobeAVInfo.log_file, 'w')
         log.write(args + '\n')
 
-        # Parse ffprobe's output.
+        # Parse avprobe's output.
         while True:
             line = pipe.readline()
             if len(line) == 0:
@@ -195,4 +195,4 @@ class FFprobeAVInfo(base.BaseAVInfo):
         exit_code = p.wait()
         if exit_code > 0:
             raise cis_exceptions.AVInfoException( \
-                    'ffprobe exited with code ' + str(exit_code) + '.')
+                    'avprobe exited with code ' + str(exit_code) + '.')

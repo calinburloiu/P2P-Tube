@@ -154,7 +154,7 @@ function format_duration($secs)
  */
 function get_av_info($file_name)
 {
-	$h = popen('ffprobe -show_streams -show_format "'
+	$h = popen('avprobe -show_streams -show_format "'
 			. $file_name . '" 2> /dev/null', 'r');
 
 	$tag = NULL;
